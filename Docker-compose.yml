@@ -1,0 +1,106 @@
+services:
+  # Banco de dados MySQL
+  db_mysql:
+    image: mysql:8.0
+    container_name: mysql_db_jotanunes
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jotanunes-net
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: redis_jotanunes
+    restart: always
+    networks:
+      - jotanunes-net
+
+  # Backend Django
+  backend:
+    build:
+      context: ./backend/backend-jotanunes  # Caminho correto para o seu Django
+      dockerfile: Dockerfile
+    container_name: django_backend_jotanunes
+    # Comando corrigido para o nome do seu projeto Django (residencia)
+    command: gunicorn residencia.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - ./backend/backend-jotanunes:/app
+      - staticfiles_volume:/app/staticfiles
+      - mediafiles_volume:/app/mediafiles
+    expose:
+      - "8000"
+    env_file:
+      - .env
+    depends_on:
+      db_mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: on-failure
+    networks:
+      - jotanunes-net
+
+  # Celery Worker
+  celery_worker:
+    build:
+      context: ./backend/backend-jotanunes  # Caminho correto para o seu Django
+      dockerfile: Dockerfile
+    container_name: celery_worker_jotanunes
+    # Comando corrigido para o nome do seu projeto Django (residencia)
+    command: celery -A residencia worker -l info
+    volumes:
+      - ./backend/backend-jotanunes:/app
+    env_file:
+      - .env
+    depends_on:
+      backend:
+        condition: service_started
+      redis:
+        condition: service_started
+      db_mysql:
+        condition: service_healthy
+    restart: always
+    networks:
+      - jotanunes-net
+
+  # Nginx (Servidor Web + Frontend)
+  nginx:
+    build:
+      context: .  # Contexto na raiz para aceder a 'frontend/' e 'nginx/'
+      dockerfile: ./nginx/Dockerfile.nginx
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    container_name: nginx_jotanunes
+    ports:
+      - "80:80"
+    volumes:
+      - staticfiles_volume:/app/staticfiles
+      - mediafiles_volume:/app/mediafiles
+    depends_on:
+      - backend
+    restart: always
+    networks:
+      - jotanunes-net
+
+# Volumes persistentes
+volumes:
+  mysql_data:
+  staticfiles_volume:
+  mediafiles_volume:
+
+# Rede interna
+networks:
+  jotanunes-net:
+    driver: bridge
