@@ -1,0 +1,183 @@
+/* container da página */
+.create-page {
+  font-family: Arial, sans-serif;
+  background: transparent;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Topbar */
+.topbar {
+  background: #fff;
+  height: 60px;
+  z-index: 1050;
+}
+
+/* Subbar */
+.subbar {
+  background: #f5f5f5;
+  height: 60px;
+  z-index: 1049;
+}
+
+/* FRAME: 3 colunas */
+.create-frame {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  min-height: calc(100vh - 180px); /* ajustado p/ 2 headers + footer */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Laterais vermelhas */
+.create-frame .side {
+  background: linear-gradient(#b92a2a, #5a0a0a);
+  width: 100%;
+  height: 100%;
+}
+
+/* Área central */
+.create-frame .center-area {
+  background: #f5f6f8;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* Card branco */
+.create-frame .center-area .center-inner {
+  width: 100%;
+  max-width: 5200px;
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 24px;
+  padding-top: 10px;
+  padding-left: 1px;
+  box-shadow: 0 2px 8px rgba(15, 15, 15, 0.03);
+  margin-top: -10px;
+}
+
+/* Aba */
+.tab {
+  background: #ddd;
+  padding: 6px 12px;
+  display: inline-block;
+  border-radius: 6px 6px 0 0;
+  margin-bottom: 6px;
+}
+
+/* Círculos */
+.circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+.red { background: red; }
+.orange { background: orange; }
+.blue { background: blue; }
+.green { background: green; }
+
+.filter {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.user-icon {
+  width: 35px;
+  height: 35px;
+  background: #122c33;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+/* Footer legenda */
+.legend {
+  background: #eee;
+  border-radius: 6px;
+  padding: 6px 12px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.legend-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* Overlay com fundo desfocado */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(20, 20, 20, 0.3);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+/* Caixa do modal */
+.modal-box {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  min-width: 280px;
+  text-align: center;
+  position: relative;
+}
+
+/* Botão de fechar */
+.close-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Conteúdo do modal */
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* Botões do modal */
+.modal-btn {
+  border: 2px solid #555;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+
+/* Responsivo */
+@media (max-width: 1000px) {
+  .create-frame {
+    grid-template-columns: 0.5fr 1fr 0.5fr;
+  }
+  .create-frame .side {
+    display: none;
+  }
+  .create-frame .center-area {
+    padding: 16px;
+  }
+  .create-frame .center-area .center-inner {
+    padding: 16px;
+    max-width: 100%;
+  }
+  
+}

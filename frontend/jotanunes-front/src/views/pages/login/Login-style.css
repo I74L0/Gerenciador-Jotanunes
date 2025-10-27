@@ -1,0 +1,33 @@
+.col {
+  height: -webkit-fill-available;
+}
+
+.btn-login {
+  color: white;
+  border: none;
+  width: 100%;
+}
+
+.btn-login:hover {
+  background-color: var(cui-btn-hover-bg);
+}
+
+.row-login {
+  --cui-gutter-x: 0 !important;
+}
+
+.background {
+  background-image: linear-gradient(var(--cui-secondary), var(--cui-primary));
+  flex: 1;
+  height: calc(100% - 97px);
+}
+
+.col-image {
+  overflow: hidden;
+}
+
+.col-image img {
+  display: block;
+  width: auto;
+  height: 100%;
+}
