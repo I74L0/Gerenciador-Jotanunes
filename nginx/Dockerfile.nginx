@@ -1,33 +1,21 @@
-# --- STAGE 1: Construir o Frontend ---
-# CORRIGIDO: Usa o Node.js 20, que é compatível com o seu Vite
 FROM node:20-alpine AS builder
 
-# Declara o argumento que o Docker Compose vai passar
 ARG VITE_API_URL
-# Define-o como uma variável de ambiente para o processo de build
 ENV VITE_API_URL=${VITE_API_URL}
-
-# Define o diretório de trabalho DENTRO do contêiner
 WORKDIR /app
-
-# Copia os ficheiros de dependência primeiro, a partir da pasta correta
 COPY ./frontend/jotanunes-front/package.json ./frontend/jotanunes-front/package-lock.json ./
-# Agora o 'npm ci' irá instalar o 'axios' que adicionámos
 RUN npm ci
 
 # Copia o resto do código do frontend
 COPY ./frontend/jotanunes-front/ ./
-# Agora o 'npm run build' irá funcionar
 RUN npm run build
 
-# --- STAGE 2: Configurar o Nginx ---
 FROM nginx:1.25-alpine
 
-# Copia a configuração do Nginx a partir da pasta correta
+# Copia a configuração do Nginx
 COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copia os ficheiros estáticos construídos do frontend (do Stage 1)
-# (Se o seu build criar 'dist' em vez de 'build', mude /app/build para /app/dist)
+# Copia o build do front
 COPY --from=builder /app/build /usr/share/nginx/html
 
 EXPOSE 80
