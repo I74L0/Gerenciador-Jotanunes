@@ -48,8 +48,9 @@ def usuario_logout_view(request):
 class ObraViewSet(viewsets.ModelViewSet):
     queryset = Obra.objects.all().order_by('-id')
     serializer_class = ObraSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['nome', 'endereco_completo']
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['nome', 'endereco_completo', 'cidade', 'estado']
+    filterset_fields = ['status', 'estado', 'cidade']
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'create', 'duplicar', 'gerar_pdf']:
@@ -115,17 +116,20 @@ class ObraViewSet(viewsets.ModelViewSet):
             obra=nova_obra, 
             torre=nova_torre, 
             nome=ambiente_original.nome,
+            metragem=getattr(ambiente_original, 'metragem', None)
         )
         for item in ambiente_original.itens.all():
             novo_item = Item.objects.create(
                 ambiente=novo_ambiente, 
                 nome=item.nome, 
+                posicao=getattr(item, 'posicao', None)
             )
             novo_item.descricoes.set(item.descricoes.all())
             for material in item.materiais.all():
                 novo_material = Material.objects.create(
                     item=novo_item, 
                     descricao=material.descricao, 
+                    dimensao=getattr(material, 'dimensao', None)
                 )
                 novo_material.marcas.set(material.marcas.all())
     

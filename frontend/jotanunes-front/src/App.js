@@ -6,31 +6,25 @@ import { CSpinner, useColorModes } from '@coreui/react'
 import './scss/style.scss'
 import './scss/examples.scss'
 
-// Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
 
-// Pages
 const Projeto = React.lazy(() => import('src/views/pages/projeto/Projeto'))
 const Index = React.lazy(() => import('./views/pages/index/Index'))
-const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
+const Create = React.lazy(() => import('./views/pages/criar/Create'))
+
+// Páginas de Autenticação/Erro
 const Login = React.lazy(() => import('./views/pages/login/Login'))
 const Register = React.lazy(() => import('./views/pages/register/Register'))
 const Page404 = React.lazy(() => import('./views/pages/page404/Page404'))
 const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
-const Create = React.lazy(() => import('./views/pages/criar/Create'))
+const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 
-// --- CORREÇÃO 1: ProtectedRoute ---
-// Agora verifica o token real guardado no localStorage pelo seu api.js
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('accessToken');
-  const isAuthenticated = !!token; // Converte a string do token para true/false
-
+  const isAuthenticated = !!token;
   if (!isAuthenticated) {
-    // Se não estiver logado, redireciona para a página de login
     return <Navigate to="/login" replace />;
   }
-
-  // Se estiver logado, renderiza o layout e as páginas protegidas
   return children;
 };
 
@@ -48,7 +42,7 @@ const App = () => {
       return
     }
     setColorMode("light")
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <BrowserRouter>
@@ -59,42 +53,37 @@ const App = () => {
           </div>
         }
       >
-        {/* --- CORREÇÃO 2: Estrutura das Rotas --- */}
         <Routes>
-          {/* Rotas Públicas: Acessíveis sem login */}
           <Route exact path="/login" name="Login Page" element={<Login />} />
           <Route exact path="/register" name="Register Page" element={<Register />} />
           <Route exact path="/404" name="Page 404" element={<Page404 />} />
           <Route exact path="/500" name="Page 500" element={<Page500 />} />
           
-          {/* A Rota "/" (raiz) redireciona para a página de login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          
+          <Route 
+            path="/index" 
+            name="Index Page" 
+            element={<ProtectedRoute><Index /></ProtectedRoute>} 
+          />
+          <Route 
+            path="/projeto" 
+            name="Projeto Page" 
+            element={<ProtectedRoute><Projeto /></ProtectedRoute>} 
+          />
+          <Route 
+            path="/criar" 
+            name="Create Page" 
+            element={<ProtectedRoute><Create /></ProtectedRoute>} 
+          />
 
-          {/* Rotas Privadas: Exigem login e usam o DefaultLayout */}
-          <Route
-            path="/" // O DefaultLayout agora é a base para as rotas privadas
-            element={
-              <ProtectedRoute>
-                <DefaultLayout />
-              </ProtectedRoute>
-            }
-          >
-            {/* O DefaultLayout irá renderizar estas rotas filhas onde tiver um <Outlet /> */}
-            
-            {/* CORRIGIDO: A rota 'index' (padrão) agora carrega o seu componente Index */}
-            <Route index element={<Index />} />
-            
-            {/* As suas outras rotas */}
-            <Route path="index" name="Index Page" element={<Index />} />
-            <Route path="projeto" name="Projeto Page" element={<Projeto />} />
-            <Route path="criar" name="Create Page" element={<Create />} />
-            
-            {/* O dashboard de exemplo ainda existe, caso o queira aceder por /dashboard */}
-            <Route path="dashboard" name="Dashboard" element={<Dashboard />} />
-            
-            {/* Se aceder a uma rota privada desconhecida, redireciona para o index */}
-            <Route path="*" element={<Navigate to="/index" replace />} />
-          </Route>
+          <Route 
+            path="/dashboard" 
+            name="Dashboard" 
+            element={<ProtectedRoute><DefaultLayout /></ProtectedRoute>} 
+          />
+          <Route path="/" element={<Navigate to="/index" replace />} />
+          
+          <Route path="*" element={<Navigate to="/index" replace />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
