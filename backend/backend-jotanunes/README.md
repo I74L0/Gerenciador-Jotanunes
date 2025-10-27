@@ -85,7 +85,7 @@ Swagger UI: http://localhost/api/schema/swagger-ui/
 Redoc: http://localhost/api/schema/redoc/
 
 Principais Endpoints da API
-Login: POST /api/login/
+Login: POST /api/token/
 
 Obras: GET, POST /api/obras/
 

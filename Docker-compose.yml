@@ -1,5 +1,4 @@
 services:
-  # Banco de dados MySQL
   db_mysql:
     image: mysql:8.0
     container_name: mysql_db_jotanunes
@@ -19,7 +18,25 @@ services:
     networks:
       - jotanunes-net
 
-  # Redis
+  frontend:
+    build:
+      context: ./frontend/jotanunes-front
+      dockerfile: Dockerfile.dev
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    container_name: frontend_jotanunes
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    command: npm run dev
+    restart: always
+    networks:
+      - jotanunes-net
+
   redis:
     image: redis:7-alpine
     container_name: redis_jotanunes
@@ -27,13 +44,11 @@ services:
     networks:
       - jotanunes-net
 
-  # Backend Django
   backend:
     build:
-      context: ./backend/backend-jotanunes  # Caminho correto para o seu Django
+      context: ./backend/backend-jotanunes
       dockerfile: Dockerfile
     container_name: django_backend_jotanunes
-    # Comando corrigido para o nome do seu projeto Django (residencia)
     command: gunicorn residencia.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - ./backend/backend-jotanunes:/app
@@ -52,13 +67,11 @@ services:
     networks:
       - jotanunes-net
 
-  # Celery Worker
   celery_worker:
     build:
-      context: ./backend/backend-jotanunes  # Caminho correto para o seu Django
+      context: ./backend/backend-jotanunes
       dockerfile: Dockerfile
     container_name: celery_worker_jotanunes
-    # Comando corrigido para o nome do seu projeto Django (residencia)
     command: celery -A residencia worker -l info
     volumes:
       - ./backend/backend-jotanunes:/app
@@ -75,10 +88,9 @@ services:
     networks:
       - jotanunes-net
 
-  # Nginx (Servidor Web + Frontend)
   nginx:
     build:
-      context: .  # Contexto na raiz para aceder a 'frontend/' e 'nginx/'
+      context: .
       dockerfile: ./nginx/Dockerfile.nginx
       args:
         VITE_API_URL: ${VITE_API_URL}
@@ -94,13 +106,11 @@ services:
     networks:
       - jotanunes-net
 
-# Volumes persistentes
 volumes:
   mysql_data:
   staticfiles_volume:
   mediafiles_volume:
 
-# Rede interna
 networks:
   jotanunes-net:
     driver: bridge

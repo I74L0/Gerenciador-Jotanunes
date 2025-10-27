@@ -42,7 +42,7 @@ const Login = () => {
       
       // 5. SUCESSO: Redireciona para o dashboard principal
       // (O App.js que corrigimos irá carregar o DefaultLayout)
-      navigate('/dashboard')
+      navigate('/index')
 
     } catch (err) {
       // 6. ERRO: Mostra uma mensagem de erro clara

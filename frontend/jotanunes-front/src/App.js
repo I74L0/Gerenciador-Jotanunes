@@ -44,11 +44,9 @@ const App = () => {
     if (theme) {
       setColorMode("light")
     }
-
     if (isColorModeSet()) {
       return
     }
-
     setColorMode("light")
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -68,11 +66,13 @@ const App = () => {
           <Route exact path="/register" name="Register Page" element={<Register />} />
           <Route exact path="/404" name="Page 404" element={<Page404 />} />
           <Route exact path="/500" name="Page 500" element={<Page500 />} />
+          
+          {/* A Rota "/" (raiz) redireciona para a página de login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
 
           {/* Rotas Privadas: Exigem login e usam o DefaultLayout */}
           <Route
-            path="*" // Apaha todas as outras rotas (ex: /dashboard, /projeto)
-            name="Home"
+            path="/" // O DefaultLayout agora é a base para as rotas privadas
             element={
               <ProtectedRoute>
                 <DefaultLayout />
@@ -80,14 +80,20 @@ const App = () => {
             }
           >
             {/* O DefaultLayout irá renderizar estas rotas filhas onde tiver um <Outlet /> */}
-            <Route index element={<Dashboard />} /> {/* Rota padrão após login */}
-            <Route path="dashboard" name="Dashboard" element={<Dashboard />} />
+            
+            {/* CORRIGIDO: A rota 'index' (padrão) agora carrega o seu componente Index */}
+            <Route index element={<Index />} />
+            
+            {/* As suas outras rotas */}
             <Route path="index" name="Index Page" element={<Index />} />
             <Route path="projeto" name="Projeto Page" element={<Projeto />} />
             <Route path="criar" name="Create Page" element={<Create />} />
             
-            {/* Se aceder a uma rota privada desconhecida, redireciona para o dashboard */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            {/* O dashboard de exemplo ainda existe, caso o queira aceder por /dashboard */}
+            <Route path="dashboard" name="Dashboard" element={<Dashboard />} />
+            
+            {/* Se aceder a uma rota privada desconhecida, redireciona para o index */}
+            <Route path="*" element={<Navigate to="/index" replace />} />
           </Route>
         </Routes>
       </Suspense>
