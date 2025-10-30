@@ -77,108 +77,21 @@ body {
   margin: 0;
 }
 
-.menu {
-  margin: 0;
-  display: flex;
-  font-size: 1.5em;
-  padding: 0;
-  flex-grow: 5;
+.div-tabs {
   position: relative;
-  align-items: center;
-  justify-content: center;
-}
-
-.menu p {
-  margin-bottom: 0;
-  text-align: center;
-}
-
-.menu__item {
-  all: unset;
-  flex-grow: 1;
-  z-index: 100;
-  display: flex;
-  cursor: pointer;
-  margin: 0 1rem;
-  position: relative;
-  border-bottom: 1px solid black;
-  align-items: center;
-  will-change: transform;
-  justify-content: center;
-  padding: 0.55em 0 0.85em;
-  transition: transform var(--timeOut , var(--duration));
-}
-
-.menu__item::before {
-  content: "";
-  z-index: -1;
-  width: 2.8rem;
-  height: 2.8rem;
-  border-radius: 50%;
-  position: absolute;
-  transform: scale(0);
-  transition: background-color var(--duration), transform var(--duration);
-}
-
-.menu__item.active {
-  transform: translate3d(0, -.3em , 0);
-}
-
-.menu__item.active::before {
-  transform: scale(1);
-  background-color: var(--bgColorItem);
-}
-
-.icon {
-  width: 2.6em;
-  height: 2.6em;
-  stroke-width: 1pt;
-  stroke-miterlimit: 10;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 400;
-}
-
-.menu__item.active .icon {
-  animation: strok 1.5s reverse;
-}
-
-.svg-container {
-  width: 0;
-  height: 0;
-}
-
-.menu__item .icon {
-  width: 24px;
-  height: 24px;
-  display: inline-block;
-  line-height: 1;
-}
-
-.menu__item .icon text {
-  font-size: 1.5rem;
-  transition: transform .28s cubic-bezier(.22,.9,.42,1), opacity .28s;
-  transform-origin: 12px 12px;
-  fill: black;
-  opacity: 0.95;
-  pointer-events: none;
-  user-select: none;
-}
-
-.menu__item.active .icon text {
-  transform: scale(1.12) translateY(1px);
-  opacity: 1;
-  fill: white;
-}
-
-.menu__item .icon path {
-  opacity: 0;
-  pointer-events: none;
 }
 
 .btn-salvar {
+  position: absolute;
+  align-self: center;
+  right: 1rem;
   border: 1px solid black;
-  flex-grow: 1;
+  transition: 0.5s;
+}
+
+.btn-salvar:hover {
+  color: white;
+  background-color: $primary;
 }
 
 @keyframes strok {
@@ -205,27 +118,24 @@ body {
   text-decoration: underline;
 }
 
-// --- linhas / lista (mantém o visual atual) ---
 .lista-ambientes {
   margin-top: 10px;
 }
 
 .linha-ambiente {
   width: 100%;
-  border: 1px solid #e0e0e0 !important; /* borda cinza */
-  background-color: #dcdcdc !important;  /* fundo cinza (igual ao seu print) */
+  border: 1px solid #e0e0e0 !important;
+  background-color: #dcdcdc !important;
   padding: 14px 18px;
   margin-bottom: 1rem;
   display: flex;
 }
 
-/* garante que o texto fique alinhado e não estoure */
 .nome-wrapper {
   flex: 1 1 auto;
   min-width: 0;
 }
 
-/* texto padrão da linha */
 .nome-ambiente {
   display: block;
   white-space: nowrap;
@@ -234,45 +144,39 @@ body {
   font-weight: 500;
 }
 
-/* input inline para edição do novo ambiente — SEM borda, ocupa toda a largura da área da linha
-   isso evita qualquer "quebra" no layout quando estiver em modo edição */
 .inline-input {
   width: 100%;
-  background: transparent;  /* transparente pra parecer com a linha */
-  border: none;   /* sem borda */
-  outline: none;  /* sem outline quando focado */
-  padding: 0;   /* sem padding extra — já vem do .linha-ambiente */
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
   font-size: 1rem;
   font-weight: 500;
   color: inherit;
   line-height: 1.6;
 }
 
-/* ajustar botão remover para ficar à direita como no seu print */
 .acao-remover {
   margin-left: 12px;
   flex: 0 0 auto;
 }
 
-/* icone e texto do botão adicionar (mantém visual que você já tem) */
 .circle-icon {
   font-size: 1.6rem;
-  color: #b22222; /* vermelho parecido com o tema */
+  color: #b22222;
 }
 
-/* título do empreendimento no topo à direita */
 .empreendimento-title {
   font-weight: 500;
   color: #333;
 }
 
-/* textarea que cresce automaticamente */
 .auto-expand {
   width: 100%;
-  min-height: 32px;  /* altura inicial (1 linha) */
-  max-height: 300px;   /* altura máxima pra não estourar a tela */
-  resize: none;  /* desabilita resize manual */
-  overflow: hidden;  /* esconde barra de rolagem */
+  min-height: 32px;
+  max-height: 300px;
+  resize: none;
+  overflow: hidden;
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 4px 6px;
@@ -329,3 +233,78 @@ body {
   font-size: 1rem;
 }
 
+.wrapper {
+  min-width: 600px;
+  max-width: 75vw;
+  margin: 0 auto;
+}
+
+.tabs {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+  -webkit-transform: translateY(5px);
+  transform: translateY(5px);
+  margin-bottom: 5px;
+
+  >li {
+    transition-duration: .25s;
+    display: table-cell;
+    list-style: none;
+    text-align: center;
+    padding: 20px 20px 25px 20px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    color: black;
+
+    &:before {
+      z-index: -1;
+      position: absolute;
+      content: "";
+      width: 100%;
+      height: 120%;
+      top: 0;
+      left: 0;
+      background-color: $primary;
+      opacity: .8;
+      -webkit-transform: translateY(100%);
+      transform: translateY(100%);
+      transition-duration: .25s;
+      border-radius: 5px 5px 0 0;
+    }
+
+    &:hover {
+      &:before {
+        -webkit-transform: translateY(70%);
+        transform: translateY(70%);
+      }
+    }
+
+    &.active {
+      color: white;
+
+      &:before {
+        transition-duration: .5s;
+        opacity: 1;
+        -webkit-transform: translateY(0);
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+.content__wrapper {
+  h2 {
+    width: 100%;
+    text-align: center;
+    padding-bottom: 20px;
+    font-weight: 300;
+  }
+
+  img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+  }
+}

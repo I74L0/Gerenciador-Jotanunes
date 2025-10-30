@@ -85,7 +85,6 @@ export default function CardAreaComum({ ambientes, setAmbientes }) {
           </CRow>
           <hr />
           <div className="lista-ambientes">
-            {/* O JSX restante permanece o mesmo, pois já consome o estado 'ambientes' */}
             {ambientes.map((amb, idx) => (
               <div key={idx}>
                 <CRow
