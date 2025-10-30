@@ -56,11 +56,11 @@ const Projeto = () => {
   useEffect(() => {
     api.getDados().then(d => {
       // Usamos '||' para garantir que o estado não receba 'undefined'
-      setPrefacioData(d.prefacioData || { nome: '', estado: '', cidade: '', texto: '' });
-      setUnidadesData(d.unidadesData || []);
-      setAreacomumData(d.areacomumData || []);
-      setMaterialData(d.materialData || []);
-      setObservacoesData(d.observacoesData || []);
+      setPrefacioData({ nome: '', estado: '', cidade: '', texto: '' });
+      setUnidadesData([]);
+      setAreacomumData([]);
+      setMaterialData([]);
+      setObservacoesData([]);
     }).catch(error => {
       console.error("Falha ao carregar dados:", error);
       // Você pode definir um estado de erro aqui para mostrar na UI
