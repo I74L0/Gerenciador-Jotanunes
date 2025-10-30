@@ -1,4 +1,4 @@
-# fullstack-jotanunes
+# fullstack-jotanunes (RODANDO SEM O DOCKER E MYSQL, APENAS PARA TESTE)
 Branch :ndocker
 
 no início precisamos ativar o venv
@@ -21,10 +21,13 @@ e caso de linux ou macOS:
 
 source venv/bin/activate
 
+git clone -b ndocker https://github.com/cauaunit/fullstack-jotanunes.git
 
 no mesmo nível do manage.py(arquivo do backend), rodar:
 
-(para chegar no nível do manage.py, digitamos cd backend e depois, cd backend-jotanunes
+(para chegar no nível do manage.py, digitamos cd backend e depois, cd backend-jotanunes)
+
+pip install -r requirements.txt
 
 python manage.py migrate
 
@@ -43,3 +46,7 @@ http://127.0.0.1:8000/api/*
 no frontend iremos rodar npm install
 
 npm start
+
+com isso teremos http://localhost:3000
+
+e so acender o front
