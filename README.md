@@ -38,7 +38,7 @@ http://127.0.0.1:8000/admin
 
 http://127.0.0.1:8000/api/*                
 
-* = urls, por exemplo http://127.0.0.1:8000/api/obras
+"*" = urls, por exemplo http://127.0.0.1:8000/api/obras
 
 no frontend iremos rodar npm install
 
