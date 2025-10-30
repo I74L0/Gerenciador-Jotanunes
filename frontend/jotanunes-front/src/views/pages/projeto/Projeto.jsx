@@ -36,11 +36,11 @@ import CardObservacoes from './CardObservacoes'
 import MenuTabs from './MenuTabs'
 import avatar8 from 'src/assets/images/avatars/8.jpg'
 import 'src/views/pages/projeto/Projeto-style.scss'
-import * as api from 'src/api'
+import * as apiClient from 'src/apiClient'
 
 const Projeto = () => {
   const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
-  
+
   const [activeTab, setActiveTab] = useState(0)
   const [prefacioData, setPrefacioData] = useState({ nome: '', estado: '', cidade: '', texto: '' });
   const [unidadesData, setUnidadesData] = useState([]);
@@ -54,13 +54,13 @@ const Projeto = () => {
 
   // Carrega os dados iniciais da API para o estado do React
   useEffect(() => {
-    api.getDados().then(d => {
+    apiClient.getDados().then(d => {
       // Usamos '||' para garantir que o estado não receba 'undefined'
-      setPrefacioData({ nome: '', estado: '', cidade: '', texto: '' });
-      setUnidadesData([]);
-      setAreacomumData([]);
-      setMaterialData([]);
-      setObservacoesData([]);
+      setPrefacioData(d.prefacioData || { nome: '', estado: '', cidade: '', texto: '' });
+      setUnidadesData(d.unidadesData || []);
+      setAreacomumData(d.areacomumData || []);
+      setMaterialData(d.materialData || []);
+      setObservacoesData(d.observacoesData || []);
     }).catch(error => {
       console.error("Falha ao carregar dados:", error);
       // Você pode definir um estado de erro aqui para mostrar na UI
@@ -70,27 +70,27 @@ const Projeto = () => {
 
   const handlePrefacioChange = (novoPrefacio) => {
     setPrefacioData(novoPrefacio); // 1. Atualiza o estado do React (UI)
-    api.setPrefacio(novoPrefacio); // 2. Atualiza o cache da API (para salvar)
+    apiClient.setPrefacio(novoPrefacio); // 2. Atualiza o cache da API (para salvar)
   };
 
   const handleUnidadesChange = (novasUnidades) => {
     setUnidadesData(novasUnidades);
-    api.setUnidades(novasUnidades);
+    apiClient.setUnidades(novasUnidades);
   };
 
   const handleAreaComumChange = (novaAreaComum) => {
     setAreacomumData(novaAreaComum);
-    api.setAreaComum(novaAreaComum);
+    apiClient.setAreaComum(novaAreaComum);
   };
 
   const handleMateriaisChange = (novosMateriais) => {
     setMaterialData(novosMateriais);
-    api.setMateriais(novosMateriais);
+    apiClient.setMateriais(novosMateriais);
   };
 
   const handleObservacoesChange = (novasObservacoes) => {
     setObservacoesData(novasObservacoes);
-    api.setObservacoes(novasObservacoes);
+    apiClient.setObservacoes(novasObservacoes);
   };
 
   /* --- FUNÇÃO DE SALVAR --- */
@@ -99,9 +99,9 @@ const Projeto = () => {
     setIsSaving(true);
     setSaveError(null);
     try {
-      await api.saveDados();
+      await apiClient.saveDados();
       // Opcional: mostrar uma mensagem de sucesso (ex: toast)
-      console.log('Dados salvos com sucesso!'); 
+      console.log('Dados salvos com sucesso!');
     } catch (error) {
       console.error("Erro ao salvar:", error);
       setSaveError(error.message || 'Falha ao salvar. Tente novamente.');
@@ -165,12 +165,10 @@ const Projeto = () => {
         <hr className="w-100" />
         <CRow className="div-tabs w-100">
           <MenuTabs activeIndex={activeTab} onChange={setActiveTab} />
-          <CButton className="btn-salvar" onClick={handleSave} disabled={isSaving}>
-            {isSaving ? 'Salvando...' : 'Salvar Projeto'}
-          </CButton>
+          <CButton className="btn-salvar" onClick={handleSave} disabled={isSaving}>Enviar</CButton>
         </CRow>
       </CHeader>
-      
+
       <div className="background w-100 d-flex justify-content-center align-items-center flex-grow-1">
         {/* Agora passamos os NOVOS handlers para os componentes filhos */}
         {activeTab === 0 && <CardPrefacio prefacio={prefacioData} setPrefacio={handlePrefacioChange} />}
