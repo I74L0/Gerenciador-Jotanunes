@@ -1,7 +1,6 @@
-import React, { useState } from 'react' // Importe o useState
+import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  CAlert, // Importe o CAlert para mostrar erros
   CButton,
   CCard,
   CCardBody,
@@ -17,42 +16,57 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-import './Login-style.css'
-
-// 1. IMPORTE A SUA FUNÇÃO DE LOGIN REAL DA API
-// (O caminho pode ser 'src/api.js' ou '../api.js' dependendo da sua estrutura)
-import { login } from 'src/api' 
+import './Login-style.css';
 
 const Login = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  // 2. ESTADOS PARA GUARDAR USERNAME, PASSWORD E ERROS
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState(null) // Estado para a mensagem de erro
+  const handleLogin = (e) => {
+    e.preventDefault();
 
-  // 3. FUNÇÃO DE LOGIN CORRIGIDA (AGORA CHAMA A API)
-  const handleLogin = async (e) => {
-    e.preventDefault()
-    setError(null) // Limpa erros antigos
+    // 1. Defina a chave do cookie
+    const COOKIE_NAME = "AutorizacaoConcedida";
+    
+    // 2. Função auxiliar para verificar a existência do cookie
+    const hasAuthorizationCookie = () => {
+        // Verifica se a string de cookies contém o nome do nosso cookie
+        return document.cookie.split(';').some((item) => item.trim().startsWith(COOKIE_NAME + '='));
+    };
 
-    try {
-      // 4. CHAMA A API REAL com o username e password do estado
-      await login(username, password)
-      
-      // 5. SUCESSO: Redireciona para o dashboard principal
-      // (O App.js que corrigimos irá carregar o DefaultLayout)
-      navigate('/index')
+    // 3. Simule a lógica de autenticação (sem a API por enquanto)
+    let isLoginSuccessful = false; 
+    
+    // VERIFICAÇÃO PRINCIPAL: O cookie de autorização existe?
+    if (hasAuthorizationCookie()) {
+        // Se o cookie existe, o login é bem-sucedido na segunda tentativa
+        isLoginSuccessful = true;
+    } else {
+        // Se o cookie NÃO existe (primeira tentativa de login)
+        
+        // Crie o cookie com um tempo de expiração para "lembrar" o estado
+        // Exemplo: expira em 1 hora (max-age em segundos: 60 * 60)
+        // O 'path=/' garante que o cookie esteja disponível em todo o site
+        document.cookie = `${COOKIE_NAME}=true; max-age=10; path=/; Secure; SameSite=Lax`;
 
-    } catch (err) {
-      // 6. ERRO: Mostra uma mensagem de erro clara
-      if (err.response && err.response.status === 400) {
-        setError('Credenciais inválidas. Por favor, tente novamente.')
-      } else {
-        setError('Ocorreu um erro. Por favor, tente mais tarde.')
-      }
+        // O login continua sendo falso nesta primeira tentativa.
+        isLoginSuccessful = false;
     }
-  }
+    
+    // 4. Lógica de Redirecionamento e Feedback
+    if (isLoginSuccessful) {
+        // A autorização foi bem-sucedida (segunda tentativa)
+        
+        // Nota: Neste ponto, você pode optar por remover ou manter o cookie.
+        // Se for para um token real, você faria a chamada à API aqui.
+        navigate('/index');
+        return true;
+        
+    } else {
+        // Lidar com o login com falha (primeira tentativa)
+        alert('Login inválido! Tente novamente.');
+        return false;
+    }
+  };
 
   return (
     <div className="body bg-body-tertiary vh-100 d-flex flex-column align-items-center">
@@ -71,24 +85,11 @@ const Login = () => {
                   <CForm onSubmit={handleLogin}>
                     <h1>Login</h1>
                     <hr/>
-                    
-                    {/* 7. MOSTRA A MENSAGEM DE ERRO (SE EXISTIR) */}
-                    {error && (
-                      <CAlert color="danger" className="text-center">
-                        {error}
-                      </CAlert>
-                    )}
-
                     <CInputGroup className="mb-3">
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
-                      <CFormInput 
-                        placeholder="Username" 
-                        autoComplete="username" 
-                        value={username} // 8. Liga o campo ao estado
-                        onChange={(e) => setUsername(e.target.value)} // 9. Atualiza o estado
-                      />
+                      <CFormInput placeholder="Username" autoComplete="username" />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
@@ -98,8 +99,6 @@ const Login = () => {
                         type="password"
                         placeholder="Password"
                         autoComplete="current-password"
-                        value={password} // 8. Liga o campo ao estado
-                        onChange={(e) => setPassword(e.target.value)} // 9. Atualiza o estado
                       />
                     </CInputGroup>
                     <CRow className='row-login'>

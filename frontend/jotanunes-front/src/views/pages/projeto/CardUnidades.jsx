@@ -14,10 +14,9 @@ import {
 } from '@coreui/react'
 import { IoIosAddCircle } from "react-icons/io";
 import { usePopper } from 'react-popper'
+import { FaCheck } from 'react-icons/fa'
+import { BsXLg } from 'react-icons/bs'
 
-/* =========================
-   Popup de Seleção de Descrição
-   ========================= */
 const descricoesBase = [
   "Porcelanato ou laminado",
   "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.",
@@ -68,19 +67,16 @@ function DescricaoPopup({ referenceElement, onSelect, onAdd, onClose }) {
     placement: 'right-start',
   });
 
-  // 🔹 Carrega lista inicial (do localStorage + base)
   useEffect(() => {
     const salvos = JSON.parse(localStorage.getItem('descricoesSalvas') || '[]');
     const todas = Array.from(new Set([...descricoesBase, ...salvos]));
     setItems(todas);
   }, []);
 
-  // 🔹 Filtra conforme busca
   const filtered = items.filter(i =>
     i.toLowerCase().includes(search.toLowerCase())
   );
 
-  // 🔹 Adiciona nova descrição e salva no localStorage
   const handleAdd = () => {
     const novo = prompt("Digite a nova descrição:");
     if (novo && !items.includes(novo)) {
@@ -91,7 +87,6 @@ function DescricaoPopup({ referenceElement, onSelect, onAdd, onClose }) {
     }
   };
 
-  // 🔹 Fecha com ESC
   useEffect(() => {
     const esc = (e) => e.key === 'Escape' && onClose();
     document.addEventListener('keydown', esc);
@@ -161,135 +156,8 @@ function DescricaoPopup({ referenceElement, onSelect, onAdd, onClose }) {
   );
 }
 
-
-/* =========================
-   Componente Principal
-   ========================= */
 export default function CardUnidades({ ambientes, setAmbientes }) {
   const [popupTarget, setPopupTarget] = useState(null);
-
-  // const [ambientes, setAmbientes] = useState([
-  //   { 
-  //     nome: "Sala de Estar/ Jantar", 
-  //     editando: false,  
-  //     linhas: [
-  //       { item: "Piso", descricao: "" },
-  //       { item: "Parede", descricao: "" },
-  //       { item: "Teto", descricao: "" },
-  //       { item: "Rodapé", descricao: "" },
-  //       { item: "Soleira", descricao: "" },
-  //       { item: "Peitoril", descricao: "" },
-  //       { item: "Esquadria", descricao: "" },
-  //       { item: "Vidro", descricao: "" },
-  //       { item: "Porta", descricao: "" },
-  //       { item: "Ferragem", descricao: "" },
-  //       { item: "Inst. Elétrica", descricao: "" },
-  //       { item: "Inst. Comunic.", descricao: "" },
-  //     ]
-  //   },
-  //   { 
-  //     nome: "Circulação", 
-  //     editando: false, 
-  //     linhas: [
-  //       { item: "Piso", descricao: "" },
-  //       { item: "Parede", descricao: "" },
-  //       { item: "Teto", descricao: "" },
-  //       { item: "Rodapé", descricao: "" },
-  //       { item: "Inst. Elétrica", descricao: "" },
-  //     ]
-  //   },
-  //   { 
-  //     nome: "Quarto e Suíte", 
-  //     editando: false, 
-  //     linhas: [
-  //       { item: "Piso", descricao: "" },
-  //       { item: "Parede", descricao: "" },
-  //       { item: "Teto", descricao: "" },
-  //       { item: "Rodapé", descricao: "" },
-  //       { item: "Soleira", descricao: "" },
-  //       { item: "Peitoril", descricao: "" },
-  //       { item: "Esquadria", descricao: "" },
-  //       { item: "Vidro", descricao: "" },
-  //       { item: "Porta", descricao: "" },
-  //       { item: "Ferragem", descricao: "" },
-  //       { item: "Inst. Elétrica", descricao: "" },
-  //       { item: "Inst. Comunic.", descricao: "" },
-  //       { item: "Ar Condicionado", descricao: "" },
-  //     ]
-  //   },
-  //   { 
-  //     nome: "Sanitário/ Lavabo", 
-  //     editando: false, 
-  //     linhas: [
-  //       { item: "Piso", descricao: "" },
-  //       { item: "Parede", descricao: "" },
-  //       { item: "Teto", descricao: "" },
-  //       { item: "Filete", descricao: "" },
-  //       { item: "Cordão de Box", descricao: "" },
-  //       { item: "Bancada", descricao: "" },
-  //       { item: "Porta", descricao: "" },
-  //       { item: "Peitoril", descricao: "" },
-  //       { item: "Ferragem", descricao: "" },
-  //       { item: "Esquadria", descricao: "" },
-  //       { item: "Vidro", descricao: "" },
-  //       { item: "Metal Sanitário", descricao: "" },
-  //       { item: "Louças", descricao: "" },
-  //       { item: "Inst. Elétrica", descricao: "" },
-  //       { item: "Inst. Hidráulica", descricao: "" },
-  //     ]
-  //   },
-  //   { 
-  //     nome: "Cozinha/ Área de Serviço", 
-  //     editando: false, 
-  //     linhas: [
-  //       { item: "Piso", descricao: "" },
-  //       { item: "Parede", descricao: "" },
-  //       { item: "Teto", descricao: "" },
-  //       { item: "Filete", descricao: "" },
-  //       { item: "Bancada", descricao: "" },
-  //       { item: "Cuba", descricao: "" },
-  //       { item: "Peitoril", descricao: "" },
-  //       { item: "Tanque", descricao: "" },
-  //       { item: "Esquadrias", descricao: "" },
-  //       { item: "Metais", descricao: "" },
-  //       { item: "Inst. Elétricas", descricao: "" },
-  //       { item: "Inst. Hidráulica", descricao: "" },
-  //       { item: "Inst. Comunicação", descricao: "" },
-  //     ]
-  //   },
-  //   { 
-  //     nome: "Área Técnica", 
-  //     editando: false, 
-  //     linhas: [
-  //       { item: "Piso", descricao: "" },
-  //       { item: "Parede", descricao: "" },
-  //       { item: "Teto", descricao: "" },
-  //       { item: "Gradil", descricao: "" },
-  //     ]
-  //   },
-  //   { 
-  //     nome: "Varanda", 
-  //     editando: false, 
-  //     linhas: [
-  //       { item: "Piso", descricao: "" },
-  //       { item: "Parede", descricao: "" },
-  //       { item: "Teto", descricao: "" },
-  //       { item: "Rodapé", descricao: "" },
-  //       { item: "Porta", descricao: "" },
-  //       { item: "Inst. Elétrica", descricao: "" },
-  //       { item: "Guarda Corpo", descricao: "" },
-  //     ]
-  //   },
-  //   { 
-  //     nome: "Garden", 
-  //     editando: false, 
-  //     linhas: [
-  //       { item: "Piso", descricao: "" },
-  //       { item: "Gradil", descricao: "" },
-  //     ]
-  //   }
-  // ])
-
 
   const adicionarAmbiente = () => {
     const novo = { nome: `Novo Ambiente ${ambientes.length + 1}`, editando: true, aberto: true, linhas: [] }
@@ -320,7 +188,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
 
   const adicionarLinha = (idx) => {
     const novos = [...ambientes]
-    novos[idx].linhas.push({ item: '', descricao: '' })
+    novos[idx].linhas.push({ item: '', descricao: '', status: false })
     setAmbientes(novos)
   }
 
@@ -336,7 +204,12 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
     setAmbientes(novos)
   }
 
-  // Fecha o popup quando o usuário clicar fora (popup ou textarea que abriu)
+  const toggleStatus = (idxAmb, idxLinha) => {
+    const novos = [...ambientes]
+    novos[idxAmb].linhas[idxLinha].status = !novos[idxAmb].linhas[idxLinha].status
+    setAmbientes(novos)
+  }
+
   useEffect(() => {
     const handler = (e) => {
       if (!popupTarget) return;
@@ -415,6 +288,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                         <CTableRow>
                           <CTableHeaderCell>Item</CTableHeaderCell>
                           <CTableHeaderCell>Descrição</CTableHeaderCell>
+                          <CTableHeaderCell>Status</CTableHeaderCell>
                           <CTableHeaderCell>Ações</CTableHeaderCell>
                         </CTableRow>
                       </CTableHead>
@@ -436,7 +310,6 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                               />
                             </CTableDataCell>
 
-                            {/* CAMPO DE DESCRIÇÃO COM POPUP */}
                             <CTableDataCell style={{ position: 'relative' }}>
                               <textarea
                                 className="auto-expand"
@@ -463,7 +336,6 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                                     onSelect={(desc) => {
                                       atualizarLinha(idx, i, 'descricao', desc);
                                       setPopupTarget(null);
-
                                       setTimeout(() => {
                                         if(linha.descricaoRef) adjustTextareaSize(linha.descricaoRef)
                                       }, 0)
@@ -474,6 +346,20 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                                     }}
                                     onClose={() => setPopupTarget(null)}
                                   />
+                              )}
+                            </CTableDataCell>
+
+                            <CTableDataCell
+                              style={{ textAlign: 'center', cursor: 'pointer' }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleStatus(idx, i);
+                              }}
+                            >
+                              {linha.status ? (
+                                <FaCheck color="green" />
+                              ) : (
+                                <BsXLg color="red" strokeWidth={1} />
                               )}
                             </CTableDataCell>
 
@@ -489,7 +375,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                           </CTableRow>
                         ))}
                         <CTableRow>
-                          <CTableDataCell colSpan={3}>
+                          <CTableDataCell colSpan={4}>
                             <CButton
                               color="success"
                               size="sm"

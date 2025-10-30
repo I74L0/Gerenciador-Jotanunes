@@ -1,100 +1,52 @@
-# fullstack-jotanunes
+# fullstack-jotanunes (RODANDO SEM O DOCKER E MYSQL, APENAS PARA TESTE)
+Branch :ndocker
 
-🛠️ *Tecnologias Utilizadas*
-Backend: Python 3.11, Django 4.x, Django REST Framework
+no início precisamos ativar o venv
 
-Servidor de Aplicação: Gunicorn
+(TUDO A BAIXO PRECISA SER DIGITADO NO TERMINAL)
 
-Servidor Web / Proxy: Nginx
+python -m venv venv
 
-Banco de Dados: MySQL 8.0
+.\venv\Scripts\Activate.ps1
 
-Filas / Cache: Redis 7, Celery
+se der erro:
 
-Autenticação: djangorestframework-simplejwt
+venv\Scripts\activate.bat
 
-Documentação: drf-spectacular
+ou:
 
-Admin: django-jazzmin
+source venv/Scripts/activate
 
-Containerização: Docker, Docker Compose
+e caso de linux ou macOS:
 
-<img width="150" height="150" alt="Python-logo-notext svg" src="https://github.com/user-attachments/assets/50b2cf26-6a19-408a-b1a7-f37d1782beb5" />
+source venv/bin/activate
 
-<img width="250" height="250" alt="1710173183065" src="https://github.com/user-attachments/assets/884e24b8-9ee2-4e02-b860-5efcc8a04703" />
+git clone -b ndocker https://github.com/cauaunit/fullstack-jotanunes.git
 
-<img width="250" height="200" alt="MySQL-Logo" src="https://github.com/user-attachments/assets/2ed701ab-8599-425e-baa5-fcd71d027dc6" />
+no mesmo nível do manage.py(arquivo do backend), rodar:
 
-<img width="150" height="150" alt="4844483" src="https://github.com/user-attachments/assets/4b6b1c4c-b4ec-4543-9a98-a85e5fedf63d" />
+(para chegar no nível do manage.py, digitamos cd backend e depois, cd backend-jotanunes)
 
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Pré-requisitos:
-Python
+pip install -r requirements.txt
 
-Django
+python manage.py migrate
 
-IDE
+python manage.py createsuperuser
 
-Git
+python manage.py runserver
 
-Docker
+teremos http://127.0.0.1:8000/
 
-Docker Compose
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Guia de instalação, via terminal VScode:
+http://127.0.0.1:8000/admin
 
-1- Este comando irá construir as imagens e iniciar todos os serviços (Nginx, Gunicorn/Django, MySQL, Redis, Celery) em segundo plano.
-docker-compose up -d --build
+http://127.0.0.1:8000/api/*                
 
-2- Após os contêineres estarem em execução, precisamos de preparar o banco de dados e os ficheiros estáticos.
+"*" = urls, por exemplo http://127.0.0.1:8000/api/obras
 
-a) Aplicar as migrações do banco de dados.
+no frontend iremos rodar npm install
 
-docker-compose exec backend python manage.py migrate
+npm start
 
-3- Coletar os ficheiros estáticos (Obrigatório para o Nginx): Este comando copia os CSS/JS do admin e do Jazzmin para um volume partilhado que o Nginx pode servir.
+com isso teremos http://localhost:3000
 
-docker-compose exec backend python manage.py collectstatic --noinput --clear
-
-4- Criar um Superusuário (Administrador): Siga as instruções para criar o seu utilizador de admin.
-docker-compose exec backend python manage.py createsuperuser
-
-5- Documentação da API (Swagger)
-Essa etapa é para acessar a documentação e testar todos os endpoints da API.
-
-Swagger UI: http://localhost/api/schema/swagger-ui/
-
-Redoc: http://localhost/api/schema/redoc/
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-🚀 Utilização
-Após a instalação, o projeto estará acessível no navegador:
-
-Painel de Administração (Jazzmin)
-Aceda ao painel para gerir todas as entidades do sistema.
-
-URL: http://localhost/admin/
-
-Utilizador: (O superusuário criado)
-
-Senha: (A senha que você definiu)
-
-Documentação da API (Swagger)
-Aceda à documentação interativa para ver e testar todos os endpoints da API.
-
-Swagger UI: http://localhost/api/schema/swagger-ui/
-
-Redoc: http://localhost/api/schema/redoc/
-
-Principais Endpoints da API
-Login: POST /api/login/
-
-Obras: GET, POST /api/obras/
-
-Detalhe Obra: GET, PUT, PATCH, DELETE /api/obras/{id}/
-
-Duplicar Obra: POST /api/obras/{id}/duplicar/
-
-Ambientes: GET, POST /api/ambientes/
-
-... e assim por diante para torres, itens, materiais, marcas e descricoes.
+e so acender o front

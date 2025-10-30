@@ -1,7 +1,6 @@
 {
   "name": "@coreui/coreui-free-react-admin-template",
   "version": "5.5.0",
-  "proxy": "http://localhost:8000",
   "description": "CoreUI Free React Admin Template",
   "homepage": ".",
   "bugs": {
@@ -28,7 +27,7 @@
     "@coreui/react-chartjs": "^3.0.0",
     "@coreui/utils": "^2.0.2",
     "@popperjs/core": "^2.11.8",
-    "axios": "^1.12.2",
+    "axios": "^1.13.1",
     "bootstrap": "^5.3.8",
     "chart.js": "^4.5.0",
     "classnames": "^2.5.1",
