@@ -61,7 +61,7 @@ class AmbienteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ambiente
-        fields = ['id', 'nome', 'itens']
+        fields = ['id', 'nome', 'obra', 'torre', 'itens' ]
 
 class TorreSerializer(serializers.ModelSerializer):
     ambientes = AmbienteSerializer(many=True, required=False)
