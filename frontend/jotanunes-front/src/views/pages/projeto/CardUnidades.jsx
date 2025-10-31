@@ -13,151 +13,25 @@ import {
   CTableRow,
 } from '@coreui/react'
 import { IoIosAddCircle } from "react-icons/io";
-import { usePopper } from 'react-popper'
+// usePopper, FaCheck e BsXLg ainda são necessários
 import { FaCheck } from 'react-icons/fa'
 import { BsXLg } from 'react-icons/bs'
 
-const descricoesBase = [
-  "Porcelanato ou laminado",
-  "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.",
-  "Porcelanato ou Laminado, h= 5cm",
-  "Mármore ou granito.",
-  "Metálico",
-  "Alumínio pintado de branco",
-  "Liso incolor.",
-  "Porta semi–ôca comum pintada c/ esmalte sintético.",
-  "Acabamento cromado.",
-  "Pontos de luz no teto, tomadas de corrente e interruptores",
-  "Pontos secos de comunicação e de antena de TV.",
-  "Infraestrutura para high wall com condensadora axial.",
-  "Cerâmica.",
-  "Cerâmica até o teto.",
-  "Forro de gesso.",
-  "Mármore ou granito L=3,5cm.",
-  "Em mármore ou granito com cuba em louça cor branca",
-  "Porta semi-ôca comum pintura c/ esmalte sintético.",
-  "Pontilhado Incolor.",
-  "Torneira para Lavatório, registro de gaveta e registro de pressão com acabamento cromado .",
-  "Vaso Sanitário com Caixa Acoplada em louça cor branca.",
-  "Pontos de luz no teto, tomada de corrente e interruptor da Prime, Alumbra, Cemar ou Fame na cor branco.",
-  "Sifão em PVC, esgoto em PVC, rede de água fria e ducha higiênica em PEX.",
-  "Pintura látex PVA sobre gesso ou argamassa de regularização PVA.",
-  "Inox.",
-  "Louça cor branca.",
-  "Torneiras e registro de gaveta com acabamento cromado.",
-  "Rede de água fria em PEX e esgoto em PVC",
-  "Tubulação seca.",
-  "Em concreto desempolado.",
-  "Textura acrílica.",
-  "Pintura ou textura acrílica.",
-  "Em perfil metálico pintado de branco.",
-  "Textura Acrílica ou Pastilha Cerâmica, conforme definido em projeto arquitetônico.",
-  "Pintura PVA látex branco sobre gesso ou massa de regulariação PVA ou Forro de gesso.",
-  "Porcelanato ou Laminado, h=5cm.",
-  "Alumínio pintado de branco com vidro liso.",
-  "Ponto de luz no teto.",
-  "Grama"
-];
-
-function DescricaoPopup({ referenceElement, onSelect, onAdd, onClose }) {
-  const [search, setSearch] = useState('');
-  const [items, setItems] = useState([]);
-  const [popperElement, setPopperElement] = useState(null);
-  const { styles, attributes } = usePopper(referenceElement, popperElement, {
-    placement: 'right-start',
-  });
-
-  useEffect(() => {
-    const salvos = JSON.parse(localStorage.getItem('descricoesSalvas') || '[]');
-    const todas = Array.from(new Set([...descricoesBase, ...salvos]));
-    setItems(todas);
-  }, []);
-
-  const filtered = items.filter(i =>
-    i.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const handleAdd = () => {
-    const novo = prompt("Digite a nova descrição:");
-    if (novo && !items.includes(novo)) {
-      const atualizados = [...items, novo];
-      setItems(atualizados);
-      localStorage.setItem('descricoesSalvas', JSON.stringify(atualizados.filter(x => !descricoesBase.includes(x))));
-      onAdd(novo);
-    }
-  };
-
-  useEffect(() => {
-    const esc = (e) => e.key === 'Escape' && onClose();
-    document.addEventListener('keydown', esc);
-    return () => document.removeEventListener('keydown', esc);
-  }, [onClose]);
-
-  return (
-    <div
-      data-descricao-popup="true"
-      ref={setPopperElement}
-      style={{
-        ...styles.popper,
-        zIndex: 9999,
-        background: '#ccc',
-        border: '1px solid #ccc',
-        borderRadius: '8px',
-        padding: '8px',
-        width: '300px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-      }}
-      {...attributes.popper}
-    >
-      <input
-        type="text"
-        className="form-control mb-2"
-        placeholder="Buscar descrição..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        autoFocus
-      />
-      <div
-        style={{
-          maxHeight: '200px',
-          overflowY: 'auto',
-          borderTop: '1px solid #eee',
-          paddingTop: '4px',
-        }}
-      >
-        {filtered.map((desc, i) => (
-          <div
-            key={i}
-            onClick={() => onSelect(desc)}
-            style={{
-              cursor: 'pointer',
-              padding: '6px 8px',
-              borderRadius: '4px',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-          >
-            {desc}
-          </div>
-        ))}
-        {filtered.length === 0 && (
-          <div className="text-muted small text-center py-2">
-            Nenhum resultado encontrado
-          </div>
-        )}
-      </div>
-      <button
-        className="btn btn-sm btn-outline-primary mt-2 w-100"
-        onClick={handleAdd}
-      >
-        + Adicionar
-      </button>
-    </div>
-  );
-}
+// Importa o componente DescricaoPopup
+import DescricaoPopup from '../../../components/DescricaoPopup'; 
 
 export default function CardUnidades({ ambientes, setAmbientes }) {
   const [popupTarget, setPopupTarget] = useState(null);
+
+  // Função utilitária para ajustar o tamanho da textarea (precisa ser definida)
+  // Se não estiver definida, vai gerar um erro. Mantenha aqui para a lógica do popup
+  const adjustTextareaSize = (el) => {
+    if (el) {
+        el.style.height = 'auto';
+        el.style.height = el.scrollHeight + 'px';
+    }
+  }
+
 
   const adicionarAmbiente = () => {
     const novo = { nome: `Novo Ambiente ${ambientes.length + 1}`, editando: true, aberto: true, linhas: [] }
@@ -215,7 +89,8 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
       if (!popupTarget) return;
       const popupEl = document.querySelector('[data-descricao-popup="true"]');
       const clickedInsidePopup = popupEl && popupEl.contains(e.target);
-      const clickedTextarea = popupTarget.ref && popupTarget.ref.contains && popupTarget.ref.contains(e.target);
+      // Aqui usamos a ref do elemento que abriu o popup para verificar o clique
+      const clickedTextarea = popupTarget.ref && popupTarget.ref.contains(e.target);
 
       if (!clickedInsidePopup && !clickedTextarea) {
         setPopupTarget(null);
@@ -314,7 +189,8 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                               <textarea
                                 className="auto-expand"
                                 rows="1"
-                                ref={(el) => linha.descricaoRef = el}
+                                // Cria uma referência para a textarea na linha atual
+                                ref={(el) => linha.descricaoRef = el} 
                                 value={linha.descricao}
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -328,6 +204,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                                   e.target.style.height = e.target.scrollHeight + 'px';
                                 }}
                               />
+                              {/* Renderiza o DescricaoPopup se for o alvo correto */}
                               {popupTarget &&
                                 popupTarget.ambIdx === idx &&
                                 popupTarget.linhaIdx === i && (
@@ -336,13 +213,15 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                                     onSelect={(desc) => {
                                       atualizarLinha(idx, i, 'descricao', desc);
                                       setPopupTarget(null);
-                                      setTimeout(() => {
+                                      // Usa a função auxiliar para ajustar o tamanho da textarea
+                                      setTimeout(() => { 
                                         if(linha.descricaoRef) adjustTextareaSize(linha.descricaoRef)
                                       }, 0)
                                     }}
                                     onAdd={(novo) => {
                                       atualizarLinha(idx, i, 'descricao', novo);
                                       setPopupTarget(null);
+                                      // Não precisa de setTimeout/adjustTextareaSize aqui, pois a alteração manual já faz isso
                                     }}
                                     onClose={() => setPopupTarget(null)}
                                   />
