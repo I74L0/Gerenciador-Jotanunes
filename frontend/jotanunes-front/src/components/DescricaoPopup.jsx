@@ -12,7 +12,7 @@ let descricoesBaseDaAPI = [];
 
 export default function DescricaoPopup({ referenceElement, onSelect, onAdd, onClose }) {
   const [search, setSearch] = useState('');
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(['']);
   const [popperElement, setPopperElement] = useState(null);
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: 'right-start',
@@ -30,7 +30,7 @@ export default function DescricaoPopup({ referenceElement, onSelect, onAdd, onCl
             // ATENÇÃO: Ajuste a linha abaixo para acessar o array de strings corretamente
             // Assumindo que a API retorna um array de objetos, e você quer a propriedade 'nome' ou 'texto'
             // Exemplo: se a resposta for [{id: 1, nome: "Porcelanato"}, ...]
-            descricoesBaseDaAPI = response.data.map(item => item.nome || item.descricao);
+            descricoesBaseDaAPI = response.data.map(item => item.detalhe);
             // Se a API retorna um array de strings diretamente: descricoesBaseDaAPI = response.data;
         }
 
@@ -39,7 +39,6 @@ export default function DescricaoPopup({ referenceElement, onSelect, onAdd, onCl
         // Combina a lista da API com os itens salvos localmente
         const todas = Array.from(new Set([...descricoesBaseDaAPI, ...salvos]));
         setItems(todas);
-
       } catch (error) {
         console.error("Erro ao carregar descrições base da API:", error);
         // Em caso de erro, inicializa com os salvos para não travar
