@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Obra, Torre, Ambiente, Item, Material, Descricao, Marca
+# 1. Importe os seus novos modelos Estado e Cidade
+from .models import Obra, Torre, Ambiente, Item, Material, Descricao, Marca, Estado, Cidade
 
 admin.site.register(Ambiente)
 admin.site.register(Material)
@@ -35,4 +36,21 @@ class ObraAdmin(admin.ModelAdmin):
         if not request.user.is_superuser:
             if not request.user.groups.filter(name='Gestores').exists():
                 return ['status']
-        return []
+        
+        return [] 
+
+
+@admin.register(Estado)
+class EstadoAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'uf')
+    search_fields = ('nome', 'uf')
+
+@admin.register(Cidade)
+class CidadeAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'get_estado_uf') 
+    search_fields = ('nome',)
+    list_filter = ('estado',)
+
+    @admin.display(description='Estado (UF)')
+    def get_estado_uf(self, obj):
+        return obj.estado.uf

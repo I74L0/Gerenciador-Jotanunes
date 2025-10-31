@@ -1,10 +1,40 @@
 from django.db import models
 
 STATUS_CHOICES = [
-    ('PENDENTE', 'Pendente'),
-    ('EM_ANDAMENTO', 'Em Andamento'),
+    ('RECUSADO', 'Recusado'),
+    ('EM_ANALISE', 'Em Análise'),
+    ('NAO_FINALIZADO', 'Não Finalizado'),
     ('FINALIZADO', 'Finalizado'),
 ]
+
+class Estado(models.Model):
+    nome = models.CharField(max_length=50, unique=True, verbose_name="Nome do Estado")
+    uf = models.CharField(max_length=2, unique=True, verbose_name="UF (Sigla)")
+
+    class Meta:
+        verbose_name = "Estado"
+        verbose_name_plural = "Estados"
+        ordering = ['nome']
+
+    def __str__(self):
+        return self.nome
+
+class Cidade(models.Model):
+    nome = models.CharField(max_length=100, verbose_name="Nome da Cidade")
+    estado = models.ForeignKey(
+        Estado, 
+        on_delete=models.CASCADE, 
+        related_name="cidades", 
+        verbose_name="Estado"
+    )
+
+    class Meta:
+        verbose_name = "Cidade"
+        verbose_name_plural = "Cidades"
+        ordering = ['nome']
+
+    def __str__(self):
+        return f"{self.nome} ({self.estado.uf})"
 
 class Obra(models.Model):
     nome = models.CharField(max_length=255)
