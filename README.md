@@ -25,7 +25,7 @@ git clone -b ndocker https://github.com/cauaunit/fullstack-jotanunes.git
 
 no mesmo nível do manage.py(arquivo do backend), rodar:
 
-(para chegar no nível do manage.py, digitamos cd backend e depois, cd backend-jotanunes)
+(para chegar no nível do manage.py, digitamos cd fullstack-jotanunes, cd backend, cd backend-jotanunes)
 
 pip install -r requirements.txt
 
@@ -45,7 +45,9 @@ http://127.0.0.1:8000/api/*
 
 no frontend iremos rodar npm install
 
-npm start
+para chegar no frontend, digitamos cd fullstack-jotanunes, cd frontend, cd jotanunes-front
+
+quando chegarmos ao frontend, digitamos npm start
 
 com isso teremos http://localhost:3000
 
