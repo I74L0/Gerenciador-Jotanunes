@@ -199,6 +199,8 @@ JAZZMIN_SETTINGS = {
                     "jotanunes.material",
                     "jotanunes.marca",
                     "jotanunes.descricao",
+                    "jotanunes.cidade",
+                    "jotanunes.estado",
                 ),
             }
         ],
