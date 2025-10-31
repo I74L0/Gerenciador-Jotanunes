@@ -25,7 +25,7 @@ git clone -b ndocker https://github.com/cauaunit/fullstack-jotanunes.git
 
 ou
 
-gil clone -b italo https://github.com/cauaunit/fullstack-jotanunes.git
+git clone -b italo https://github.com/cauaunit/fullstack-jotanunes.git
 
 (TESTAR A BRANCH MAIS ATUAL, QUE FOI MODIFICADA POR ÚLTIMO)
 
