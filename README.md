@@ -23,6 +23,12 @@ source venv/bin/activate
 
 git clone -b ndocker https://github.com/cauaunit/fullstack-jotanunes.git
 
+ou
+
+gil clone -b italo https://github.com/cauaunit/fullstack-jotanunes.git
+
+(TESTAR A BRANCH MAIS ATUAL, QUE FOI MODIFICADA POR ÚLTIMO)
+
 no mesmo nível do manage.py(arquivo do backend), rodar:
 
 (para chegar no nível do manage.py, digitamos cd fullstack-jotanunes, cd backend, cd backend-jotanunes)
