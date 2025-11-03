@@ -107,17 +107,7 @@ export default function CardAreaComum({ ambientes, setAmbientes }) {
                         }}
                       />
                     ) : (
-                      <span
-                        className="nome-ambiente"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          const novos = [...ambientes]
-                          novos[idx].editando = true
-                          setAmbientes(novos)
-                        }}
-                      >
-                        {`${amb.id} ${amb.nome}`}
-                      </span>
+                      <span className="nome-ambiente">{`${amb.id} ${amb.nome}`}</span>
                     )}
                   </div>
 

@@ -6,17 +6,141 @@
     "texto": ""
   },
   "unidadesData": [
-    { "nome": "Sala de Estar/ Jantar", "editando": false, "aberto": false, "linhas": [
-        { "item": "Piso", "descricao": "Porcelanato", "status": true }
+    {
+      "id": "1.",
+      "nome": "Sala de Estar/ Jantar",
+      "editando": false,
+      "aberto": false,
+      "items": [
+        { "item": "Piso", "descricao": "Porcelanato ou laminado", "status": true },
+        { "item": "Parede", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.", "status": true },
+        { "item": "Teto", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.", "status": true },
+        { "item": "Rodapé", "descricao": "Porcelanato ou Laminado, h= 5cm", "status": true },
+        { "item": "Soleira", "descricao": "Mármore ou granito.", "status": true },
+        { "item": "Peitoril", "descricao": "Metálico", "status": true },
+        { "item": "Esquadria", "descricao": "Alumínio pintado de branco", "status": true },
+        { "item": "Vidro", "descricao": "Liso incolor.", "status": true },
+        { "item": "Porta", "descricao": "Porta semi–ôca comum pintada c/ esmalte sintético.", "status": true },
+        { "item": "Ferragem", "descricao": "Acabamento cromado.", "status": true },
+        { "item": "Inst. Elétrica", "descricao": "Pontos de luz no teto, tomadas de corrente e interruptores", "status": true },
+        { "item": "Inst. Comunic.", "descricao": "Pontos secos de comunicação e de antena de TV.", "status": true }
       ]
     },
-    { "nome": "Circulação", "editando": false, "aberto": false, "linhas": [] },
-    { "nome": "Quarto e Suíte", "editando": false, "aberto": false, "linhas": [] },
-    { "nome": "Sanitário/ Lavabo", "editando": false, "aberto": false, "linhas": [] },
-    { "nome": "Cozinha/ Área de Serviço", "editando": false, "aberto": false, "linhas": [] },
-    { "nome": "Área Técnica", "editando": false, "aberto": false, "linhas": [] },
-    { "nome": "Varanda", "editando": false, "aberto": false, "linhas": [] },
-    { "nome": "Garden", "editando": false, "aberto": false, "linhas": [] }
+    {
+      "id": "2.",
+      "nome": "Circulação",
+      "editando": false,
+      "aberto": false,
+      "items": [
+        { "item": "Piso", "descricao": "Porcelanato ou laminado", "status": true },
+        { "item": "Parede", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.", "status": true },
+        { "item": "Teto", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.", "status": true },
+        { "item": "Rodapé", "descricao": "Porcelanato ou Laminado, h= 5cm", "status": true },
+        { "item": "Inst. Elétrica", "descricao": "Pontos de luz no teto, tomadas de corrente e interruptores", "status": true }
+      ]
+    },
+    {
+      "id": "3.",
+      "nome": "Quarto e Suíte",
+      "editando": false,
+      "aberto": false,
+      "items": [
+        { "item": "Piso", "descricao": "Porcelanato ou laminado.", "status": true },
+        { "item": "Parede", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.", "status": true },
+        { "item": "Teto", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.", "status": true },
+        { "item": "Rodapé", "descricao": "Porcelanato ou Laminado, h= 5cm.", "status": true },
+        { "item": "Soleira", "descricao": "Mármore ou granito.", "status": true },
+        { "item": "Peitoril", "descricao": "Metálico.", "status": true },
+        { "item": "Esquadria", "descricao": "Alumínio pintado de branco.", "status": true },
+        { "item": "Vidro", "descricao": "Liso incolor.", "status": true },
+        { "item": "Porta", "descricao": "Porta semi–ôca comum pintada c/ esmalte sintético.", "status": true },
+        { "item": "Ferragem", "descricao": "Acabamento cromado.", "status": true },
+        { "item": "Inst. Elétrica", "descricao": "Pontos de luz no teto, tomadas de corrente e interruptores.", "status": true },
+        { "item": "Inst. Comunic.", "descricao": "Pontos secos de comunicação e de antena de TV.", "status": true },
+        { "item": "Ar Condicionado", "descricao": "Infraestrutura para high wall com condensadora axial.", "status": true }
+      ]
+    },
+    {
+      "id": "4.",
+      "nome": "Sanitário/ Lavabo",
+      "editando": false,
+      "aberto": false,
+      "items": [
+        { "item": "Piso", "descricao": "Cerâmica.", "status": true },
+        { "item": "Parede", "descricao": "Cerâmica até o teto.", "status": true },
+        { "item": "Teto", "descricao": "Forro de gesso.", "status": true },
+        { "item": "Filete", "descricao": "Mármore ou granito L=3,5cm.", "status": true },
+        { "item": "Cordão de Box", "descricao": "Mármore ou granito.", "status": true },
+        { "item": "Bancada", "descricao": "Em mármore ou granito com cuba em louça cor branca", "status": true },
+        { "item": "Porta", "descricao": "Porta semi-oca comum pintura c/ esmalte sintético.", "status": true },
+        { "item": "Peitoril", "descricao": "Metálico.", "status": true },
+        { "item": "Ferragem", "descricao": "Acabamento cromado.", "status": true },
+        { "item": "Esquadria", "descricao": "Alumínio pintado de branco.", "status": true },
+        { "item": "Vidro", "descricao": "Pontilhado Incolor.", "status": true },
+        { "item": "Metal Sanitário", "descricao": "Torneira para lavatório, registro de gaveta e registro de pressão com acabamento cromado .", "status": true },
+        { "item": "Louças", "descricao": "Vaso Sanitário com Caixa Acoplada em louça cor branca.", "status": true },
+        { "item": "Inst. Elétrica", "descricao": "Pontos de luz no teto, tomada de corrente e interruptor da Prime, Alumbra, Cemar ou Fame na cor branco.", "status": true },
+        { "item": "Inst. Hidráulica", "descricao": "Sifão em PVC, esgoto em PVC, rede de água fria e ducha higiênica em PEX.", "status": true }
+      ]
+    },
+    {
+      "id": "5.",
+      "nome": "Cozinha/ Área de Serviço",
+      "editando": false,
+      "aberto": false,
+      "items": [
+        { "item": "Piso", "descricao": "Cerâmica.", "status": true },
+        { "item": "Parede", "descricao": "Cerâmica até o teto.", "status": true },
+        { "item": "Teto", "descricao": "Pintura látex PVA sobre gesso ou argamassa de regularização PVA.", "status": true },
+        { "item": "Filete", "descricao": "Mármore ou granito L=3,5cm.", "status": true },
+        { "item": "Bancada", "descricao": "Em mármore ou granito.", "status": true },
+        { "item": "Cuba", "descricao": "Inox.", "status": true },
+        { "item": "Peitoril", "descricao": "Metálico.", "status": true },
+        { "item": "Tanque", "descricao": "Louça cor branca.", "status": true },
+        { "item": "Esquadrias", "descricao": "Alumínio pintado de branco.", "status": true },
+        { "item": "Metais", "descricao": "Torneiras e registro de gaveta com acabamento cromado.", "status": true },
+        { "item": "Inst. Elétricas", "descricao": "Ponto de luz no teto, tomadas de corrente e interruptores.", "status": true },
+        { "item": "Inst. Hidráulica", "descricao": "Rede de água fria em PEX e esgoto em PVC", "status": true },
+        { "item": "Inst. Comunicação", "descricao": "Tubulação seca.", "status": true }
+      ]
+    },
+    {
+      "id": "6.",
+      "nome": "Área Técnica",
+      "editando": false,
+      "aberto": false,
+      "items": [
+        { "item": "Piso", "descricao": "Em concreto desempolado.", "status": true },
+        { "item": "Parede", "descricao": "Textura acrílica.", "status": true },
+        { "item": "Teto", "descricao": "Pintura ou textura acrílica.", "status": true },
+        { "item": "Gradil", "descricao": "Em perfil metálico pintado de branco.", "status": true }
+      ]
+    },
+    {
+      "id": "7.",
+      "nome": "Varanda",
+      "editando": false,
+      "aberto": false,
+      "items": [
+        { "item": "Piso", "descricao": "Porcelanato.", "status": true },
+        { "item": "Parede", "descricao": "Textura Acrílica ou Pastilha Cerâmica, conforme definido em projeto arquitetônico.", "status": true },
+        { "item": "Teto", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA ou Forro de gesso.", "status": true },
+        { "item": "Rodapé", "descricao": "Porcelanato ou Laminado, h=5cm.", "status": true },
+        { "item": "Porta", "descricao": "Alumínio pintado de branco com vidro liso.", "status": true },
+        { "item": "Inst. Elétrica", "descricao": "Ponto de luz no teto.", "status": true },
+        { "item": "Guarda Corpo", "descricao": "Em perfil metálico pintado de branco.", "status": true }
+      ]
+    },
+    {
+      "id": "8.",
+      "nome": "Garden",
+      "editando": false,
+      "aberto": false,
+      "items": [
+        { "item": "Piso", "descricao": "Grama", "status": true },
+        { "item": "Gradil", "descricao": "Em perfil metálico pintado de branco.", "status": true }
+      ]
+    }
   ],
   "areacomumData": [
     {
