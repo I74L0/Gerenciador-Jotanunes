@@ -77,21 +77,46 @@ function DescricaoPopup({ referenceElement, onSelect, onAdd, onClose }) {
     i.toLowerCase().includes(search.toLowerCase())
   );
 
+  // estado para fluxo de adicionar inline (substitui prompt)
+  const [adding, setAdding] = useState(false);
+  const [newDesc, setNewDesc] = useState('');
+
   const handleAdd = () => {
-    const novo = prompt("Digite a nova descrição:");
+    // abre o input dentro do popup
+    setAdding(true);
+    setNewDesc('');
+  };
+
+  const confirmAdd = () => {
+    const novo = newDesc && newDesc.trim();
     if (novo && !items.includes(novo)) {
       const atualizados = [...items, novo];
       setItems(atualizados);
       localStorage.setItem('descricoesSalvas', JSON.stringify(atualizados.filter(x => !descricoesBase.includes(x))));
       onAdd(novo);
     }
+    setAdding(false);
+    setNewDesc('');
+  };
+
+  const cancelAdd = () => {
+    setAdding(false);
+    setNewDesc('');
   };
 
   useEffect(() => {
-    const esc = (e) => e.key === 'Escape' && onClose();
+    const esc = (e) => {
+      if (e.key === 'Escape') {
+        if (adding) {
+          cancelAdd();
+        } else {
+          onClose();
+        }
+      }
+    };
     document.addEventListener('keydown', esc);
     return () => document.removeEventListener('keydown', esc);
-  }, [onClose]);
+  }, [onClose, adding]);
 
   return (
     <div
@@ -146,12 +171,33 @@ function DescricaoPopup({ referenceElement, onSelect, onAdd, onClose }) {
           </div>
         )}
       </div>
-      <button
-        className="btn btn-sm btn-outline-primary mt-2 w-100"
-        onClick={handleAdd}
-      >
-        + Adicionar
-      </button>
+      {adding ? (
+        <div className="clicado_novaDescricao">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Nova descrição..."
+            value={newDesc}
+            onChange={(e) => setNewDesc(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') confirmAdd();
+              if (e.key === 'Escape') cancelAdd();
+            }}
+            autoFocus
+          />
+          <div className='clicado_novaDescricao_botoes'>
+            <button className="btn btn-sm btn-primary" onClick={confirmAdd}>Adicionar</button>
+            <button className="btn btn-sm btn-secondary" onClick={cancelAdd}>Cancelar</button>
+          </div>
+        </div>
+      ) : (
+        <button
+          className="btn btn-sm btn-outline-primary mt-2 w-100"
+          onClick={handleAdd}
+        >
+          + Adicionar
+        </button>
+      )}
     </div>
   );
 }
