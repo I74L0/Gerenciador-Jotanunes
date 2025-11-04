@@ -16,8 +16,7 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-// --- IMPORTAÇÃO ATUALIZADA ---
-import { login, setAuthToken } from '../../../apiClient' // <--- Importe 'setAuthToken'
+import { login, setAuthToken } from '../../../apiClient'
 import './Login-style.css';
 
 const Login = () => {
@@ -43,7 +42,7 @@ const Login = () => {
             localStorage.setItem('refreshToken', refreshToken);
 
             // 2. CONFIGURA O CLIENTE API PARA USAR O TOKEN IMEDIATAMENTE
-            setAuthToken(accessToken); // <--- Chamada da função aqui!
+            setAuthToken(accessToken);
 
             console.log('Login bem-sucedido. Tokens armazenados e cliente API configurado.');
         } 
@@ -54,8 +53,7 @@ const Login = () => {
 
     } catch (err) {
         console.error('Login Falhou:', err);
-        setError(true); 
-        // É uma boa prática limpar os tokens em caso de falha, se existirem
+        setError(true);
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         setAuthToken(null);

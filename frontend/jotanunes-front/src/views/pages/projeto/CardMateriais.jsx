@@ -15,8 +15,8 @@ export default function CardMateriais({ materiais, setMateriais }) {
   const adicionarMaterial = () => {
     const novoMaterial = {
       id: `${materiais.length + 1}`,
-      nome: 'Novo Material',
-      marcas: ['Nova Marca'],
+      nome: '',
+      marcas: [''],
     }
     setMateriais([...materiais, novoMaterial])
   }
@@ -56,6 +56,7 @@ export default function CardMateriais({ materiais, setMateriais }) {
                     type="text"
                     className="form-control"
                     value={material.nome}
+                    placeholder='Material'
                     onChange={(e) => atualizarNomeMaterial(i, e.target.value)}
                   />
                 </CTableDataCell>
@@ -63,6 +64,7 @@ export default function CardMateriais({ materiais, setMateriais }) {
                   <textarea
                     className="form-control"
                     rows="2"
+                    placeholder='Marcas'
                     value={material.marcas.join(', ')}
                     onChange={(e) => atualizarMarcas(i, e.target.value)}
                   />

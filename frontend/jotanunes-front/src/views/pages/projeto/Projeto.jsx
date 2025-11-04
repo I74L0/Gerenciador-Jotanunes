@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import {
   CImage,
   CHeader,
@@ -14,7 +15,8 @@ import {
   CRow,
   CHeaderText,
   CButton,
-  useColorModes
+  useColorModes,
+  CSpinner
 } from '@coreui/react'
 import {
   cilBell,
@@ -36,69 +38,141 @@ import CardObservacoes from './CardObservacoes'
 import MenuTabs from './MenuTabs'
 import avatar8 from 'src/assets/images/avatars/8.jpg'
 import 'src/views/pages/projeto/Projeto-style.scss'
-import * as apiClient from 'src/apiClient'
+import { obras, ambientes, materiais } from 'src/apiClient'
 
 const Projeto = () => {
   const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
-
+  const { id } = useParams()
   const [activeTab, setActiveTab] = useState(0)
   const [prefacioData, setPrefacioData] = useState({ nome: '', estado: '', cidade: '', texto: '' });
   const [unidadesData, setUnidadesData] = useState([]);
   const [areacomumData, setAreacomumData] = useState([]);
   const [materialData, setMaterialData] = useState([]);
-  const [observacoesData, setObservacoesData] = useState([]);
+  const [observacoesData, setObservacoesData] = useState({texto: ''});
 
-  // Estados para controle de salvamento
+  // Estados para controle de salvamento e carregamento
+  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
   // Carrega os dados iniciais da API para o estado do React
   useEffect(() => {
-    apiClient.getDados().then(d => {
-      setPrefacioData(d.prefacioData || { nome: '', estado: '', cidade: '', texto: '' });
-      setUnidadesData(d.unidadesData || []);
-      setAreacomumData(d.areacomumData || []);
-      setMaterialData(d.materialData || []);
-      setObservacoesData(d.observacoesData || []);
-    }).catch(error => {
-      console.error("Falha ao carregar dados:", error);
-    });
-  }, [])
+    const carregarDadosDoProjeto = async () => {
+      if (id) {
+        // Se temos um ID, carregamos um projeto existente
+        setIsLoading(true);
+        try {
+          // Vamos buscar os dados da obra e os ambientes em paralelo
+          const obraPromise = obras.retrieve(id);
+          const ambientesPromise = ambientes.list(id); // Assumindo que ambientes.list(id) retorna os ambientes desta obra
+          // const materiaisPromise = materiais.list(...) // Se materiais forem por obra, adicione aqui
+
+          const [obraRes, ambientesRes] = await Promise.all([obraPromise, ambientesPromise]);
+          const dadosObra = obraRes.data;
+
+          // --- IMPORTANTE: Mapeamento de Dados ---
+          // Você precisa ajustar os nomes dos campos (ex: 'dadosObra.nome')
+          // para bater com o que sua API real retorna.
+
+          setPrefacioData({
+            nome: dadosObra.nome || '',
+            estado: dadosObra.estado || '',
+            cidade: dadosObra.cidade || '',
+            texto: dadosObra.texto_prefacio || '', 
+          });
+
+          // Assumindo que os ambientes têm um campo 'tipo' para separar
+          // 'UNIDADE' de 'AREA_COMUM'. Se não, você precisará de outra lógica.
+          const todosAmbientes = ambientesRes.data || [];
+          setUnidadesData(todosAmbientes.filter(a => a.tipo === 'UNIDADE'));
+          setAreacomumData(todosAmbientes.filter(a => a.tipo === 'AREA_COMUM'));
+
+          // Assumindo que materiais e observações vêm aninhados na obra
+          setMaterialData(dadosObra.materiais || []);
+          setObservacoesData(dadosObra.observacoes || { texto: '' });
+
+        } catch (error) {
+          console.error("Falha ao carregar dados do projeto:", error);
+          setSaveError("Não foi possível carregar o projeto.");
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setPrefacioData({ nome: '', estado: '', cidade: '', texto: '' });
+        setUnidadesData([]);
+        setAreacomumData([]);
+        setMaterialData([]);
+        setObservacoesData({ texto: '' });
+        setIsLoading(false);
+      }
+    };
+
+    carregarDadosDoProjeto();
+  }, [id]);
 
   const handlePrefacioChange = (novoPrefacio) => {
     setPrefacioData(novoPrefacio);
-    apiClient.setPrefacio(novoPrefacio);
+    // apiClient.setPrefacio(novoPrefacio);
   };
 
   const handleUnidadesChange = (novasUnidades) => {
     setUnidadesData(novasUnidades);
-    apiClient.setUnidades(novasUnidades);
+    // apiClient.setUnidades(novasUnidades);
   };
 
   const handleAreaComumChange = (novaAreaComum) => {
     setAreacomumData(novaAreaComum);
-    apiClient.setAreaComum(novaAreaComum);
+    // apiClient.setAreaComum(novaAreaComum);
   };
 
   const handleMateriaisChange = (novosMateriais) => {
     setMaterialData(novosMateriais);
-    apiClient.setMateriais(novosMateriais);
+    // apiClient.setMateriais(novosMateriais);
   };
 
   const handleObservacoesChange = (novasObservacoes) => {
     setObservacoesData(novasObservacoes);
-    apiClient.setObservacoes(novasObservacoes);
+    // apiClient.setObservacoes(novasObservacoes);
   };
 
   /* --- FUNÇÃO DE SALVAR --- */
-  // Esta função chama a API para persistir o cache no servidor
   const handleSave = async () => {
     setIsSaving(true);
     setSaveError(null);
+
+    // Reúne todos os dados do estado em um objeto para a API
+    const dadosParaSalvar = {
+      // Dados do Prefácio
+      nome: prefacioData.nome,
+      estado: prefacioData.estado,
+      cidade: prefacioData.cidade,
+      texto_prefacio: prefacioData.texto, // Exemplo
+      
+      // Dados de Ambientes (isto é mais complexo)
+      // A API pode querer que você salve os ambientes em /ambientes/
+      // e não junto com a obra. Isso depende da sua API.
+      // Para este exemplo, vou assumir que a API de obra NÃO salva ambientes
+      // e que os CardUnidades/CardAreaComum salvam a si mesmos (o que não fazem).
+      // Por simplicidade, vamos focar em salvar os dados do 'prefacio'
+      
+      // VAMOS ASSUMIR que a API aceita um 'patch' só com os dados do prefácio
+      observacoes: observacoesData,
+      // materiais: materialData, //...etc
+    };
+
     try {
-      await apiClient.saveDados();
-      // Opcional: mostrar uma mensagem de sucesso (ex: toast)
-      console.log('Dados salvos com sucesso!');
+      let response;
+      if (id) {
+        response = await obras.partialUpdate(id, dadosParaSalvar); // Usando partialUpdate (PATCH)
+        console.log('Projeto atualizado!', response.data);
+      } else {
+        // Se não temos ID, CRIA (create) um novo projeto
+        response = await obras.create(dadosParaSalvar); //
+        console.log('Projeto criado!', response.data);
+        // Opcional: redirecionar para a nova URL /projeto/NOVO_ID
+        // navigate(`/projeto/${response.data.id}`);
+      }
+      
     } catch (error) {
       console.error("Erro ao salvar:", error);
       setSaveError(error.message || 'Falha ao salvar. Tente novamente.');
@@ -107,9 +181,18 @@ const Projeto = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="vh-100 d-flex justify-content-center align-items-center">
+        <CSpinner color="primary" />
+        <span className="ms-3">Carregando Projeto...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="body bg-body-tertiary vh-100 d-flex flex-column align-items-center">
-      <CHeader position="sticky" className="d-flex w-100 p-4 pb-0" onLoad={() => setColorMode('light')}>
+      <CHeader position="sticky" className="d-flex w-100 p-4 pb-0">
         <CRow className="header-row w-100 justify-content-between align-items-center">
           <CContainer>
             <CImage src="/images/Logo Vermelha.png" alt="JotaNunes Logo" height={48} />
@@ -162,12 +245,19 @@ const Projeto = () => {
         <hr className="w-100" />
         <CRow className="div-tabs w-100">
           <MenuTabs activeIndex={activeTab} onChange={setActiveTab} />
-          <CButton className="btn-salvar" onClick={handleSave} disabled={isSaving}>Enviar</CButton>
+          <CButton className="btn-salvar" onClick={handleSave} disabled={isSaving}>
+            {isSaving ? 'Salvando...' : (id ? 'Atualizar' : 'Salvar Novo')}
+          </CButton>
         </CRow>
       </CHeader>
 
+      {saveError && (
+        <CContainer className="w-75 p-2 bg-danger-light text-danger border rounded">
+          Erro: {saveError}
+        </CContainer>
+      )}
+
       <div className="background w-100 d-flex justify-content-center align-items-center flex-grow-1">
-        {/* Agora passamos os NOVOS handlers para os componentes filhos */}
         {activeTab === 0 && <CardPrefacio prefacio={prefacioData} setPrefacio={handlePrefacioChange} />}
         {activeTab === 1 && <CardUnidades ambientes={unidadesData} setAmbientes={handleUnidadesChange} />}
         {activeTab === 2 && <CardAreaComum ambientes={areacomumData} setAmbientes={handleAreaComumChange} />}

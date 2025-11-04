@@ -18,7 +18,7 @@ export default function CardObservacoes({ observacoes, setObservacoes }) {
         <textarea
           className="w-100 h-75 form-control"
           placeholder="Observações do projeto"
-          value={observacoes[0].observacao}
+          value={observacoes.texto}
           onChange={handleChange}
         ></textarea>
       </CCardBody>

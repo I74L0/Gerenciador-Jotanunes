@@ -7,11 +7,11 @@ import {
   CHeader,
   CImage,
   CContainer,
-  CCard, // Adicionei CCard para o exemplo de listagem
+  CCard,
   CCardBody,
   CCardTitle,
   CCardText,
-  CSpinner, // Adicionei CSpinner para feedback de loading
+  CSpinner,
 } from "@coreui/react";
 import './Index-style.css';
 
