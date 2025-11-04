@@ -27,16 +27,11 @@ export default function DescricaoPopup({ referenceElement, onSelect, onAdd, onCl
             // Chama a API para obter a lista base
             const response = await descricoes.list(); 
             
-            // ATENÇÃO: Ajuste a linha abaixo para acessar o array de strings corretamente
-            // Assumindo que a API retorna um array de objetos, e você quer a propriedade 'nome' ou 'texto'
-            // Exemplo: se a resposta for [{id: 1, nome: "Porcelanato"}, ...]
             descricoesBaseDaAPI = response.data.map(item => item.detalhe);
             // Se a API retorna um array de strings diretamente: descricoesBaseDaAPI = response.data;
         }
 
         const salvos = JSON.parse(localStorage.getItem('descricoesSalvas') || '[]');
-        
-        // Combina a lista da API com os itens salvos localmente
         const todas = Array.from(new Set([...descricoesBaseDaAPI, ...salvos]));
         setItems(todas);
       } catch (error) {
@@ -48,33 +43,53 @@ export default function DescricaoPopup({ referenceElement, onSelect, onAdd, onCl
     };
     
     carregarDescricoesBase();
-  }, []); // Dependência vazia: roda apenas uma vez na montagem
+  }, []);
 
   const filtered = items.filter(i =>
     i.toLowerCase().includes(search.toLowerCase())
   );
 
+  // estado para fluxo de adicionar inline (substitui prompt)
+  const [adding, setAdding] = useState(false);
+  const [newDesc, setNewDesc] = useState('');
+
   const handleAdd = () => {
-    const novo = prompt("Digite a nova descrição:");
+    setAdding(true);
+    setNewDesc('');
+  };
+
+  const confirmAdd = () => {
+    const novo = newDesc && newDesc.trim();
     if (novo && !items.includes(novo)) {
       const atualizados = [...items, novo];
       setItems(atualizados);
-      
-      // Filtra os itens da base antes de salvar no localStorage
-      const itensSalvos = atualizados.filter(x => !descricoesBaseDaAPI.includes(x));
-      localStorage.setItem('descricoesSalvas', JSON.stringify(itensSalvos));
+      localStorage.setItem('descricoesSalvas', JSON.stringify(atualizados.filter(x => !descricoesBaseDaAPI.includes(x))));
       onAdd(novo);
     }
+    setAdding(false);
+    setNewDesc('');
+  };
+
+  const cancelAdd = () => {
+    setAdding(false);
+    setNewDesc('');
   };
 
   useEffect(() => {
-    const esc = (e) => e.key === 'Escape' && onClose();
+    const esc = (e) => {
+      if (e.key === 'Escape') {
+        if (adding) {
+          cancelAdd();
+        } else {
+          onClose();
+        }
+      }
+    };
     document.addEventListener('keydown', esc);
     return () => document.removeEventListener('keydown', esc);
-  }, [onClose]);
+  }, [onClose, adding]);
 
   return (
-    // ... restante do seu código JSX ...
     <div
       data-descricao-popup="true"
       ref={setPopperElement}
@@ -106,7 +121,6 @@ export default function DescricaoPopup({ referenceElement, onSelect, onAdd, onCl
           paddingTop: '4px',
         }}
       >
-        {items.length === 0 && <p className="text-muted small text-center py-2">Carregando descrições...</p>}
         {filtered.map((desc, i) => (
           <div
             key={i}
@@ -122,18 +136,39 @@ export default function DescricaoPopup({ referenceElement, onSelect, onAdd, onCl
             {desc}
           </div>
         ))}
-        {filtered.length === 0 && items.length > 0 && (
+        {filtered.length === 0 && (
           <div className="text-muted small text-center py-2">
             Nenhum resultado encontrado
           </div>
         )}
       </div>
-      <button
-        className="btn btn-sm btn-outline-primary mt-2 w-100"
-        onClick={handleAdd}
-      >
-        <IoIosAddCircle style={{ marginRight: '4px', verticalAlign: 'middle' }} /> Adicionar Nova
-      </button>
+      {adding ? (
+        <div className="clicado_novaDescricao">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Nova descrição..."
+            value={newDesc}
+            onChange={(e) => setNewDesc(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') confirmAdd();
+              if (e.key === 'Escape') cancelAdd();
+            }}
+            autoFocus
+          />
+          <div className='clicado_novaDescricao_botoes'>
+            <button className="btn btn-sm btn-primary" onClick={confirmAdd}>Adicionar</button>
+            <button className="btn btn-sm btn-secondary" onClick={cancelAdd}>Cancelar</button>
+          </div>
+        </div>
+      ) : (
+        <button
+          className="btn btn-sm btn-outline-primary mt-2 w-100"
+          onClick={handleAdd}
+        >
+          + Adicionar
+        </button>
+      )}
     </div>
   );
 }

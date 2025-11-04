@@ -308,3 +308,15 @@ body {
     border-radius: 5px;
   }
 }
+
+.clicado_novaDescricao {
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.clicado_novaDescricao_botoes {
+  display: flex;
+  gap: 0.5rem;
+}

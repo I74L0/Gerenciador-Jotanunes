@@ -13,28 +13,17 @@ import {
   CTableRow,
 } from '@coreui/react'
 import { IoIosAddCircle } from "react-icons/io";
-// usePopper, FaCheck e BsXLg ainda são necessários
 import { FaCheck } from 'react-icons/fa'
 import { BsXLg } from 'react-icons/bs'
 
 // Importa o componente DescricaoPopup
-import DescricaoPopup from '../../../components/DescricaoPopup'; 
+import DescricaoPopup from '../../../components/DescricaoPopup';
 
 export default function CardUnidades({ ambientes, setAmbientes }) {
   const [popupTarget, setPopupTarget] = useState(null);
 
-  // Função utilitária para ajustar o tamanho da textarea (precisa ser definida)
-  // Se não estiver definida, vai gerar um erro. Mantenha aqui para a lógica do popup
-  const adjustTextareaSize = (el) => {
-    if (el) {
-        el.style.height = 'auto';
-        el.style.height = el.scrollHeight + 'px';
-    }
-  }
-
-
   const adicionarAmbiente = () => {
-    const novo = { nome: `Novo Ambiente ${ambientes.length + 1}`, editando: true, aberto: true, linhas: [] }
+    const novo = { nome: `Novo Ambiente ${ambientes.length + 1}`, editando: true, aberto: true, items: [] }
     setAmbientes([...ambientes, novo])
   }
 
@@ -60,27 +49,31 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
     setAmbientes(novos)
   }
 
-  const adicionarLinha = (idx) => {
+  const adicionarItem = (idx) => {
     const novos = [...ambientes]
-    novos[idx].linhas.push({ item: '', descricao: '', status: false })
+    if (!novos[idx].items) novos[idx].items = []
+    novos[idx].items.push({ item: '', descricao: '', status: false })
     setAmbientes(novos)
   }
 
-  const atualizarLinha = (idxAmb, idxLinha, campo, valor) => {
+  const atualizarItem = (idxAmb, idxItem, campo, valor) => {
     const novos = [...ambientes]
-    novos[idxAmb].linhas[idxLinha][campo] = valor
+    if (!novos[idxAmb].items) return
+    novos[idxAmb].items[idxItem][campo] = valor
     setAmbientes(novos)
   }
 
-  const removerLinha = (idxAmb, idxLinha) => {
+  const removerItem = (idxAmb, idxItem) => {
     const novos = [...ambientes]
-    novos[idxAmb].linhas.splice(idxLinha, 1)
+    if (!novos[idxAmb].items) return
+    novos[idxAmb].items.splice(idxItem, 1)
     setAmbientes(novos)
   }
 
-  const toggleStatus = (idxAmb, idxLinha) => {
+  const toggleStatus = (idxAmb, idxItem) => {
     const novos = [...ambientes]
-    novos[idxAmb].linhas[idxLinha].status = !novos[idxAmb].linhas[idxLinha].status
+    if (!novos[idxAmb].items) return
+    novos[idxAmb].items[idxItem].status = !novos[idxAmb].items[idxItem].status
     setAmbientes(novos)
   }
 
@@ -89,7 +82,6 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
       if (!popupTarget) return;
       const popupEl = document.querySelector('[data-descricao-popup="true"]');
       const clickedInsidePopup = popupEl && popupEl.contains(e.target);
-      // Aqui usamos a ref do elemento que abriu o popup para verificar o clique
       const clickedTextarea = popupTarget.ref && popupTarget.ref.contains(e.target);
 
       if (!clickedInsidePopup && !clickedTextarea) {
@@ -168,7 +160,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                         </CTableRow>
                       </CTableHead>
                       <CTableBody>
-                        {amb.linhas.map((linha, i) => (
+                        { (amb.items || []).map((linha, i) => (
                           <CTableRow key={i}>
                             <CTableDataCell>
                               <textarea
@@ -176,7 +168,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                                 rows="1"
                                 value={linha.item}
                                 onChange={(e) =>
-                                  atualizarLinha(idx, i, 'item', e.target.value)
+                                  atualizarItem(idx, i, 'item', e.target.value)
                                 }
                                 onInput={(e) => {
                                   e.target.style.height = 'auto'
@@ -194,10 +186,10 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                                 value={linha.descricao}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setPopupTarget({ ambIdx: idx, linhaIdx: i, ref: e.target });
+                                  setPopupTarget({ ambIdx: idx, itemIdx: i, ref: e.target });
                                 }}
                                 onChange={(e) =>
-                                  atualizarLinha(idx, i, 'descricao', e.target.value)
+                                  atualizarItem(idx, i, 'descricao', e.target.value)
                                 }
                                 onInput={(e) => {
                                   e.target.style.height = 'auto';
@@ -207,11 +199,11 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                               {/* Renderiza o DescricaoPopup se for o alvo correto */}
                               {popupTarget &&
                                 popupTarget.ambIdx === idx &&
-                                popupTarget.linhaIdx === i && (
+                                popupTarget.itemIdx === i && (
                                   <DescricaoPopup
                                     referenceElement={popupTarget.ref}
                                     onSelect={(desc) => {
-                                      atualizarLinha(idx, i, 'descricao', desc);
+                                      atualizarItem(idx, i, 'descricao', desc);
                                       setPopupTarget(null);
                                       // Usa a função auxiliar para ajustar o tamanho da textarea
                                       setTimeout(() => { 
@@ -219,7 +211,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                                       }, 0)
                                     }}
                                     onAdd={(novo) => {
-                                      atualizarLinha(idx, i, 'descricao', novo);
+                                      atualizarItem(idx, i, 'descricao', novo);
                                       setPopupTarget(null);
                                       // Não precisa de setTimeout/adjustTextareaSize aqui, pois a alteração manual já faz isso
                                     }}
@@ -246,7 +238,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                               <CButton
                                 color="danger"
                                 size="sm"
-                                onClick={() => removerLinha(idx, i)}
+                                onClick={() => removerItem(idx, i)}
                               >
                                 Remover
                               </CButton>
@@ -258,7 +250,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                             <CButton
                               color="success"
                               size="sm"
-                              onClick={() => adicionarLinha(idx)}
+                              onClick={() => adicionarItem(idx)}
                             >
                               + Adicionar Linha
                             </CButton>
