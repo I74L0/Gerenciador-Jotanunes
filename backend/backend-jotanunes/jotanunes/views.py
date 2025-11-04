@@ -45,6 +45,7 @@ def usuario_logout_view(request):
     return Response({"detail": "Logout bem-sucedido. O token deve ser descartado no cliente."}, status=status.HTTP_200_OK)
 
 
+
 class ObraViewSet(viewsets.ModelViewSet):
     queryset = Obra.objects.all().order_by('-id')
     serializer_class = ObraSerializer
@@ -59,6 +60,32 @@ class ObraViewSet(viewsets.ModelViewSet):
             self.permission_classes = [permissions.IsAuthenticated, IsGestor]
         return super().get_permissions()
 
+    @action(detail=True, methods=['post'], url_path='finalizar')
+    def finalizar_obra(self, request, pk=None):
+        """
+        Ação personalizada para mudar o status de uma obra
+        de 'NAO_FINALIZADO' para 'EM_ANALISE'.
+        """
+        try:
+            obra = self.get_object()
+            
+            if obra.status != 'NAO_FINALIZADO':
+                return Response(
+                    {'error': f'A obra com status "{obra.status}" não pode ser movida para "Em Análise".'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            obra.status = 'EM_ANALISE'
+            obra.save(update_fields=['status'])
+
+            serializer = self.get_serializer(obra)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {'error': f'Ocorreu um erro: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     @action(detail=True, methods=['post'], url_path='duplicar')
     def duplicar(self, request, pk=None):
         try:
@@ -93,6 +120,7 @@ class ObraViewSet(viewsets.ModelViewSet):
                 status='EM_ANALISE'
             )
             
+            
             mapa_torres = {}
             for torre in original_obra.torres.all():
                 nova_torre = Torre.objects.create(obra=nova_obra, nome=torre.nome)
@@ -116,20 +144,17 @@ class ObraViewSet(viewsets.ModelViewSet):
             obra=nova_obra, 
             torre=nova_torre, 
             nome=ambiente_original.nome,
-            metragem=getattr(ambiente_original, 'metragem', None)
         )
         for item in ambiente_original.itens.all():
             novo_item = Item.objects.create(
                 ambiente=novo_ambiente, 
                 nome=item.nome, 
-                posicao=getattr(item, 'posicao', None)
             )
             novo_item.descricoes.set(item.descricoes.all())
             for material in item.materiais.all():
                 novo_material = Material.objects.create(
                     item=novo_item, 
                     descricao=material.descricao, 
-                    dimensao=getattr(material, 'dimensao', None)
                 )
                 novo_material.marcas.set(material.marcas.all())
     
@@ -167,8 +192,9 @@ class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['ambiente']
+    filterset_fields = ['nome', 'descricoes']
     search_fields = ['nome']
+
 
 class MaterialViewSet(viewsets.ModelViewSet):
     queryset = Material.objects.all()
