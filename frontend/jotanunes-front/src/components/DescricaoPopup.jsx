@@ -28,7 +28,6 @@ export default function DescricaoPopup({ referenceElement, onSelect, onAdd, onCl
             const response = await descricoes.list(); 
             
             descricoesBaseDaAPI = response.data.map(item => item.detalhe);
-            // Se a API retorna um array de strings diretamente: descricoesBaseDaAPI = response.data;
         }
 
         const salvos = JSON.parse(localStorage.getItem('descricoesSalvas') || '[]');

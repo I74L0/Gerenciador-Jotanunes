@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react"; //
 import { useNavigate } from 'react-router-dom'
 import {
   CButton,
@@ -7,18 +7,94 @@ import {
   CHeader,
   CImage,
   CContainer,
+  CCard, // Adicionei CCard para o exemplo de listagem
+  CCardBody,
+  CCardTitle,
+  CCardText,
+  CSpinner, // Adicionei CSpinner para feedback de loading
 } from "@coreui/react";
 import './Index-style.css';
 
+import { obras } from "../../../apiClient";
+
 const Index = () => {
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false); //
 
-  const [showModal, setShowModal] = useState(false);
+  const [obrasLista, setObrasLista] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const handleTemplateVazio = () => {
     navigate('/projeto');
     return;
   }
+
+  // Efeito para carregar os dados
+  useEffect(() => {
+    const carregarObras = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await obras.list(); 
+        setObrasLista(response.data); 
+      } catch (error) {
+        console.error("Erro ao carregar obras:", error);
+        setError("Falha ao carregar as obras. Tente novamente.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    carregarObras();
+  }, []);
+
+  // Função para renderizar o conteúdo principal
+  const renderMainContent = () => {
+    if (isLoading) {
+      return (
+        <div className="d-flex justify-content-center align-items-center h-100">
+          <CSpinner color="primary" />
+          <span className="ms-2">Carregando obras...</span>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="d-flex justify-content-center align-items-center h-100 text-danger">
+          {error}
+        </div>
+      );
+    }
+
+    if (obrasLista.length === 0) {
+      return (
+        <div className="d-flex justify-content-center align-items-center h-100">
+          <p>Nenhuma obra encontrada.</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="obras-grid p-3">
+        {obrasLista.map((obra) => (
+          <CCard key={obra.id} className="mb-3">
+            <CCardBody>
+              <CCardTitle>{obra.nome || `Obra ID: ${obra.id}`}</CCardTitle>
+              <CCardText>
+                {obra.cidade && obra.estado ? `${obra.cidade} - ${obra.estado}` : 'Localização não definida'}
+              </CCardText>
+              <CButton onClick={() => navigate(`/projeto/${obra.id}`)}>
+                Abrir Projeto
+              </CButton>
+            </CCardBody>
+          </CCard>
+        ))}
+      </div>
+    );
+  };
   
   return (
     <div className="create-page d-flex flex-column vh-100">
@@ -91,7 +167,10 @@ const Index = () => {
               </CForm>
             </div>
 
-            <div className="main-content-placeholder" style={{ minHeight: 420 }} />
+            <div className="main-content-placeholder" style={{ minHeight: 420 }}>
+              {/* 7. Chama a função de renderização */}
+              {renderMainContent()}
+            </div>
           </div>
         </div>
         <div className="side right" />
