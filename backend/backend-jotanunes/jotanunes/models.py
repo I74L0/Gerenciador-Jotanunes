@@ -13,7 +13,6 @@ class Estado(models.Model):
 
     class Meta:
         verbose_name = "Estado"
-        verbose_name_plural = "Estados"
         ordering = ['nome']
 
     def __str__(self):
@@ -30,7 +29,6 @@ class Cidade(models.Model):
 
     class Meta:
         verbose_name = "Cidade"
-        verbose_name_plural = "Cidades"
         ordering = ['nome']
 
     def __str__(self):
@@ -42,7 +40,7 @@ class Obra(models.Model):
     estado = models.CharField(max_length=2, blank=True)
     descricao = models.TextField(blank=True, null=True)
     endereco_completo = models.TextField("Endereço Completo", blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDENTE')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='NAO_FINALIZADO')
 
     def __str__(self):
         return self.nome
@@ -54,20 +52,6 @@ class Torre(models.Model):
     def __str__(self):
         return f'{self.nome} - {self.obra.nome}'
 
-class Ambiente(models.Model):
-    obra = models.ForeignKey(Obra, related_name='ambientes', on_delete=models.CASCADE, null=True)
-    torre = models.ForeignKey(Torre, related_name='ambientes', on_delete=models.CASCADE, null=True, blank=True)
-    nome = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.nome
-
-class Marca(models.Model):
-    nome = models.CharField(max_length=255, unique=True)
-
-    def __str__(self):
-        return self.nome
-
 class Descricao(models.Model):
     detalhe = models.CharField(max_length=255, unique=True)
 
@@ -75,9 +59,24 @@ class Descricao(models.Model):
         return self.detalhe
 
 class Item(models.Model):
-    ambiente = models.ForeignKey(Ambiente, related_name='itens', on_delete=models.CASCADE)
     nome = models.CharField(max_length=255)
     descricoes = models.ManyToManyField(Descricao, related_name='itens', blank=True)
+
+    def __str__(self):
+        return self.nome
+
+class Ambiente(models.Model):
+    obra = models.ForeignKey(Obra, related_name='ambientes', on_delete=models.CASCADE, null=True)
+    torre = models.ForeignKey(Torre, related_name='ambientes', on_delete=models.CASCADE, null=True, blank=True)
+    nome = models.CharField(max_length=255)
+    itens = models.ManyToManyField(Item, related_name='ambientes', blank=True)
+
+    def __str__(self):
+        return self.nome
+
+class Marca(models.Model):
+    nome = models.CharField(max_length=255, unique=True)
+
     def __str__(self):
         return self.nome
 
