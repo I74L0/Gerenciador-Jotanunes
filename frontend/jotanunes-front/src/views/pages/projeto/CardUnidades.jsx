@@ -182,7 +182,6 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                                 className="auto-expand"
                                 rows="1"
                                 // Cria uma referência para a textarea na linha atual
-                                ref={(el) => linha.descricaoRef = el} 
                                 value={linha.descricao}
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -203,12 +202,17 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                                   <DescricaoPopup
                                     referenceElement={popupTarget.ref}
                                     onSelect={(desc) => {
+                                      const targetRef = popupTarget.ref; 
+                                    
                                       atualizarItem(idx, i, 'descricao', desc);
                                       setPopupTarget(null);
-                                      // Usa a função auxiliar para ajustar o tamanho da textarea
+                                    
                                       setTimeout(() => { 
-                                        if(linha.descricaoRef) adjustTextareaSize(linha.descricaoRef)
-                                      }, 0)
+                                        if (targetRef) {
+                                          targetRef.style.height = 'auto';
+                                          targetRef.style.height = targetRef.scrollHeight + 'px';
+                                        }
+                                      }, 0);
                                     }}
                                     onAdd={(novo) => {
                                       atualizarItem(idx, i, 'descricao', novo);
