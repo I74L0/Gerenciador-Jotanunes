@@ -93,7 +93,7 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
-  paramsSerializer,
+  // paramsSerializer,
 })
 
 // --- Autenticação ---
@@ -157,6 +157,145 @@ export const saveBlob = (blob, filename = 'download.bin') => {
   window.URL.revokeObjectURL(url)
 }
 
+// --- Funções de Autenticação ---
+export const login = async (username, password) => {
+  try {
+    const response = await apiClient.post('/token/', { username, password })
+    const { access, refresh } = response.data
+
+    if (access && refresh) {
+      localStorage.setItem('accessToken', access)
+      localStorage.setItem('refreshToken', refresh)
+      setAuthToken(access) // Define o header para requisições futuras
+    }
+    
+    return response // Retorna a resposta completa caso o componente precise dela
+  } catch (error) {
+    // Limpa tokens em caso de falha de login (opcional, mas seguro)
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    setAuthToken(null)
+    throw error // Lança o erro para o componente de login tratar
+  }
+}
+export const refreshToken = (refreshToken) => apiClient.post('/token/refresh/', { refresh: refreshToken })/**
+
+* Desloga o usuário, limpando tokens e redirecionando.
+*/
+export const handleLogout = () => {
+ localStorage.removeItem('accessToken')
+ localStorage.removeItem('refreshToken')
+ setAuthToken(null)
+ 
+ // Redireciona para a página de login
+ // Evita loops de redirecionamento se já estiver no login
+ if (window.location.pathname !== '/login') {
+   window.location.href = '/login?sessionExpired=true'
+ }
+}
+
+// --- LÓGICA DE INTERCEPTAÇÃO ---
+let isRefreshing = false
+let failedQueue = [] // Fila de requisições que falharam
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error)
+    } else {
+      prom.resolve(token)
+    }
+  })
+  failedQueue = []
+}
+
+apiClient.interceptors.response.use(
+  (response) => {
+    // Passa direto se a resposta for bem-sucedida
+    return response
+  },
+  async (error) => {
+    const originalRequest = error.config
+
+    // Verificamos se o erro é 401 ou 403 E se a requisição já não é uma tentativa de "retry"
+    // O usuário mencionou 403, mas 401 é mais comum para token *expirado*. Vamos tratar ambos.
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403) &&
+      !originalRequest._retry
+    ) {
+      // Se já estamos atualizando o token, colocamos esta requisição na fila
+      if (isRefreshing) {
+        return new Promise(function (resolve, reject) {
+          failedQueue.push({ resolve, reject })
+        })
+          .then((token) => {
+            originalRequest.headers['Authorization'] = 'Bearer ' + token
+            return apiClient(originalRequest) // Tenta novamente com o novo token
+          })
+          .catch((err) => {
+            return Promise.reject(err)
+          })
+      }
+
+      // Esta é a primeira requisição a falhar, então iniciamos o refresh
+      originalRequest._retry = true
+      isRefreshing = true
+
+      const currentRefreshToken = localStorage.getItem('refreshToken')
+      if (!currentRefreshToken) {
+        // Se não há refresh token, não há como continuar. Deslogamos.
+        handleLogout()
+        return Promise.reject(error)
+      }
+
+      try {
+        const response = await refreshToken(currentRefreshToken)
+        const { access, refresh: newRefreshToken } = response.data
+
+        // 1. Armazena os novos tokens
+        localStorage.setItem('accessToken', access)
+        if (newRefreshToken) {
+          // A API pode ou não retornar um novo refresh token
+          localStorage.setItem('refreshToken', newRefreshToken)
+        }
+
+        // 2. Atualiza o header padrão do axios
+        setAuthToken(access)
+
+        // 3. Atualiza o header da requisição original
+        originalRequest.headers['Authorization'] = 'Bearer ' + access
+
+        // 4. Processa a fila de requisições pendentes com o novo token
+        processQueue(null, access)
+
+        // 5. Retenta a requisição original
+        return apiClient(originalRequest)
+      } catch (refreshError) {
+        // Se o REFRESH falhar (ex: refresh token também expirou), deslogamos o usuário
+        processQueue(refreshError, null)
+        handleLogout()
+        return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
+      }
+    }
+
+    // Para qualquer outro erro, apenas rejeitamos a promise
+    return Promise.reject(error)
+  },
+)
+
+// --- Inicialização do Cliente ---
+// Ao carregar o app, verifica se já existe um token no localStorage
+// e define o header padrão do axios.
+;(() => {
+  const token = localStorage.getItem('accessToken')
+  if (token) {
+    setAuthToken(token)
+  }
+})()
+
 // --- Funções do Endpoint: /api/marcas ---
 /**
  * Lista todas as marcas (GET /api/marcas/)
@@ -172,10 +311,6 @@ export const getMarcaById = (id) => apiClient.get(`/marcas/${id}/`)
 export const updateMarca = (id, marcaData) => apiClient.put(`/marcas/${id}/`, marcaData)
 export const partialUpdateMarca = (id, marcaData) => apiClient.patch(`/marcas/${id}/`, marcaData)
 export const deleteMarca = (id) => apiClient.delete(`/marcas/${id}/`)
-
-// --- Funções de Autenticação ---
-export const login = (username, password) => apiClient.post('/token/', { username, password })
-export const refreshToken = (refreshToken) => apiClient.post('/token/refresh/', { refresh: refreshToken })
 
 // --- Funções do Endpoint: /api/obras ---
 export const obras = {
