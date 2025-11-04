@@ -1,7 +1,7 @@
 # fullstack-jotanunes (RODANDO SEM O DOCKER E MYSQL, APENAS PARA TESTE)
-Branch :ndocker
+Branch :italo
 
-no início precisamos ativar o venv
+No início precisamos ativar o venv
 
 (TUDO A BAIXO PRECISA SER DIGITADO NO TERMINAL)
 
@@ -58,3 +58,23 @@ quando chegarmos ao frontend, digitamos npm start
 com isso teremos http://localhost:3000
 
 e so acender o front
+
+## Código pro Back
+```
+python -m venv venv
+venv\Scripts\activate.bat
+cd backend/backend-jotanunes
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+
+```
+
+## Código pro Front
+
+```
+cd frontend/jotanunes-front
+npm install
+npm start
+
+```
