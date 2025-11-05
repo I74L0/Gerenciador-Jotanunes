@@ -117,21 +117,16 @@ const Index = () => {
         className="subbar d-flex justify-content-between align-items-center px-4 py-2 border-bottom bg-light"
       >
         <div className="d-flex gap-3">
-          <CButton
-            color="light"
-            className="text-danger fw-bold d-flex align-items-center gap-2 border-0 bg-transparent"
-          >
-            <CImage src="/images/mais.png" alt="Mais" height={20} />
-            <span className="text-dark">Cadastrar Materiais</span>
-          </CButton>
+        <CButton
+           color="light"
+           className="text-danger fw-bold d-flex align-items-center gap-2 border-0"
+           onClick={handleTemplateVazio}
+           style={{ zIndex: 9999, backgroundColor: "#f5f6f8" }}
+        >
+          <CImage src="/images/mais.png" alt="Mais" height={20} />
+          <span className="text-dark">Criar Projeto</span>
+        </CButton>
 
-          <CButton
-            color="light"
-            className="text-danger fw-bold d-flex align-items-center gap-2 border-0 bg-transparent"
-          >
-            <CImage src="/images/mais.png" alt="Mais" height={20} />
-            <span className="text-dark" onClick={handleTemplateVazio}>Criar Projeto</span>
-          </CButton>
         </div>
 
         <div className="flex-grow-1 px-3">
