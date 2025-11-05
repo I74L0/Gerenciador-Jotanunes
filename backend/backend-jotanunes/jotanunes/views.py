@@ -90,7 +90,7 @@ class ObraViewSet(viewsets.ModelViewSet):
                 estado=original_obra.estado,
                 endereco_completo=original_obra.endereco_completo,
                 descricao=original_obra.descricao,
-                status='PENDENTE'
+                status='EM_ANALISE'
             )
             
             mapa_torres = {}

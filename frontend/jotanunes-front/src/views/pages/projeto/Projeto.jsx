@@ -58,7 +58,6 @@ const Projeto = () => {
   // Carrega os dados iniciais da API para o estado do React
   useEffect(() => {
     apiClient.getDados().then(d => {
-      // Usamos '||' para garantir que o estado não receba 'undefined'
       setPrefacioData(d.prefacioData || { nome: '', estado: '', cidade: '', texto: '' });
       setUnidadesData(d.unidadesData || []);
       setAreacomumData(d.areacomumData || []);
@@ -66,14 +65,12 @@ const Projeto = () => {
       setObservacoesData(d.observacoesData || []);
     }).catch(error => {
       console.error("Falha ao carregar dados:", error);
-      // Você pode definir um estado de erro aqui para mostrar na UI
     });
-  }, [])/* --- NOVOS HANDLERS --- */
-  // Estes handlers atualizam o estado do React E o cache da API
+  }, [])
 
   const handlePrefacioChange = (novoPrefacio) => {
-    setPrefacioData(novoPrefacio); // 1. Atualiza o estado do React (UI)
-    apiClient.setPrefacio(novoPrefacio); // 2. Atualiza o cache da API (para salvar)
+    setPrefacioData(novoPrefacio);
+    apiClient.setPrefacio(novoPrefacio);
   };
 
   const handleUnidadesChange = (novasUnidades) => {

@@ -279,170 +279,168 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
   return (
     <CCard className="h-100 w-75">
       <CCardBody className="p-0">
-        <>
-          <CRow className="justify-content-between align-items-center mb-2 mt-3">
-            <div
-              className="d-flex align-items-center add-ambiente"
-              onClick={adicionarAmbiente}
-              style={{ cursor: 'pointer' }}
-            >
-              <IoIosAddCircle className="circle-icon" />
-              <span className="ms-2">Adicionar Ambiente</span>
-            </div>
-          </CRow>
-          <hr />
-          <div className="lista-ambientes">
-            {ambientes.map((amb, idx) => (
-              <div key={idx}>
-                <CRow
-                  className="linha-ambiente justify-content-between align-items-center"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => toggleCollapse(idx)}
-                >
-                  <div className="nome-wrapper">
-                    {amb.editando ? (
-                      <input
-                        type="text"
-                        className="inline-input"
-                        autoFocus
-                        value={amb.nome}
-                        onChange={(e) => atualizarNome(idx, e.target.value)}
-                        onBlur={() => finalizarEdicao(idx)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') finalizarEdicao(idx)
-                        }}
-                      />
-                    ) : (
-                      <span className="nome-ambiente">{`${idx + 1}. ${amb.nome}`}</span>
-                    )}
-                  </div>
-
-                  <div className="acao-remover">
-                    <CButton
-                      color="danger"
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        removerAmbiente(idx)
+        <CRow className="justify-content-between align-items-center mb-2 mt-3">
+          <div
+            className="d-flex align-items-center add-ambiente"
+            onClick={adicionarAmbiente}
+            style={{ cursor: 'pointer' }}
+          >
+            <IoIosAddCircle className="circle-icon" />
+            <span className="ms-2">Adicionar Ambiente</span>
+          </div>
+        </CRow>
+        <hr />
+        <div className="lista-ambientes">
+          {ambientes.map((amb, idx) => (
+            <div key={idx}>
+              <CRow
+                className="linha-ambiente justify-content-between align-items-center"
+                style={{ cursor: 'pointer' }}
+                onClick={() => toggleCollapse(idx)}
+              >
+                <div className="nome-wrapper">
+                  {amb.editando ? (
+                    <input
+                      type="text"
+                      className="inline-input"
+                      autoFocus
+                      value={amb.nome}
+                      onChange={(e) => atualizarNome(idx, e.target.value)}
+                      onBlur={() => finalizarEdicao(idx)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') finalizarEdicao(idx)
                       }}
-                    >
-                      Remover Ambiente
-                    </CButton>
-                  </div>
-                </CRow>
+                    />
+                  ) : (
+                    <span className="nome-ambiente">{`${idx + 1}. ${amb.nome}`}</span>
+                  )}
+                </div>
 
-                <CCollapse className='div-collapse' visible={amb.aberto}>
-                  <CCard>
-                    <CTable bordered>
-                      <CTableHead>
-                        <CTableRow>
-                          <CTableHeaderCell>Item</CTableHeaderCell>
-                          <CTableHeaderCell>Descrição</CTableHeaderCell>
-                          <CTableHeaderCell>Status</CTableHeaderCell>
-                          <CTableHeaderCell>Ações</CTableHeaderCell>
-                        </CTableRow>
-                      </CTableHead>
-                      <CTableBody>
-                        { (amb.items || []).map((linha, i) => (
-                          <CTableRow key={i}>
-                            <CTableDataCell>
-                              <textarea
-                                className="auto-expand"
-                                rows="1"
-                                value={linha.item}
-                                onChange={(e) =>
-                                  atualizarItem(idx, i, 'item', e.target.value)
-                                }
-                                onInput={(e) => {
-                                  e.target.style.height = 'auto'
-                                  e.target.style.height = e.target.scrollHeight + 'px'
-                                }}
-                              />
-                            </CTableDataCell>
+                <div className="acao-remover">
+                  <CButton
+                    color="danger"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      removerAmbiente(idx)
+                    }}
+                  >
+                    Remover Ambiente
+                  </CButton>
+                </div>
+              </CRow>
 
-                            <CTableDataCell style={{ position: 'relative' }}>
-                              <textarea
-                                className="auto-expand"
-                                rows="1"
-                                ref={(el) => linha.descricaoRef = el}
-                                value={linha.descricao}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setPopupTarget({ ambIdx: idx, itemIdx: i, ref: e.target });
-                                }}
-                                onChange={(e) =>
-                                  atualizarItem(idx, i, 'descricao', e.target.value)
-                                }
-                                onInput={(e) => {
-                                  e.target.style.height = 'auto';
-                                  e.target.style.height = e.target.scrollHeight + 'px';
-                                }}
-                              />
-                              {popupTarget &&
-                                popupTarget.ambIdx === idx &&
-                                popupTarget.itemIdx === i && (
-                                  <DescricaoPopup
-                                    referenceElement={popupTarget.ref}
-                                    onSelect={(desc) => {
-                                      atualizarItem(idx, i, 'descricao', desc);
-                                      setPopupTarget(null);
-                                      setTimeout(() => {
-                                        if(linha.descricaoRef) adjustTextareaSize(linha.descricaoRef)
-                                      }, 0)
-                                    }}
-                                    onAdd={(novo) => {
-                                      atualizarItem(idx, i, 'descricao', novo);
-                                      setPopupTarget(null);
-                                    }}
-                                    onClose={() => setPopupTarget(null)}
-                                  />
-                              )}
-                            </CTableDataCell>
+              <CCollapse className='div-collapse' visible={amb.aberto}>
+                <CCard>
+                  <CTable bordered>
+                    <CTableHead>
+                      <CTableRow>
+                        <CTableHeaderCell>Item</CTableHeaderCell>
+                        <CTableHeaderCell>Descrição</CTableHeaderCell>
+                        <CTableHeaderCell>Status</CTableHeaderCell>
+                        <CTableHeaderCell>Ações</CTableHeaderCell>
+                      </CTableRow>
+                    </CTableHead>
+                    <CTableBody>
+                      { (amb.items || []).map((linha, i) => (
+                        <CTableRow key={i}>
+                          <CTableDataCell>
+                            <textarea
+                              className="auto-expand"
+                              rows="1"
+                              value={linha.item}
+                              onChange={(e) =>
+                                atualizarItem(idx, i, 'item', e.target.value)
+                              }
+                              onInput={(e) => {
+                                e.target.style.height = 'auto'
+                                e.target.style.height = e.target.scrollHeight + 'px'
+                              }}
+                            />
+                          </CTableDataCell>
 
-                            <CTableDataCell
-                              style={{ textAlign: 'center', cursor: 'pointer' }}
+                          <CTableDataCell style={{ position: 'relative' }}>
+                            <textarea
+                              className="auto-expand"
+                              rows="1"
+                              ref={(el) => linha.descricaoRef = el}
+                              value={linha.descricao}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                toggleStatus(idx, i);
+                                setPopupTarget({ ambIdx: idx, itemIdx: i, ref: e.target });
                               }}
-                            >
-                              {linha.status ? (
-                                <FaCheck color="green" />
-                              ) : (
-                                <BsXLg color="red" strokeWidth={1} />
-                              )}
-                            </CTableDataCell>
+                              onChange={(e) =>
+                                atualizarItem(idx, i, 'descricao', e.target.value)
+                              }
+                              onInput={(e) => {
+                                e.target.style.height = 'auto';
+                                e.target.style.height = e.target.scrollHeight + 'px';
+                              }}
+                            />
+                            {popupTarget &&
+                              popupTarget.ambIdx === idx &&
+                              popupTarget.itemIdx === i && (
+                                <DescricaoPopup
+                                  referenceElement={popupTarget.ref}
+                                  onSelect={(desc) => {
+                                    atualizarItem(idx, i, 'descricao', desc);
+                                    setPopupTarget(null);
+                                    setTimeout(() => {
+                                      if(linha.descricaoRef) adjustTextareaSize(linha.descricaoRef)
+                                    }, 0)
+                                  }}
+                                  onAdd={(novo) => {
+                                    atualizarItem(idx, i, 'descricao', novo);
+                                    setPopupTarget(null);
+                                  }}
+                                  onClose={() => setPopupTarget(null)}
+                                />
+                            )}
+                          </CTableDataCell>
 
-                            <CTableDataCell>
-                              <CButton
-                                color="danger"
-                                size="sm"
-                                onClick={() => removerItem(idx, i)}
-                              >
-                                Remover
-                              </CButton>
-                            </CTableDataCell>
-                          </CTableRow>
-                        ))}
-                        <CTableRow>
-                          <CTableDataCell colSpan={4}>
+                          <CTableDataCell
+                            style={{ textAlign: 'center', cursor: 'pointer' }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleStatus(idx, i);
+                            }}
+                          >
+                            {linha.status ? (
+                              <FaCheck color="green" />
+                            ) : (
+                              <BsXLg color="red" strokeWidth={1} />
+                            )}
+                          </CTableDataCell>
+
+                          <CTableDataCell>
                             <CButton
-                              color="success"
+                              color="danger"
                               size="sm"
-                              onClick={() => adicionarItem(idx)}
+                              onClick={() => removerItem(idx, i)}
                             >
-                              + Adicionar Linha
+                              Remover
                             </CButton>
                           </CTableDataCell>
                         </CTableRow>
-                      </CTableBody>
-                    </CTable>
-                  </CCard>
-                </CCollapse>
-              </div>
-            ))}
-          </div>
-        </>
+                      ))}
+                      <CTableRow>
+                        <CTableDataCell colSpan={4}>
+                          <CButton
+                            color="success"
+                            size="sm"
+                            onClick={() => adicionarItem(idx)}
+                          >
+                            + Adicionar Linha
+                          </CButton>
+                        </CTableDataCell>
+                      </CTableRow>
+                    </CTableBody>
+                  </CTable>
+                </CCard>
+              </CCollapse>
+            </div>
+          ))}
+        </div>
       </CCardBody>
     </CCard>
   )

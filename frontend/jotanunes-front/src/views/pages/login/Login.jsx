@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react' 
 import { Link, useNavigate } from 'react-router-dom'
 import {
   CButton,
@@ -16,54 +16,49 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
+// --- IMPORTAÇÃO ATUALIZADA ---
+import { login, setAuthToken } from '../../../apiClient' // <--- Importe 'setAuthToken'
 import './Login-style.css';
 
 const Login = () => {
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(false);
+
+  const handleLogin = async (e) => { 
     e.preventDefault();
+    setError(false);
 
-    // 1. Defina a chave do cookie
-    const COOKIE_NAME = "AutorizacaoConcedida";
-    
-    // 2. Função auxiliar para verificar a existência do cookie
-    const hasAuthorizationCookie = () => {
-        // Verifica se a string de cookies contém o nome do nosso cookie
-        return document.cookie.split(';').some((item) => item.trim().startsWith(COOKIE_NAME + '='));
-    };
-
-    // 3. Simule a lógica de autenticação (sem a API por enquanto)
-    let isLoginSuccessful = false; 
-    
-    // VERIFICAÇÃO PRINCIPAL: O cookie de autorização existe?
-    if (hasAuthorizationCookie()) {
-        // Se o cookie existe, o login é bem-sucedido na segunda tentativa
-        isLoginSuccessful = true;
-    } else {
-        // Se o cookie NÃO existe (primeira tentativa de login)
+    try {
+        const response = await login(username, password);
         
-        // Crie o cookie com um tempo de expiração para "lembrar" o estado
-        // Exemplo: expira em 1 hora (max-age em segundos: 60 * 60)
-        // O 'path=/' garante que o cookie esteja disponível em todo o site
-        document.cookie = `${COOKIE_NAME}=true; max-age=10; path=/; Secure; SameSite=Lax`;
+        if (response.data && response.data.access && response.data.refresh) {
+            const accessToken = response.data.access;
+            const refreshToken = response.data.refresh;
+            
+            // 1. Armazena o token no localStorage para persistência
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
 
-        // O login continua sendo falso nesta primeira tentativa.
-        isLoginSuccessful = false;
-    }
-    
-    // 4. Lógica de Redirecionamento e Feedback
-    if (isLoginSuccessful) {
-        // A autorização foi bem-sucedida (segunda tentativa)
-        
-        // Nota: Neste ponto, você pode optar por remover ou manter o cookie.
-        // Se for para um token real, você faria a chamada à API aqui.
+            // 2. CONFIGURA O CLIENTE API PARA USAR O TOKEN IMEDIATAMENTE
+            setAuthToken(accessToken); // <--- Chamada da função aqui!
+
+            console.log('Login bem-sucedido. Tokens armazenados e cliente API configurado.');
+        } 
+
+        // 3. Navega para a próxima página
         navigate('/index');
         return true;
-        
-    } else {
-        // Lidar com o login com falha (primeira tentativa)
-        alert('Login inválido! Tente novamente.');
+
+    } catch (err) {
+        console.error('Login Falhou:', err);
+        setError(true); 
+        // É uma boa prática limpar os tokens em caso de falha, se existirem
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setAuthToken(null);
         return false;
     }
   };
@@ -84,12 +79,20 @@ const Login = () => {
                 <CCardBody>
                   <CForm onSubmit={handleLogin}>
                     <h1>Login</h1>
+                    {error ? ( 
+                      <p style={{ color: 'red' }}>Login Incorreto</p>
+                    ):""}
                     <hr/>
                     <CInputGroup className="mb-3">
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
-                      <CFormInput placeholder="Username" autoComplete="username" />
+                      <CFormInput 
+                        placeholder="Username" 
+                        autoComplete="username" 
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                      />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
@@ -99,6 +102,8 @@ const Login = () => {
                         type="password"
                         placeholder="Password"
                         autoComplete="current-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                       />
                     </CInputGroup>
                     <CRow className='row-login'>

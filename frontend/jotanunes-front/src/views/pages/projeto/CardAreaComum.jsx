@@ -10,12 +10,19 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CModal,
+  CModalHeader,
+  CModalBody,
+  CModalFooter,
 } from '@coreui/react'
+import { useState } from 'react'
 import { IoIosAddCircle } from 'react-icons/io'
 import { FaCheck } from 'react-icons/fa'
 import { BsXLg } from 'react-icons/bs'
 
 export default function CardAreaComum({ ambientes, setAmbientes }) {
+  const [confirmEnvIdx, setConfirmEnvIdx] = useState(null)
+  const [confirmItem, setConfirmItem] = useState(null)
 
   const adicionarAmbiente = () => {
     const novoId = `${ambientes.length + 1}.`
@@ -36,7 +43,18 @@ export default function CardAreaComum({ ambientes, setAmbientes }) {
   }
 
   const removerAmbiente = (idx) => {
-    setAmbientes(ambientes.filter((_, i) => i !== idx))
+    // abrir modal de confirmação em vez de remover imediatamente
+    setConfirmEnvIdx(idx)
+  }
+
+  const confirmRemoveAmbiente = () => {
+    if (confirmEnvIdx === null) return
+    setAmbientes(ambientes.filter((_, i) => i !== confirmEnvIdx))
+    setConfirmEnvIdx(null)
+  }
+
+  const cancelRemoveAmbiente = () => {
+    setConfirmEnvIdx(null)
   }
 
   const toggleCollapse = (idx) => {
@@ -64,9 +82,23 @@ export default function CardAreaComum({ ambientes, setAmbientes }) {
   }
 
   const removerLinha = (idxAmb, idxLinha) => {
+    // abrir modal de confirmação para remoção da linha
+    setConfirmItem({ idxAmb, idxLinha })
+  }
+
+  const confirmRemoveItem = () => {
+    if (!confirmItem) return
+    const { idxAmb, idxLinha } = confirmItem
     const novos = [...ambientes]
-    novos[idxAmb].items.splice(idxLinha, 1)
-    setAmbientes(novos)
+    if (novos[idxAmb] && novos[idxAmb].items && novos[idxAmb].items.length > idxLinha) {
+      novos[idxAmb].items.splice(idxLinha, 1)
+      setAmbientes(novos)
+    }
+    setConfirmItem(null)
+  }
+
+  const cancelRemoveItem = () => {
+    setConfirmItem(null)
   }
 
   return (
@@ -191,6 +223,38 @@ export default function CardAreaComum({ ambientes, setAmbientes }) {
             </div>
           ))}
         </div>
+      {/* Modal de confirmação para remoção de ambiente */}
+      <CModal visible={confirmEnvIdx !== null} onClose={cancelRemoveAmbiente} alignment="center">
+        <CModalHeader>Confirmar remoção</CModalHeader>
+        <CModalBody>
+          Tem certeza que deseja remover o ambiente "{confirmEnvIdx !== null ? ambientes[confirmEnvIdx].nome : ''}" e todos os seus itens?
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" variant="ghost" onClick={cancelRemoveAmbiente}>
+            Cancelar
+          </CButton>
+          <CButton color="danger" onClick={confirmRemoveAmbiente}>
+            Remover
+          </CButton>
+        </CModalFooter>
+      </CModal>
+
+      {/* Modal de confirmação para remoção de linha/item */}
+      <CModal visible={confirmItem !== null} onClose={cancelRemoveItem} alignment="center">
+        <CModalHeader>Confirmar remoção</CModalHeader>
+        <CModalBody>
+          Tem certeza que deseja remover este item?
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" variant="ghost" onClick={cancelRemoveItem}>
+            Cancelar
+          </CButton>
+          <CButton color="danger" onClick={confirmRemoveItem}>
+            Remover
+          </CButton>
+        </CModalFooter>
+      </CModal>
+
       </CCardBody>
     </CCard>
   )
