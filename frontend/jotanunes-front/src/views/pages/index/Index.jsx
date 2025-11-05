@@ -19,7 +19,6 @@ import { obras } from "../../../apiClient";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false); //
 
   const [obrasLista, setObrasLista] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -129,10 +128,9 @@ const Index = () => {
           <CButton
             color="light"
             className="text-danger fw-bold d-flex align-items-center gap-2 border-0 bg-transparent"
-            onClick={() => setShowModal(true)}
           >
             <CImage src="/images/mais.png" alt="Mais" height={20} />
-            <span className="text-dark">Criar Projeto</span>
+            <span className="text-dark" onClick={handleTemplateVazio}>Criar Projeto</span>
           </CButton>
         </div>
 
@@ -175,19 +173,6 @@ const Index = () => {
         </div>
         <div className="side right" />
       </CContainer>
-
-      {/* Modal Criar Projeto */}
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <button className="close-btn" onClick={() => setShowModal(false)}>↩</button>
-            <div className="modal-content">
-              <CButton color="light" className="modal-btn" onClick={handleTemplateVazio}>Template Vazio</CButton>
-              <CButton color="light" className="modal-btn">Com Referência</CButton>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Footer */}
       <div className="footer p-2">
