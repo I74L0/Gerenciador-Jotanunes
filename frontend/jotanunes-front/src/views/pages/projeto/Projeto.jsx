@@ -34,12 +34,15 @@ import CardAreaComum from './CardAreaComum'
 import CardMateriais from './CardMateriais'
 import CardObservacoes from './CardObservacoes'
 import MenuTabs from './MenuTabs'
+import { useNavigate } from 'react-router-dom'
 import avatar8 from 'src/assets/images/avatars/8.jpg'
 import 'src/views/pages/projeto/Projeto-style.scss'
 import * as apiClient from 'src/apiClient'
 
 const Projeto = () => {
   const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
+
+  const navigate = useNavigate()
 
   const [activeTab, setActiveTab] = useState(0)
   const [prefacioData, setPrefacioData] = useState({ nome: '', estado: '', cidade: '', texto: '' });
@@ -163,9 +166,16 @@ const Projeto = () => {
           </CContainer>
         </CRow>
         <hr className="w-100" />
-        <CRow className="div-tabs w-100">
+        <CRow className="div-tabs w-100 align-items-center">
+          <CButton
+            className="btn-sair me-3"
+            onClick={() => navigate('/index')}
+            style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #000000ff' }}
+          >
+            Sair
+          </CButton>
           <MenuTabs activeIndex={activeTab} onChange={setActiveTab} />
-          <CButton className="btn-salvar" onClick={handleSave} disabled={isSaving}>Enviar</CButton>
+          <CButton className="btn-salvar ms-auto" onClick={handleSave} disabled={isSaving}>Enviar</CButton>
         </CRow>
       </CHeader>
 
