@@ -82,44 +82,57 @@ class MaterialSerializer(serializers.ModelSerializer):
 
 
 class ItemSerializer(serializers.ModelSerializer):
-    materiais = MaterialSerializer(many=True, required=False)
-    descricoes = DescricaoSerializer(many=True, read_only=True)  # leitura
+    descricoes = DescricaoSerializer(many=True, read_only=True)
+    materiais = MaterialSerializer(many=True, read_only=True)
+    
     descricoes_input = serializers.ListField(
-        child=serializers.CharField(), write_only=True, required=False
-    )  # escrita
+        child=serializers.CharField(allow_blank=True), 
+        write_only=True, 
+        required=False
+    )
+    
+    materiais_input = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Material.objects.all(),
+        write_only=True,
+        required=False,
+        source='materiais'
+    )
 
     class Meta:
         model = Item
-        fields = ['id', 'nome', 'materiais', 'descricoes', 'descricoes_input']
+        fields = [
+            'id', 'nome', 
+            'descricoes', 'materiais',
+            'descricoes_input', 'materiais_input'
+        ]
+        read_only_fields = ['id', 'descricoes', 'materiais']
 
     def create(self, validated_data):
-        materiais_data = validated_data.pop('materiais', [])
-        descricoes_data = validated_data.pop('descricoes_input', [])
-
+        descricoes_input_list = validated_data.pop('descricoes_input', [])
+        materiais_objs = validated_data.pop('materiais', [])
+        
         item = Item.objects.create(**validated_data)
-
-        # Cria ou vincula descrições
-        descricoes_objs = []
-        for desc in descricoes_data:
-            if isinstance(desc, int):
-                try:
-                    descricoes_objs.append(Descricao.objects.get(pk=desc))
-                except Descricao.DoesNotExist:
+        
+        descricoes_objs_a_ligar = []
+        if descricoes_input_list:
+            for item_str in descricoes_input_list:
+                if not item_str:
                     continue
-            else:
-                descricao_obj, _ = Descricao.objects.get_or_create(detalhe=desc)
-                descricoes_objs.append(descricao_obj)
+                try:
+                    desc_id = int(item_str)
+                    desc_obj = Descricao.objects.get(pk=desc_id)
+                    descricoes_objs_a_ligar.append(desc_obj)
+                except (ValueError, TypeError, Descricao.DoesNotExist):
+                    desc_obj, _ = Descricao.objects.get_or_create(detalhe=item_str)
+                    descricoes_objs_a_ligar.append(desc_obj)
+        
+        if descricoes_objs_a_ligar:
+            item.descricoes.set(descricoes_objs_a_ligar)
 
-        if descricoes_objs:
-            item.descricoes.set(descricoes_objs)
-
-        # Cria materiais e associa marcas
-        for material_data in materiais_data:
-            marcas = material_data.pop('marcas', [])
-            material = Material.objects.create(item=item, **material_data)
-            if marcas:
-                material.marcas.set(marcas)
-
+        if materiais_objs:
+            item.materiais.set(materiais_objs)
+            
         return item
 
 class AmbienteSerializer(serializers.ModelSerializer):
