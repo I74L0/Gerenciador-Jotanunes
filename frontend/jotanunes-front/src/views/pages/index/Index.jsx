@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"; //
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom'
 import {
   CButton,
@@ -7,10 +7,6 @@ import {
   CHeader,
   CImage,
   CContainer,
-  CCard,
-  CCardBody,
-  CCardTitle,
-  CCardText,
   CSpinner,
 } from "@coreui/react";
 import './Index-style.css';
@@ -23,11 +19,23 @@ const Index = () => {
   const [obrasLista, setObrasLista] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selecionados, setSelecionados] = useState([]); // ✅ Novo estado
 
   const handleTemplateVazio = () => {
     navigate('/projeto');
     return;
-  }
+  };
+
+  // Função para alternar seleção de checkbox
+  const toggleSelecionado = (id) => {
+    setSelecionados((prev) =>
+      prev.includes(id)
+        ? prev.filter((item) => item !== id)
+        : [...prev, id]
+    );
+  };
+
+  const temSelecionado = selecionados.length > 0; // ✅ Detecta se há selecionados
 
   // Efeito para carregar os dados
   useEffect(() => {
@@ -77,20 +85,66 @@ const Index = () => {
     }
 
     return (
-      <div className="obras-grid p-3">
-        {obrasLista.map((obra) => (
-          <CCard key={obra.id} className="mb-3">
-            <CCardBody>
-              <CCardTitle>{obra.nome || `Obra ID: ${obra.id}`}</CCardTitle>
-              <CCardText>
-                {obra.cidade && obra.estado ? `${obra.cidade} - ${obra.estado}` : 'Localização não definida'}
-              </CCardText>
-              <CButton onClick={() => navigate(`/projeto/${obra.id}`)}>
-                Abrir Projeto
-              </CButton>
-            </CCardBody>
-          </CCard>
-        ))}
+      <div className="obras-lista p-3">
+        {obrasLista.map((obra) => {
+          let statusColor = "blue";
+          switch (obra.status) {
+            case "Recusado": statusColor = "red"; break;
+            case "Em análise": statusColor = "blue"; break;
+            case "Não Finalizado": statusColor = "orange"; break;
+            case "Finalizado": statusColor = "green"; break;
+          }
+
+          return (
+            <div
+              key={obra.id}
+              className="obra-item d-flex align-items-center justify-content-between border-bottom py-2"
+            >
+              {/* Parte esquerda: checkbox + info em linha */}
+              <div className="d-flex align-items-center gap-3 flex-wrap">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={selecionados.includes(obra.id)}
+                  onChange={() => toggleSelecionado(obra.id)}
+                />
+
+                <div className="d-flex align-items-center flex-wrap gap-custom">
+                  <span className="fw-bold">{obra.nome || `Obra ID: ${obra.id}`}</span>
+                  {obra.estado && obra.cidade ? (
+                    <>
+                      <span className="text-muted">{obra.estado}</span>
+                      <span className="text-muted">{obra.cidade}</span>
+                    </>
+                  ) : (
+                    <span className="text-muted">Localização não definida</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Parte direita: círculo + botão */}
+              <div className="d-flex align-items-center gap-3">
+                <div
+                  className="status-circle"
+                  style={{
+                    width: "16px",
+                    height: "16px",
+                    borderRadius: "50%",
+                    backgroundColor: statusColor,
+                  }}
+                />
+                <CButton
+                  size="sm"
+                  color="light"
+                  className="border"
+                  onClick={() => navigate(`/projeto/${obra.id}`)}
+                >
+                  Abrir Projeto
+                </CButton>
+              </div>
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -117,16 +171,17 @@ const Index = () => {
         className="subbar d-flex justify-content-between align-items-center px-4 py-2 border-bottom bg-light"
       >
         <div className="d-flex gap-3">
-        <CButton
-           color="light"
-           className="text-danger fw-bold d-flex align-items-center gap-2 border-0"
-           onClick={handleTemplateVazio}
-           style={{ zIndex: 9999, backgroundColor: "#f5f6f8" }}
-        >
-          <CImage src="/images/mais.png" alt="Mais" height={20} />
-          <span className="text-dark">Criar Projeto</span>
-        </CButton>
-
+          <CButton
+            color="light"
+            className="text-danger fw-bold d-flex align-items-center gap-2 border-0"
+            onClick={handleTemplateVazio}
+            style={{ zIndex: 9999, backgroundColor: "#f5f6f8" }}
+          >
+            <CImage src="/images/mais.png" alt="Mais" height={20} />
+            <span className="text-dark">
+              {temSelecionado ? "Criar com Referência" : "Criar Projeto"}
+            </span>
+          </CButton>
         </div>
 
         <div className="flex-grow-1 px-3">
@@ -161,7 +216,6 @@ const Index = () => {
             </div>
 
             <div className="main-content-placeholder" style={{ minHeight: 420 }}>
-              {/* 7. Chama a função de renderização */}
               {renderMainContent()}
             </div>
           </div>
@@ -182,4 +236,4 @@ const Index = () => {
   );
 }
 
-export default Index
+export default Index;
