@@ -97,7 +97,7 @@ const Projeto = () => {
         }
       } else {
         // É um projeto novo, carregar dados do template (dados.json)
-        setIsLoading(true); // Manter o loading ativo enquanto busca o template
+        setIsLoading(true);
         try {
           // 1. Busca todos os dados do template 'dados.json'
           const templateData = await getDados(); 
