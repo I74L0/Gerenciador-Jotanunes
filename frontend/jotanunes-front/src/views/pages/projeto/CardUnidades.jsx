@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { 
+import {
   CButton,
   CCard,
   CCardBody,
@@ -20,13 +20,13 @@ import { IoIosAddCircle } from "react-icons/io";
 import { FaCheck } from 'react-icons/fa'
 import { BsXLg } from 'react-icons/bs'
 
-// Importa o componente DescricaoPopup
+// Importa o componente DescricaoPopup compartilhado
 import DescricaoPopup from '../../../components/DescricaoPopup';
 
 export default function CardUnidades({ ambientes, setAmbientes }) {
   const [popupTarget, setPopupTarget] = useState(null)
   const [confirmEnvIdx, setConfirmEnvIdx] = useState(null)
-  const [confirmItem, setConfirmItem] = useState(null);
+  const [confirmItem, setConfirmItem] = useState(null)
 
   const adicionarAmbiente = () => {
     const novo = { nome: `Novo Ambiente ${ambientes.length + 1}`, editando: true, aberto: true, items: [] }
@@ -65,17 +65,17 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
     setAmbientes(novos)
   }
 
-  const adicionarItem = (idx) => {
+  const adicionarLinha = (idx) => {
     const novos = [...ambientes]
     if (!novos[idx].items) novos[idx].items = []
     novos[idx].items.push({ item: '', descricao: '', status: false })
     setAmbientes(novos)
   }
 
-  const atualizarItem = (idxAmb, idxItem, campo, valor) => {
+  const atualizarLinha = (idxAmb, idxLinha, campo, valor) => {
     const novos = [...ambientes]
     if (!novos[idxAmb].items) return
-    novos[idxAmb].items[idxItem][campo] = valor
+    novos[idxAmb].items[idxLinha][campo] = valor
     setAmbientes(novos)
   }
 
@@ -87,14 +87,10 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
     if (!confirmItem) return
     const { idxAmb, idxLinha } = confirmItem
     const novos = [...ambientes]
-    if (!novos[idxAmb].items) return
-    novos[idxAmb].items.splice(idxItem, 1)
-    setAmbientes(novos)
-    setConfirmItem(null)
-  }
-
-  const cancelRemoveItem = () => {
-    setConfirmItem(null)
+    if (novos[idxAmb] && novos[idxAmb].items && novos[idxAmb].items.length > idxLinha) {
+      novos[idxAmb].items.splice(idxLinha, 1)
+      setAmbientes(novos)
+    }
     setConfirmItem(null)
   }
 
@@ -114,7 +110,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
       if (!popupTarget) return;
       const popupEl = document.querySelector('[data-descricao-popup="true"]');
       const clickedInsidePopup = popupEl && popupEl.contains(e.target);
-      const clickedTextarea = popupTarget.ref && popupTarget.ref.contains(e.target);
+      const clickedTextarea = popupTarget.ref && popupTarget.ref.contains && popupTarget.ref.contains(e.target);
 
       if (!clickedInsidePopup && !clickedTextarea) {
         setPopupTarget(null);
@@ -163,7 +159,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                         onClick={(e) => e.stopPropagation()}
                       />
                     ) : (
-                      <span 
+                      <span
                         className="nome-ambiente"
                         onDoubleClick={(e) => {
                           e.stopPropagation()
@@ -202,16 +198,14 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                         </CTableRow>
                       </CTableHead>
                       <CTableBody>
-                        {amb.linhas.map((linha, i) => (
+                        {amb.items.map((linha, i) => (
                           <CTableRow key={i}>
                             <CTableDataCell>
                               <textarea
                                 className="auto-expand"
                                 rows="1"
                                 value={linha.item}
-                                onChange={(e) =>
-                                  atualizarLinha(idx, i, 'item', e.target.value)
-                                }
+                                onChange={(e) => atualizarLinha(idx, i, 'item', e.target.value)}
                                 onInput={(e) => {
                                   e.target.style.height = 'auto'
                                   e.target.style.height = e.target.scrollHeight + 'px'
@@ -223,100 +217,57 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                               <textarea
                                 className="auto-expand"
                                 rows="1"
-                                // Cria uma referência para a textarea na linha atual
+                                ref={(el) => linha.descricaoRef = el}
                                 value={linha.descricao}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setPopupTarget({ ambIdx: idx, itemIdx: i, ref: e.target });
                                 }}
                                 onChange={(e) =>
-                                  atualizarItem(idx, i, 'descricao', e.target.value)
+                                  atualizarLinha(idx, i, 'descricao', e.target.value)
                                 }
                                 onInput={(e) => {
                                   e.target.style.height = 'auto';
                                   e.target.style.height = e.target.scrollHeight + 'px';
                                 }}
                               />
-                              {/* Renderiza o DescricaoPopup se for o alvo correto */}
                               {popupTarget &&
                                 popupTarget.ambIdx === idx &&
                                 popupTarget.itemIdx === i && (
                                   <DescricaoPopup
                                     referenceElement={popupTarget.ref}
                                     onSelect={(desc) => {
-                                      const targetRef = popupTarget.ref; 
-                                    
-                                      atualizarItem(idx, i, 'descricao', desc);
+                                      atualizarLinha(idx, i, 'descricao', desc);
                                       setPopupTarget(null);
-                                    
-                                      setTimeout(() => { 
-                                        if (targetRef) {
-                                          targetRef.style.height = 'auto';
-                                          targetRef.style.height = targetRef.scrollHeight + 'px';
+                                      setTimeout(() => {
+                                        if (linha.descricaoRef) {
+                                          linha.descricaoRef.style.height = 'auto';
+                                          linha.descricaoRef.style.height = linha.descricaoRef.scrollHeight + 'px';
                                         }
                                       }, 0);
                                     }}
                                     onAdd={(novo) => {
-                                      atualizarItem(idx, i, 'descricao', novo);
+                                      atualizarLinha(idx, i, 'descricao', novo);
                                       setPopupTarget(null);
-                                      // Não precisa de setTimeout/adjustTextareaSize aqui, pois a alteração manual já faz isso
                                     }}
                                     onClose={() => setPopupTarget(null)}
                                   />
-                              )}
+                                )}
                             </CTableDataCell>
-                          <CTableDataCell style={{ position: 'relative' }}>
-                            <textarea
-                              className="auto-expand"
-                              rows="1"
-                              ref={(el) => linha.descricaoRef = el}
-                              value={linha.descricao}
+
+                            <CTableDataCell
+                              style={{ textAlign: 'center', cursor: 'pointer' }}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setPopupTarget({ ambIdx: idx, itemIdx: i, ref: e.target });
+                                toggleStatus(idx, i);
                               }}
-                              onChange={(e) =>
-                                atualizarItem(idx, i, 'descricao', e.target.value)
-                              }
-                              onInput={(e) => {
-                                e.target.style.height = 'auto';
-                                e.target.style.height = e.target.scrollHeight + 'px';
-                              }}
-                            />
-                            {popupTarget &&
-                              popupTarget.ambIdx === idx &&
-                              popupTarget.itemIdx === i && (
-                                <DescricaoPopup
-                                  referenceElement={popupTarget.ref}
-                                  onSelect={(desc) => {
-                                    atualizarItem(idx, i, 'descricao', desc);
-                                    setPopupTarget(null);
-                                    setTimeout(() => {
-                                      if(linha.descricaoRef) adjustTextareaSize(linha.descricaoRef)
-                                    }, 0)
-                                  }}
-                                  onAdd={(novo) => {
-                                    atualizarItem(idx, i, 'descricao', novo);
-                                    setPopupTarget(null);
-                                  }}
-                                  onClose={() => setPopupTarget(null)}
-                                />
-                            )}
-                          </CTableDataCell>
-
-                          <CTableDataCell
-                            style={{ textAlign: 'center', cursor: 'pointer' }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleStatus(idx, i);
-                            }}
-                          >
-                            {linha.status ? (
-                              <FaCheck color="green" />
-                            ) : (
-                              <BsXLg color="red" strokeWidth={1} />
-                            )}
-                          </CTableDataCell>
+                            >
+                              {linha.status ? (
+                                <FaCheck color="green" />
+                              ) : (
+                                <BsXLg color="red" strokeWidth={1} />
+                              )}
+                            </CTableDataCell>
 
                             <CTableDataCell>
                               <CButton

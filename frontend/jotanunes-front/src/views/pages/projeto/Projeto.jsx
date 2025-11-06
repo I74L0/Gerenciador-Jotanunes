@@ -107,6 +107,7 @@ const Projeto = () => {
 
           // 2. Define os estados com os dados do template
           setPrefacioData(templateData.prefacioData || { nome: '', estado: '', cidade: '', texto: '' });
+          alert(unidadesData);
           setUnidadesData(templateData.unidadesData || []);
           setAreacomumData(templateData.areacomumData || []);
           setMaterialData(templateData.materialData || []);
