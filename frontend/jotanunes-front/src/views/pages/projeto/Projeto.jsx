@@ -38,7 +38,7 @@ import CardObservacoes from './CardObservacoes'
 import MenuTabs from './MenuTabs'
 import avatar8 from 'src/assets/images/avatars/8.jpg'
 import 'src/views/pages/projeto/Projeto-style.scss'
-import { obras, ambientes, materiais } from 'src/apiClient'
+import { obras, ambientes, materiais, getDados } from 'src/apiClient'
 
 const Projeto = () => {
   const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
@@ -48,7 +48,7 @@ const Projeto = () => {
   const [unidadesData, setUnidadesData] = useState([]);
   const [areacomumData, setAreacomumData] = useState([]);
   const [materialData, setMaterialData] = useState([]);
-  const [observacoesData, setObservacoesData] = useState({texto: ''});
+  const [observacoesData, setObservacoesData] = useState({observacoes: ''});
 
   // Estados para controle de salvamento e carregamento
   const [isLoading, setIsLoading] = useState(false);
@@ -70,9 +70,7 @@ const Projeto = () => {
           const [obraRes, ambientesRes] = await Promise.all([obraPromise, ambientesPromise]);
           const dadosObra = obraRes.data;
 
-          // --- IMPORTANTE: Mapeamento de Dados ---
-          // Você precisa ajustar os nomes dos campos (ex: 'dadosObra.nome')
-          // para bater com o que sua API real retorna.
+          // --- Mapeamento de Dados ---
 
           setPrefacioData({
             nome: dadosObra.nome || '',
@@ -89,7 +87,7 @@ const Projeto = () => {
 
           // Assumindo que materiais e observações vêm aninhados na obra
           setMaterialData(dadosObra.materiais || []);
-          setObservacoesData(dadosObra.observacoes || { texto: '' });
+          setObservacoesData(dadosObra.observacoes || { observacoes: '' });
 
         } catch (error) {
           console.error("Falha ao carregar dados do projeto:", error);
@@ -98,12 +96,32 @@ const Projeto = () => {
           setIsLoading(false);
         }
       } else {
-        setPrefacioData({ nome: '', estado: '', cidade: '', texto: '' });
-        setUnidadesData([]);
-        setAreacomumData([]);
-        setMaterialData([]);
-        setObservacoesData({ texto: '' });
-        setIsLoading(false);
+        // É um projeto novo, carregar dados do template (dados.json)
+        setIsLoading(true); // Manter o loading ativo enquanto busca o template
+        try {
+          // 1. Busca todos os dados do template 'dados.json'
+          const templateData = await getDados(); 
+
+          // 2. Define os estados com os dados do template
+          setPrefacioData(templateData.prefacioData || { nome: '', estado: '', cidade: '', texto: '' });
+          setUnidadesData(templateData.unidadesData || []);
+          setAreacomumData(templateData.areacomumData || []);
+          setMaterialData(templateData.materialData || []);
+          const obsTemplate = templateData.observacoesData && templateData.observacoesData[0];
+          setObservacoesData({ observacoes: obsTemplate ? obsTemplate.observacao : '' });
+
+        } catch (error) {
+          console.error("Falha ao carregar template (dados.json):", error);
+          setSaveError("Não foi possível carregar o template padrão.");
+          // Define como vazio em caso de falha
+          setPrefacioData({ nome: '', estado: '', cidade: '', texto: '' });
+          setUnidadesData([]);
+          setAreacomumData([]);
+          setMaterialData([]);
+          setObservacoesData({ observacoes: '' });
+        } finally {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -112,27 +130,22 @@ const Projeto = () => {
 
   const handlePrefacioChange = (novoPrefacio) => {
     setPrefacioData(novoPrefacio);
-    // apiClient.setPrefacio(novoPrefacio);
   };
 
   const handleUnidadesChange = (novasUnidades) => {
     setUnidadesData(novasUnidades);
-    // apiClient.setUnidades(novasUnidades);
   };
 
   const handleAreaComumChange = (novaAreaComum) => {
     setAreacomumData(novaAreaComum);
-    // apiClient.setAreaComum(novaAreaComum);
   };
 
   const handleMateriaisChange = (novosMateriais) => {
     setMaterialData(novosMateriais);
-    // apiClient.setMateriais(novosMateriais);
   };
 
   const handleObservacoesChange = (novasObservacoes) => {
     setObservacoesData(novasObservacoes);
-    // apiClient.setObservacoes(novasObservacoes);
   };
 
   /* --- FUNÇÃO DE SALVAR --- */
@@ -146,7 +159,7 @@ const Projeto = () => {
       nome: prefacioData.nome,
       estado: prefacioData.estado,
       cidade: prefacioData.cidade,
-      texto_prefacio: prefacioData.texto, // Exemplo
+      texto_prefacio: prefacioData.texto,
       
       // Dados de Ambientes (isto é mais complexo)
       // A API pode querer que você salve os ambientes em /ambientes/
@@ -169,8 +182,6 @@ const Projeto = () => {
         // Se não temos ID, CRIA (create) um novo projeto
         response = await obras.create(dadosParaSalvar); //
         console.log('Projeto criado!', response.data);
-        // Opcional: redirecionar para a nova URL /projeto/NOVO_ID
-        // navigate(`/projeto/${response.data.id}`);
       }
       
     } catch (error) {
