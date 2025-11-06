@@ -11,6 +11,10 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CModal,
+  CModalHeader,
+  CModalBody,
+  CModalFooter,
 } from '@coreui/react'
 import { IoIosAddCircle } from "react-icons/io";
 import { usePopper } from 'react-popper'
@@ -62,6 +66,8 @@ const descricoesBase = [
 function DescricaoPopup({ referenceElement, onSelect, onAdd, onClose }) {
   const [search, setSearch] = useState('');
   const [items, setItems] = useState([]);
+  const [adding, setAdding] = useState(false);
+  const [newDesc, setNewDesc] = useState('');
   const [popperElement, setPopperElement] = useState(null);
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: 'right-start',
@@ -78,20 +84,40 @@ function DescricaoPopup({ referenceElement, onSelect, onAdd, onClose }) {
   );
 
   const handleAdd = () => {
-    const novo = prompt("Digite a nova descrição:");
+    setAdding(true)
+    setNewDesc('')
+  }
+
+  const confirmAdd = () => {
+    const novo = newDesc && newDesc.trim();
     if (novo && !items.includes(novo)) {
       const atualizados = [...items, novo];
       setItems(atualizados);
       localStorage.setItem('descricoesSalvas', JSON.stringify(atualizados.filter(x => !descricoesBase.includes(x))));
       onAdd(novo);
     }
-  };
+    setAdding(false)
+    setNewDesc('')
+  }
+
+  const cancelAdd = () => {
+    setAdding(false)
+    setNewDesc('')
+  }
 
   useEffect(() => {
-    const esc = (e) => e.key === 'Escape' && onClose();
+    const esc = (e) => {
+      if (e.key === 'Escape') {
+        if (adding) {
+          cancelAdd()
+        } else {
+          onClose()
+        }
+      }
+    };
     document.addEventListener('keydown', esc);
     return () => document.removeEventListener('keydown', esc);
-  }, [onClose]);
+  }, [onClose, adding]);
 
   return (
     <div
@@ -146,18 +172,41 @@ function DescricaoPopup({ referenceElement, onSelect, onAdd, onClose }) {
           </div>
         )}
       </div>
-      <button
-        className="btn btn-sm btn-outline-primary mt-2 w-100"
-        onClick={handleAdd}
-      >
-        + Adicionar
-      </button>
+      {adding ? (
+        <div className="clicado_novaDescricao">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Nova descrição..."
+            value={newDesc}
+            onChange={(e) => setNewDesc(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') confirmAdd();
+              if (e.key === 'Escape') cancelAdd();
+            }}
+            autoFocus
+          />
+          <div className='clicado_novaDescricao_botoes'>
+            <button className="btn btn-sm btn-primary" onClick={confirmAdd}>Adicionar</button>
+            <button className="btn btn-sm btn-secondary" onClick={cancelAdd}>Cancelar</button>
+          </div>
+        </div>
+      ) : (
+        <button
+          className="btn btn-sm btn-outline-primary mt-2 w-100"
+          onClick={handleAdd}
+        >
+          + Adicionar
+        </button>
+      )}
     </div>
   );
 }
 
 export default function CardUnidades({ ambientes, setAmbientes }) {
   const [popupTarget, setPopupTarget] = useState(null);
+  const [confirmEnvIdx, setConfirmEnvIdx] = useState(null);
+  const [confirmItem, setConfirmItem] = useState(null);
 
   const adicionarAmbiente = () => {
     const novo = { nome: `Novo Ambiente ${ambientes.length + 1}`, editando: true, aberto: true, linhas: [] }
@@ -177,7 +226,17 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
   }
 
   const removerAmbiente = (idx) => {
-    setAmbientes(ambientes.filter((_, i) => i !== idx))
+    setConfirmEnvIdx(idx)
+  }
+
+  const confirmRemoveAmbiente = () => {
+    if (confirmEnvIdx === null) return
+    setAmbientes(ambientes.filter((_, i) => i !== confirmEnvIdx))
+    setConfirmEnvIdx(null)
+  }
+
+  const cancelRemoveAmbiente = () => {
+    setConfirmEnvIdx(null)
   }
 
   const toggleCollapse = (idx) => {
@@ -199,9 +258,20 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
   }
 
   const removerLinha = (idxAmb, idxLinha) => {
+    setConfirmItem({ idxAmb, idxLinha })
+  }
+
+  const confirmRemoveItem = () => {
+    if (!confirmItem) return
+    const { idxAmb, idxLinha } = confirmItem
     const novos = [...ambientes]
     novos[idxAmb].linhas.splice(idxLinha, 1)
     setAmbientes(novos)
+    setConfirmItem(null)
+  }
+
+  const cancelRemoveItem = () => {
+    setConfirmItem(null)
   }
 
   const toggleStatus = (idxAmb, idxLinha) => {
@@ -261,12 +331,22 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') finalizarEdicao(idx)
                         }}
+                        onClick={(e) => e.stopPropagation()}
                       />
                     ) : (
-                      <span className="nome-ambiente">{`${idx + 1}. ${amb.nome}`}</span>
+                      <span 
+                        className="nome-ambiente"
+                        onDoubleClick={(e) => {
+                          e.stopPropagation()
+                          const novos = [...ambientes]
+                          novos[idx].editando = true
+                          setAmbientes(novos)
+                        }}
+                      >
+                        {`${idx + 1}. ${amb.nome}`}
+                      </span>
                     )}
                   </div>
-
                   <div className="acao-remover">
                     <CButton
                       color="danger"
@@ -392,6 +472,38 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
               </div>
             ))}
           </div>
+
+          {/* Modal de confirmação para remoção de ambiente */}
+          <CModal visible={confirmEnvIdx !== null} onClose={cancelRemoveAmbiente} alignment="center" backdrop="static" keyboard={false}>
+            <CModalHeader>Confirmar remoção</CModalHeader>
+            <CModalBody>
+              Tem certeza que deseja remover o ambiente "{confirmEnvIdx !== null ? ambientes[confirmEnvIdx].nome : ''}" e todos os seus itens?
+            </CModalBody>
+            <CModalFooter>
+              <CButton color="secondary" variant="ghost" onClick={cancelRemoveAmbiente}>
+                Cancelar
+              </CButton>
+              <CButton color="danger" onClick={confirmRemoveAmbiente}>
+                Remover
+              </CButton>
+            </CModalFooter>
+          </CModal>
+
+          {/* Modal de confirmação para remoção de linha/item */}
+          <CModal visible={confirmItem !== null} onClose={cancelRemoveItem} alignment="center" backdrop="static" keyboard={false}>
+            <CModalHeader>Confirmar remoção</CModalHeader>
+            <CModalBody>
+              Tem certeza que deseja remover este item?
+            </CModalBody>
+            <CModalFooter>
+              <CButton color="secondary" variant="ghost" onClick={cancelRemoveItem}>
+                Cancelar
+              </CButton>
+              <CButton color="danger" onClick={confirmRemoveItem}>
+                Remover
+              </CButton>
+            </CModalFooter>
+          </CModal>
         </>
       </CCardBody>
     </CCard>
