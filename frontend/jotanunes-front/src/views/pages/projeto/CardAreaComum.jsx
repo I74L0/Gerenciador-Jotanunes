@@ -36,7 +36,9 @@ export default function CardAreaComum({ ambientes, setAmbientes }) {
   }
 
   const removerAmbiente = (idx) => {
-    setAmbientes(ambientes.filter((_, i) => i !== idx))
+    if (window.confirm('Tem certeza que deseja remover este ambiente?')) {
+      setAmbientes(ambientes.filter((_, i) => i !== idx))
+    }
   }
 
   const toggleCollapse = (idx) => {
@@ -64,9 +66,11 @@ export default function CardAreaComum({ ambientes, setAmbientes }) {
   }
 
   const removerLinha = (idxAmb, idxLinha) => {
-    const novos = [...ambientes]
-    novos[idxAmb].items.splice(idxLinha, 1)
-    setAmbientes(novos)
+    if (window.confirm('Tem certeza que deseja remover este item?')) {
+      const novos = [...ambientes]
+      novos[idxAmb].items.splice(idxLinha, 1)
+      setAmbientes(novos)
+    }
   }
 
   return (
