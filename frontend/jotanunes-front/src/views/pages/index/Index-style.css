@@ -111,73 +111,7 @@
   border-radius: 50%;
 }
 
-/* Overlay com fundo desfocado */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(20, 20, 20, 0.3);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
+.gap-custom {
+  gap: 15rem; /* ou o valor que quiser */
 }
 
-/* Caixa do modal */
-.modal-box {
-  background: white;
-  padding: 20px 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  min-width: 280px;
-  text-align: center;
-  position: relative;
-}
-
-/* Botão de fechar */
-.close-btn {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  border: none;
-  background: transparent;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-/* Conteúdo do modal */
-.modal-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-/* Botões do modal */
-.modal-btn {
-  border: 2px solid #555;
-  border-radius: 8px;
-  font-weight: 500;
-}
-
-
-/* Responsivo */
-@media (max-width: 1000px) {
-  .create-frame {
-    grid-template-columns: 0.5fr 1fr 0.5fr;
-  }
-  .create-frame .side {
-    display: none;
-  }
-  .create-frame .center-area {
-    padding: 16px;
-  }
-  .create-frame .center-area .center-inner {
-    padding: 16px;
-    max-width: 100%;
-  }
-  
-}
