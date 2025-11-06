@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom'
 import {
   CButton,
   CForm,
@@ -10,7 +11,14 @@ import {
 import './Index-style.css';
 
 const Index = () => {
+  const navigate = useNavigate();
+
   const [showModal, setShowModal] = useState(false);
+
+  const handleTemplateVazio = () => {
+    navigate('/projeto');
+    return;
+  }
   
   return (
     <div className="create-page d-flex flex-column vh-100">
@@ -95,7 +103,7 @@ const Index = () => {
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
             <button className="close-btn" onClick={() => setShowModal(false)}>↩</button>
             <div className="modal-content">
-              <CButton color="light" className="modal-btn">Template Vazio</CButton>
+              <CButton color="light" className="modal-btn" onClick={handleTemplateVazio}>Template Vazio</CButton>
               <CButton color="light" className="modal-btn">Com Referência</CButton>
             </div>
           </div>

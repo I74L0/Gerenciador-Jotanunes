@@ -17,199 +17,19 @@ import {
   CModalFooter,
 } from '@coreui/react'
 import { IoIosAddCircle } from "react-icons/io";
-import { usePopper } from 'react-popper'
 import { FaCheck } from 'react-icons/fa'
 import { BsXLg } from 'react-icons/bs'
 
-const descricoesBase = [
-  "Porcelanato ou laminado",
-  "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.",
-  "Porcelanato ou Laminado, h= 5cm",
-  "Mármore ou granito.",
-  "Metálico",
-  "Alumínio pintado de branco",
-  "Liso incolor.",
-  "Porta semi–ôca comum pintada c/ esmalte sintético.",
-  "Acabamento cromado.",
-  "Pontos de luz no teto, tomadas de corrente e interruptores",
-  "Pontos secos de comunicação e de antena de TV.",
-  "Infraestrutura para high wall com condensadora axial.",
-  "Cerâmica.",
-  "Cerâmica até o teto.",
-  "Forro de gesso.",
-  "Mármore ou granito L=3,5cm.",
-  "Em mármore ou granito com cuba em louça cor branca",
-  "Porta semi-ôca comum pintura c/ esmalte sintético.",
-  "Pontilhado Incolor.",
-  "Torneira para Lavatório, registro de gaveta e registro de pressão com acabamento cromado .",
-  "Vaso Sanitário com Caixa Acoplada em louça cor branca.",
-  "Pontos de luz no teto, tomada de corrente e interruptor da Prime, Alumbra, Cemar ou Fame na cor branco.",
-  "Sifão em PVC, esgoto em PVC, rede de água fria e ducha higiênica em PEX.",
-  "Pintura látex PVA sobre gesso ou argamassa de regularização PVA.",
-  "Inox.",
-  "Louça cor branca.",
-  "Torneiras e registro de gaveta com acabamento cromado.",
-  "Rede de água fria em PEX e esgoto em PVC",
-  "Tubulação seca.",
-  "Em concreto desempolado.",
-  "Textura acrílica.",
-  "Pintura ou textura acrílica.",
-  "Em perfil metálico pintado de branco.",
-  "Textura Acrílica ou Pastilha Cerâmica, conforme definido em projeto arquitetônico.",
-  "Pintura PVA látex branco sobre gesso ou massa de regulariação PVA ou Forro de gesso.",
-  "Porcelanato ou Laminado, h=5cm.",
-  "Alumínio pintado de branco com vidro liso.",
-  "Ponto de luz no teto.",
-  "Grama"
-];
-
-function DescricaoPopup({ referenceElement, onSelect, onAdd, onClose }) {
-  const [search, setSearch] = useState('');
-  const [items, setItems] = useState([]);
-  const [adding, setAdding] = useState(false);
-  const [newDesc, setNewDesc] = useState('');
-  const [popperElement, setPopperElement] = useState(null);
-  const { styles, attributes } = usePopper(referenceElement, popperElement, {
-    placement: 'right-start',
-  });
-
-  useEffect(() => {
-    const salvos = JSON.parse(localStorage.getItem('descricoesSalvas') || '[]');
-    const todas = Array.from(new Set([...descricoesBase, ...salvos]));
-    setItems(todas);
-  }, []);
-
-  const filtered = items.filter(i =>
-    i.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const handleAdd = () => {
-    setAdding(true)
-    setNewDesc('')
-  }
-
-  const confirmAdd = () => {
-    const novo = newDesc && newDesc.trim();
-    if (novo && !items.includes(novo)) {
-      const atualizados = [...items, novo];
-      setItems(atualizados);
-      localStorage.setItem('descricoesSalvas', JSON.stringify(atualizados.filter(x => !descricoesBase.includes(x))));
-      onAdd(novo);
-    }
-    setAdding(false)
-    setNewDesc('')
-  }
-
-  const cancelAdd = () => {
-    setAdding(false)
-    setNewDesc('')
-  }
-
-  useEffect(() => {
-    const esc = (e) => {
-      if (e.key === 'Escape') {
-        if (adding) {
-          cancelAdd()
-        } else {
-          onClose()
-        }
-      }
-    };
-    document.addEventListener('keydown', esc);
-    return () => document.removeEventListener('keydown', esc);
-  }, [onClose, adding]);
-
-  return (
-    <div
-      data-descricao-popup="true"
-      ref={setPopperElement}
-      style={{
-        ...styles.popper,
-        zIndex: 9999,
-        background: '#ccc',
-        border: '1px solid #ccc',
-        borderRadius: '8px',
-        padding: '8px',
-        width: '300px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-      }}
-      {...attributes.popper}
-    >
-      <input
-        type="text"
-        className="form-control mb-2"
-        placeholder="Buscar descrição..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        autoFocus
-      />
-      <div
-        style={{
-          maxHeight: '200px',
-          overflowY: 'auto',
-          borderTop: '1px solid #eee',
-          paddingTop: '4px',
-        }}
-      >
-        {filtered.map((desc, i) => (
-          <div
-            key={i}
-            onClick={() => onSelect(desc)}
-            style={{
-              cursor: 'pointer',
-              padding: '6px 8px',
-              borderRadius: '4px',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-          >
-            {desc}
-          </div>
-        ))}
-        {filtered.length === 0 && (
-          <div className="text-muted small text-center py-2">
-            Nenhum resultado encontrado
-          </div>
-        )}
-      </div>
-      {adding ? (
-        <div className="clicado_novaDescricao">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Nova descrição..."
-            value={newDesc}
-            onChange={(e) => setNewDesc(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') confirmAdd();
-              if (e.key === 'Escape') cancelAdd();
-            }}
-            autoFocus
-          />
-          <div className='clicado_novaDescricao_botoes'>
-            <button className="btn btn-sm btn-primary" onClick={confirmAdd}>Adicionar</button>
-            <button className="btn btn-sm btn-secondary" onClick={cancelAdd}>Cancelar</button>
-          </div>
-        </div>
-      ) : (
-        <button
-          className="btn btn-sm btn-outline-primary mt-2 w-100"
-          onClick={handleAdd}
-        >
-          + Adicionar
-        </button>
-      )}
-    </div>
-  );
-}
+// Importa o componente DescricaoPopup
+import DescricaoPopup from '../../../components/DescricaoPopup';
 
 export default function CardUnidades({ ambientes, setAmbientes }) {
-  const [popupTarget, setPopupTarget] = useState(null);
-  const [confirmEnvIdx, setConfirmEnvIdx] = useState(null);
+  const [popupTarget, setPopupTarget] = useState(null)
+  const [confirmEnvIdx, setConfirmEnvIdx] = useState(null)
   const [confirmItem, setConfirmItem] = useState(null);
 
   const adicionarAmbiente = () => {
-    const novo = { nome: `Novo Ambiente ${ambientes.length + 1}`, editando: true, aberto: true, linhas: [] }
+    const novo = { nome: `Novo Ambiente ${ambientes.length + 1}`, editando: true, aberto: true, items: [] }
     setAmbientes([...ambientes, novo])
   }
 
@@ -245,15 +65,17 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
     setAmbientes(novos)
   }
 
-  const adicionarLinha = (idx) => {
+  const adicionarItem = (idx) => {
     const novos = [...ambientes]
-    novos[idx].linhas.push({ item: '', descricao: '', status: false })
+    if (!novos[idx].items) novos[idx].items = []
+    novos[idx].items.push({ item: '', descricao: '', status: false })
     setAmbientes(novos)
   }
 
-  const atualizarLinha = (idxAmb, idxLinha, campo, valor) => {
+  const atualizarItem = (idxAmb, idxItem, campo, valor) => {
     const novos = [...ambientes]
-    novos[idxAmb].linhas[idxLinha][campo] = valor
+    if (!novos[idxAmb].items) return
+    novos[idxAmb].items[idxItem][campo] = valor
     setAmbientes(novos)
   }
 
@@ -265,8 +87,14 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
     if (!confirmItem) return
     const { idxAmb, idxLinha } = confirmItem
     const novos = [...ambientes]
-    novos[idxAmb].linhas.splice(idxLinha, 1)
+    if (!novos[idxAmb].items) return
+    novos[idxAmb].items.splice(idxItem, 1)
     setAmbientes(novos)
+    setConfirmItem(null)
+  }
+
+  const cancelRemoveItem = () => {
+    setConfirmItem(null)
     setConfirmItem(null)
   }
 
@@ -274,9 +102,10 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
     setConfirmItem(null)
   }
 
-  const toggleStatus = (idxAmb, idxLinha) => {
+  const toggleStatus = (idxAmb, idxItem) => {
     const novos = [...ambientes]
-    novos[idxAmb].linhas[idxLinha].status = !novos[idxAmb].linhas[idxLinha].status
+    if (!novos[idxAmb].items) return
+    novos[idxAmb].items[idxItem].status = !novos[idxAmb].items[idxItem].status
     setAmbientes(novos)
   }
 
@@ -285,7 +114,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
       if (!popupTarget) return;
       const popupEl = document.querySelector('[data-descricao-popup="true"]');
       const clickedInsidePopup = popupEl && popupEl.contains(e.target);
-      const clickedTextarea = popupTarget.ref && popupTarget.ref.contains && popupTarget.ref.contains(e.target);
+      const clickedTextarea = popupTarget.ref && popupTarget.ref.contains(e.target);
 
       if (!clickedInsidePopup && !clickedTextarea) {
         setPopupTarget(null);
@@ -394,54 +223,96 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                               <textarea
                                 className="auto-expand"
                                 rows="1"
-                                ref={(el) => linha.descricaoRef = el}
+                                // Cria uma referência para a textarea na linha atual
+                                ref={(el) => linha.descricaoRef = el} 
                                 value={linha.descricao}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setPopupTarget({ ambIdx: idx, linhaIdx: i, ref: e.target });
+                                  setPopupTarget({ ambIdx: idx, itemIdx: i, ref: e.target });
                                 }}
                                 onChange={(e) =>
-                                  atualizarLinha(idx, i, 'descricao', e.target.value)
+                                  atualizarItem(idx, i, 'descricao', e.target.value)
                                 }
                                 onInput={(e) => {
                                   e.target.style.height = 'auto';
                                   e.target.style.height = e.target.scrollHeight + 'px';
                                 }}
                               />
+                              {/* Renderiza o DescricaoPopup se for o alvo correto */}
                               {popupTarget &&
                                 popupTarget.ambIdx === idx &&
-                                popupTarget.linhaIdx === i && (
+                                popupTarget.itemIdx === i && (
                                   <DescricaoPopup
                                     referenceElement={popupTarget.ref}
                                     onSelect={(desc) => {
-                                      atualizarLinha(idx, i, 'descricao', desc);
+                                      atualizarItem(idx, i, 'descricao', desc);
                                       setPopupTarget(null);
-                                      setTimeout(() => {
+                                      // Usa a função auxiliar para ajustar o tamanho da textarea
+                                      setTimeout(() => { 
                                         if(linha.descricaoRef) adjustTextareaSize(linha.descricaoRef)
                                       }, 0)
                                     }}
                                     onAdd={(novo) => {
-                                      atualizarLinha(idx, i, 'descricao', novo);
+                                      atualizarItem(idx, i, 'descricao', novo);
                                       setPopupTarget(null);
+                                      // Não precisa de setTimeout/adjustTextareaSize aqui, pois a alteração manual já faz isso
                                     }}
                                     onClose={() => setPopupTarget(null)}
                                   />
                               )}
                             </CTableDataCell>
-
-                            <CTableDataCell
-                              style={{ textAlign: 'center', cursor: 'pointer' }}
+                          <CTableDataCell style={{ position: 'relative' }}>
+                            <textarea
+                              className="auto-expand"
+                              rows="1"
+                              ref={(el) => linha.descricaoRef = el}
+                              value={linha.descricao}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                toggleStatus(idx, i);
+                                setPopupTarget({ ambIdx: idx, itemIdx: i, ref: e.target });
                               }}
-                            >
-                              {linha.status ? (
-                                <FaCheck color="green" />
-                              ) : (
-                                <BsXLg color="red" strokeWidth={1} />
-                              )}
-                            </CTableDataCell>
+                              onChange={(e) =>
+                                atualizarItem(idx, i, 'descricao', e.target.value)
+                              }
+                              onInput={(e) => {
+                                e.target.style.height = 'auto';
+                                e.target.style.height = e.target.scrollHeight + 'px';
+                              }}
+                            />
+                            {popupTarget &&
+                              popupTarget.ambIdx === idx &&
+                              popupTarget.itemIdx === i && (
+                                <DescricaoPopup
+                                  referenceElement={popupTarget.ref}
+                                  onSelect={(desc) => {
+                                    atualizarItem(idx, i, 'descricao', desc);
+                                    setPopupTarget(null);
+                                    setTimeout(() => {
+                                      if(linha.descricaoRef) adjustTextareaSize(linha.descricaoRef)
+                                    }, 0)
+                                  }}
+                                  onAdd={(novo) => {
+                                    atualizarItem(idx, i, 'descricao', novo);
+                                    setPopupTarget(null);
+                                  }}
+                                  onClose={() => setPopupTarget(null)}
+                                />
+                            )}
+                          </CTableDataCell>
+
+                          <CTableDataCell
+                            style={{ textAlign: 'center', cursor: 'pointer' }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleStatus(idx, i);
+                            }}
+                          >
+                            {linha.status ? (
+                              <FaCheck color="green" />
+                            ) : (
+                              <BsXLg color="red" strokeWidth={1} />
+                            )}
+                          </CTableDataCell>
 
                             <CTableDataCell>
                               <CButton

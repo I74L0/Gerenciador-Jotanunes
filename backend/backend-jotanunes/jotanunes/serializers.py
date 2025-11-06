@@ -1,8 +1,13 @@
 from rest_framework import serializers
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, get_user_model
 from rest_framework.relations import PrimaryKeyRelatedField
-from .models import Obra, Ambiente, Material, Marca, Item, Descricao, Torre
+from .models import (
+    Obra, Ambiente, Material, Marca, Item, Descricao, Torre,
+    Estado, Cidade
+)
+
+User = get_user_model()
+
 
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,14 +28,36 @@ class UsuarioLoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
     
-    def validate(self, data):
-        user = authenticate(**data)
-        if user and user.is_active:
-            data['user'] = user
-            return data
-        raise serializers.ValidationError('Credenciais inválidas.')
-    
+    user = serializers.SerializerMethodField(read_only=True)
 
+    def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
+        user = authenticate(username=username, password=password)
+
+        if user is None:
+            raise serializers.ValidationError("Credenciais inválidas. Verifique o usuário e a senha.")
+        
+        if not user.is_active:
+            raise serializers.ValidationError("Este usuário está inativo.")
+        
+        data['user'] = user
+        return data
+
+    def get_user(self, obj):
+        user = obj.get('user')
+        return UsuarioSerializer(user).data
+
+class EstadoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Estado
+        fields = ['id', 'nome', 'uf']
+
+class CidadeSerializer(serializers.ModelSerializer):
+    estado_uf = serializers.CharField(source='estado.uf', read_only=True)
+    class Meta:
+        model = Cidade
+        fields = ['id', 'nome', 'estado', 'estado_uf']
 class MarcaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Marca
@@ -46,7 +73,7 @@ class MaterialSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Material
-        fields = ['id', 'descricao', 'marcas']
+        fields = ['id', 'descricao', 'marcas'] 
 
 class ItemSerializer(serializers.ModelSerializer):
     materiais = MaterialSerializer(many=True, required=False)
@@ -61,7 +88,7 @@ class AmbienteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ambiente
-        fields = ['id', 'nome', 'itens']
+        fields = ['id', 'nome', 'obra', 'torre', 'itens' ]
 
 class TorreSerializer(serializers.ModelSerializer):
     ambientes = AmbienteSerializer(many=True, required=False)
@@ -109,8 +136,8 @@ class ObraSerializer(serializers.ModelSerializer):
                     if marcas:
                         material.marcas.set(marcas)
 
-                for descricao_data in descricoes_data:
-                    Descricao.objects.create(item=item, **descricao_data)
+                if descricoes_data:
+                    item.descricoes.set(descricoes_data)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

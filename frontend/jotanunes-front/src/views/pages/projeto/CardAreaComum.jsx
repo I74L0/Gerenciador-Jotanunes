@@ -351,19 +351,19 @@ export default function CardAreaComum({ ambientes, setAmbientes }) {
                     )}
                   </div>
 
-                  <div className="acao-remover">
-                    <CButton
-                      color="danger"
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        removerAmbiente(idx)
-                      }}
-                    >
-                      Remover Ambiente
-                    </CButton>
-                  </div>
-                </CRow>
+                <div className="acao-remover">
+                  <CButton
+                    color="danger"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      removerAmbiente(idx)
+                    }}
+                  >
+                    Remover Ambiente
+                  </CButton>
+                </div>
+              </CRow>
 
                 <CCollapse className='div-collapse' visible={amb.aberto}>
                   <CCard>
