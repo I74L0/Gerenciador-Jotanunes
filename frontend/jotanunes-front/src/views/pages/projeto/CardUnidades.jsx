@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { 
+import {
   CButton,
   CCard,
   CCardBody,
@@ -11,16 +11,22 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CModal,
+  CModalHeader,
+  CModalBody,
+  CModalFooter,
 } from '@coreui/react'
 import { IoIosAddCircle } from "react-icons/io";
 import { FaCheck } from 'react-icons/fa'
 import { BsXLg } from 'react-icons/bs'
 
-// Importa o componente DescricaoPopup
+// Importa o componente DescricaoPopup compartilhado
 import DescricaoPopup from '../../../components/DescricaoPopup';
 
 export default function CardUnidades({ ambientes, setAmbientes }) {
-  const [popupTarget, setPopupTarget] = useState(null);
+  const [popupTarget, setPopupTarget] = useState(null)
+  const [confirmEnvIdx, setConfirmEnvIdx] = useState(null)
+  const [confirmItem, setConfirmItem] = useState(null)
 
   const adicionarAmbiente = () => {
     const novo = { nome: `Novo Ambiente ${ambientes.length + 1}`, editando: true, aberto: true, items: [] }
@@ -40,7 +46,17 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
   }
 
   const removerAmbiente = (idx) => {
-    setAmbientes(ambientes.filter((_, i) => i !== idx))
+    setConfirmEnvIdx(idx)
+  }
+
+  const confirmRemoveAmbiente = () => {
+    if (confirmEnvIdx === null) return
+    setAmbientes(ambientes.filter((_, i) => i !== confirmEnvIdx))
+    setConfirmEnvIdx(null)
+  }
+
+  const cancelRemoveAmbiente = () => {
+    setConfirmEnvIdx(null)
   }
 
   const toggleCollapse = (idx) => {
@@ -49,25 +65,37 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
     setAmbientes(novos)
   }
 
-  const adicionarItem = (idx) => {
+  const adicionarLinha = (idx) => {
     const novos = [...ambientes]
     if (!novos[idx].items) novos[idx].items = []
     novos[idx].items.push({ item: '', descricao: '', status: false })
     setAmbientes(novos)
   }
 
-  const atualizarItem = (idxAmb, idxItem, campo, valor) => {
+  const atualizarLinha = (idxAmb, idxLinha, campo, valor) => {
     const novos = [...ambientes]
     if (!novos[idxAmb].items) return
-    novos[idxAmb].items[idxItem][campo] = valor
+    novos[idxAmb].items[idxLinha][campo] = valor
     setAmbientes(novos)
   }
 
-  const removerItem = (idxAmb, idxItem) => {
+  const removerLinha = (idxAmb, idxLinha) => {
+    setConfirmItem({ idxAmb, idxLinha })
+  }
+
+  const confirmRemoveItem = () => {
+    if (!confirmItem) return
+    const { idxAmb, idxLinha } = confirmItem
     const novos = [...ambientes]
-    if (!novos[idxAmb].items) return
-    novos[idxAmb].items.splice(idxItem, 1)
-    setAmbientes(novos)
+    if (novos[idxAmb] && novos[idxAmb].items && novos[idxAmb].items.length > idxLinha) {
+      novos[idxAmb].items.splice(idxLinha, 1)
+      setAmbientes(novos)
+    }
+    setConfirmItem(null)
+  }
+
+  const cancelRemoveItem = () => {
+    setConfirmItem(null)
   }
 
   const toggleStatus = (idxAmb, idxItem) => {
@@ -82,7 +110,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
       if (!popupTarget) return;
       const popupEl = document.querySelector('[data-descricao-popup="true"]');
       const clickedInsidePopup = popupEl && popupEl.contains(e.target);
-      const clickedTextarea = popupTarget.ref && popupTarget.ref.contains(e.target);
+      const clickedTextarea = popupTarget.ref && popupTarget.ref.contains && popupTarget.ref.contains(e.target);
 
       if (!clickedInsidePopup && !clickedTextarea) {
         setPopupTarget(null);
@@ -128,12 +156,22 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') finalizarEdicao(idx)
                         }}
+                        onClick={(e) => e.stopPropagation()}
                       />
                     ) : (
-                      <span className="nome-ambiente">{`${idx + 1}. ${amb.nome}`}</span>
+                      <span
+                        className="nome-ambiente"
+                        onDoubleClick={(e) => {
+                          e.stopPropagation()
+                          const novos = [...ambientes]
+                          novos[idx].editando = true
+                          setAmbientes(novos)
+                        }}
+                      >
+                        {`${idx + 1}. ${amb.nome}`}
+                      </span>
                     )}
                   </div>
-
                   <div className="acao-remover">
                     <CButton
                       color="danger"
@@ -160,16 +198,14 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                         </CTableRow>
                       </CTableHead>
                       <CTableBody>
-                        { (amb.items || []).map((linha, i) => (
+                        {amb.items.map((linha, i) => (
                           <CTableRow key={i}>
                             <CTableDataCell>
                               <textarea
                                 className="auto-expand"
                                 rows="1"
                                 value={linha.item}
-                                onChange={(e) =>
-                                  atualizarItem(idx, i, 'item', e.target.value)
-                                }
+                                onChange={(e) => atualizarLinha(idx, i, 'item', e.target.value)}
                                 onInput={(e) => {
                                   e.target.style.height = 'auto'
                                   e.target.style.height = e.target.scrollHeight + 'px'
@@ -181,47 +217,42 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                               <textarea
                                 className="auto-expand"
                                 rows="1"
-                                // Cria uma referência para a textarea na linha atual
+                                ref={(el) => linha.descricaoRef = el}
                                 value={linha.descricao}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setPopupTarget({ ambIdx: idx, itemIdx: i, ref: e.target });
                                 }}
                                 onChange={(e) =>
-                                  atualizarItem(idx, i, 'descricao', e.target.value)
+                                  atualizarLinha(idx, i, 'descricao', e.target.value)
                                 }
                                 onInput={(e) => {
                                   e.target.style.height = 'auto';
                                   e.target.style.height = e.target.scrollHeight + 'px';
                                 }}
                               />
-                              {/* Renderiza o DescricaoPopup se for o alvo correto */}
                               {popupTarget &&
                                 popupTarget.ambIdx === idx &&
                                 popupTarget.itemIdx === i && (
                                   <DescricaoPopup
                                     referenceElement={popupTarget.ref}
                                     onSelect={(desc) => {
-                                      const targetRef = popupTarget.ref; 
-                                    
-                                      atualizarItem(idx, i, 'descricao', desc);
+                                      atualizarLinha(idx, i, 'descricao', desc);
                                       setPopupTarget(null);
-                                    
-                                      setTimeout(() => { 
-                                        if (targetRef) {
-                                          targetRef.style.height = 'auto';
-                                          targetRef.style.height = targetRef.scrollHeight + 'px';
+                                      setTimeout(() => {
+                                        if (linha.descricaoRef) {
+                                          linha.descricaoRef.style.height = 'auto';
+                                          linha.descricaoRef.style.height = linha.descricaoRef.scrollHeight + 'px';
                                         }
                                       }, 0);
                                     }}
                                     onAdd={(novo) => {
-                                      atualizarItem(idx, i, 'descricao', novo);
+                                      atualizarLinha(idx, i, 'descricao', novo);
                                       setPopupTarget(null);
-                                      // Não precisa de setTimeout/adjustTextareaSize aqui, pois a alteração manual já faz isso
                                     }}
                                     onClose={() => setPopupTarget(null)}
                                   />
-                              )}
+                                )}
                             </CTableDataCell>
 
                             <CTableDataCell
@@ -242,7 +273,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                               <CButton
                                 color="danger"
                                 size="sm"
-                                onClick={() => removerItem(idx, i)}
+                                onClick={() => removerLinha(idx, i)}
                               >
                                 Remover
                               </CButton>
@@ -254,7 +285,7 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                             <CButton
                               color="success"
                               size="sm"
-                              onClick={() => adicionarItem(idx)}
+                              onClick={() => adicionarLinha(idx)}
                             >
                               + Adicionar Linha
                             </CButton>
@@ -267,6 +298,38 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
               </div>
             ))}
           </div>
+
+          {/* Modal de confirmação para remoção de ambiente */}
+          <CModal visible={confirmEnvIdx !== null} onClose={cancelRemoveAmbiente} alignment="center" backdrop="static" keyboard={false}>
+            <CModalHeader>Confirmar remoção</CModalHeader>
+            <CModalBody>
+              Tem certeza que deseja remover o ambiente "{confirmEnvIdx !== null ? ambientes[confirmEnvIdx].nome : ''}" e todos os seus itens?
+            </CModalBody>
+            <CModalFooter>
+              <CButton color="secondary" variant="ghost" onClick={cancelRemoveAmbiente}>
+                Cancelar
+              </CButton>
+              <CButton color="danger" onClick={confirmRemoveAmbiente}>
+                Remover
+              </CButton>
+            </CModalFooter>
+          </CModal>
+
+          {/* Modal de confirmação para remoção de linha/item */}
+          <CModal visible={confirmItem !== null} onClose={cancelRemoveItem} alignment="center" backdrop="static" keyboard={false}>
+            <CModalHeader>Confirmar remoção</CModalHeader>
+            <CModalBody>
+              Tem certeza que deseja remover este item?
+            </CModalBody>
+            <CModalFooter>
+              <CButton color="secondary" variant="ghost" onClick={cancelRemoveItem}>
+                Cancelar
+              </CButton>
+              <CButton color="danger" onClick={confirmRemoveItem}>
+                Remover
+              </CButton>
+            </CModalFooter>
+          </CModal>
         </>
       </CCardBody>
     </CCard>

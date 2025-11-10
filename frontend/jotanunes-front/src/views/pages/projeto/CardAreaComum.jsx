@@ -10,12 +10,63 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CModal,
+  CModalHeader,
+  CModalBody,
+  CModalFooter,
 } from '@coreui/react'
+import { useState, useEffect } from 'react'
 import { IoIosAddCircle } from 'react-icons/io'
 import { FaCheck } from 'react-icons/fa'
 import { BsXLg } from 'react-icons/bs'
+import DescricaoPopup from '../../../components/DescricaoPopup'
+
+const descricoesBase = [
+  "Porcelanato ou laminado",
+  "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.",
+  "Porcelanato ou Laminado, h= 5cm",
+  "Mármore ou granito.",
+  "Metálico",
+  "Alumínio pintado de branco",
+  "Liso incolor.",
+  "Porta semi–ôca comum pintada c/ esmalte sintético.",
+  "Acabamento cromado.",
+  "Pontos de luz no teto, tomadas de corrente e interruptores",
+  "Pontos secos de comunicação e de antena de TV.",
+  "Infraestrutura para high wall com condensadora axial.",
+  "Cerâmica.",
+  "Cerâmica até o teto.",
+  "Forro de gesso.",
+  "Mármore ou granito L=3,5cm.",
+  "Em mármore ou granito com cuba em louça cor branca",
+  "Porta semi-ôca comum pintura c/ esmalte sintético.",
+  "Pontilhado Incolor.",
+  "Torneira para Lavatório, registro de gaveta e registro de pressão com acabamento cromado .",
+  "Vaso Sanitário com Caixa Acoplada em louça cor branca.",
+  "Pontos de luz no teto, tomada de corrente e interruptor da Prime, Alumbra, Cemar ou Fame na cor branco.",
+  "Sifão em PVC, esgoto em PVC, rede de água fria e ducha higiênica em PEX.",
+  "Pintura látex PVA sobre gesso ou argamassa de regularização PVA.",
+  "Inox.",
+  "Louça cor branca.",
+  "Torneiras e registro de gaveta com acabamento cromado.",
+  "Rede de água fria em PEX e esgoto em PVC",
+  "Tubulação seca.",
+  "Em concreto desempolado.",
+  "Textura acrílica.",
+  "Pintura ou textura acrílica.",
+  "Em perfil metálico pintado de branco.",
+  "Textura Acrílica ou Pastilha Cerâmica, conforme definido em projeto arquitetônico.",
+  "Pintura PVA látex branco sobre gesso ou massa de regulariação PVA ou Forro de gesso.",
+  "Porcelanato ou Laminado, h=5cm.",
+  "Alumínio pintado de branco com vidro liso.",
+  "Ponto de luz no teto.",
+  "Grama"
+]
 
 export default function CardAreaComum({ ambientes, setAmbientes }) {
+  const [popupTarget, setPopupTarget] = useState(null);
+  const [confirmEnvIdx, setConfirmEnvIdx] = useState(null);
+  const [confirmItem, setConfirmItem] = useState(null);
 
   const adicionarAmbiente = () => {
     const novoId = `${ambientes.length + 1}.`
@@ -36,7 +87,17 @@ export default function CardAreaComum({ ambientes, setAmbientes }) {
   }
 
   const removerAmbiente = (idx) => {
-    setAmbientes(ambientes.filter((_, i) => i !== idx))
+    setConfirmEnvIdx(idx)
+  }
+
+  const confirmRemoveAmbiente = () => {
+    if (confirmEnvIdx === null) return
+    setAmbientes(ambientes.filter((_, i) => i !== confirmEnvIdx))
+    setConfirmEnvIdx(null)
+  }
+
+  const cancelRemoveAmbiente = () => {
+    setConfirmEnvIdx(null)
   }
 
   const toggleCollapse = (idx) => {
@@ -47,27 +108,59 @@ export default function CardAreaComum({ ambientes, setAmbientes }) {
 
   const adicionarLinha = (idx) => {
     const novos = [...ambientes]
+    if (!novos[idx].items) novos[idx].items = []
     novos[idx].items.push({ item: '', descricao: '', status: false })
     setAmbientes(novos)
   }
 
   const atualizarLinha = (idxAmb, idxLinha, campo, valor) => {
     const novos = [...ambientes]
+    if (!novos[idxAmb].items) return
     novos[idxAmb].items[idxLinha][campo] = valor
     setAmbientes(novos)
   }
 
   const toggleStatus = (idxAmb, idxLinha) => {
     const novos = [...ambientes]
+    if (!novos[idxAmb].items) return
     novos[idxAmb].items[idxLinha].status = !novos[idxAmb].items[idxLinha].status
     setAmbientes(novos)
   }
 
   const removerLinha = (idxAmb, idxLinha) => {
-    const novos = [...ambientes]
-    novos[idxAmb].items.splice(idxLinha, 1)
-    setAmbientes(novos)
+    setConfirmItem({ idxAmb, idxLinha })
   }
+
+  const confirmRemoveItem = () => {
+    if (!confirmItem) return
+    const { idxAmb, idxLinha } = confirmItem
+    const novos = [...ambientes]
+    if (novos[idxAmb] && novos[idxAmb].items && novos[idxAmb].items.length > idxLinha) {
+      novos[idxAmb].items.splice(idxLinha, 1)
+      setAmbientes(novos)
+    }
+    setConfirmItem(null)
+  }
+
+  const cancelRemoveItem = () => {
+    setConfirmItem(null)
+  }
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (!popupTarget) return;
+      const popupEl = document.querySelector('[data-descricao-popup="true"]');
+      const clickedInsidePopup = popupEl && popupEl.contains(e.target);
+      const clickedTextarea = popupTarget.ref && popupTarget.ref.contains && popupTarget.ref.contains(e.target);
+
+      if (!clickedInsidePopup && !clickedTextarea) {
+        setPopupTarget(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [popupTarget]);
 
   return (
     <CCard className="h-100 w-75">
@@ -107,7 +200,17 @@ export default function CardAreaComum({ ambientes, setAmbientes }) {
                         }}
                       />
                     ) : (
-                      <span className="nome-ambiente">{`${amb.id} ${amb.nome}`}</span>
+                      <span
+                        className="nome-ambiente"
+                        onDoubleClick={(e) => {
+                          e.stopPropagation()
+                          const novos = [...ambientes]
+                          novos[idx].editando = true
+                          setAmbientes(novos)
+                        }}
+                      >
+                        {`${amb.id} ${amb.nome}`}
+                      </span>
                     )}
                   </div>
 
@@ -147,15 +250,46 @@ export default function CardAreaComum({ ambientes, setAmbientes }) {
                                 onChange={(e) => atualizarLinha(idx, i, 'item', e.target.value)}
                               />
                             </CTableDataCell>
-                            <CTableDataCell>
+                            <CTableDataCell style={{ position: 'relative' }}>
                               <textarea
                                 className="auto-expand"
                                 rows="1"
+                                ref={(el) => linha.descricaoRef = el}
                                 value={linha.descricao}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setPopupTarget({ ambIdx: idx, itemIdx: i, ref: e.target });
+                                }}
                                 onChange={(e) =>
                                   atualizarLinha(idx, i, 'descricao', e.target.value)
                                 }
+                                onInput={(e) => {
+                                  e.target.style.height = 'auto';
+                                  e.target.style.height = e.target.scrollHeight + 'px';
+                                }}
                               />
+                              {popupTarget &&
+                                popupTarget.ambIdx === idx &&
+                                popupTarget.itemIdx === i && (
+                                  <DescricaoPopup
+                                    referenceElement={popupTarget.ref}
+                                    onSelect={(desc) => {
+                                      atualizarLinha(idx, i, 'descricao', desc);
+                                      setPopupTarget(null);
+                                      setTimeout(() => {
+                                        if (linha.descricaoRef) {
+                                          linha.descricaoRef.style.height = 'auto';
+                                          linha.descricaoRef.style.height = linha.descricaoRef.scrollHeight + 'px';
+                                        }
+                                      }, 0);
+                                    }}
+                                    onAdd={(novo) => {
+                                      atualizarLinha(idx, i, 'descricao', novo);
+                                      setPopupTarget(null);
+                                    }}
+                                    onClose={() => setPopupTarget(null)}
+                                  />
+                                )}
                             </CTableDataCell>
                             <CTableDataCell
                               style={{ textAlign: 'center', cursor: 'pointer' }}
@@ -192,6 +326,27 @@ export default function CardAreaComum({ ambientes, setAmbientes }) {
               </div>
             ))}
           </div>
+          {/* Modal de confirmação para remoção de ambiente */}
+          <CModal visible={confirmEnvIdx !== null} onClose={cancelRemoveAmbiente} alignment="center" backdrop="static" keyboard={false}>
+            <CModalHeader>Confirmar remoção</CModalHeader>
+            <CModalBody>
+              Tem certeza que deseja remover o ambiente "{confirmEnvIdx !== null ? ambientes[confirmEnvIdx].nome : ''}" e todos os seus itens?
+            </CModalBody>
+            <CModalFooter>
+              <CButton color="secondary" variant="ghost" onClick={cancelRemoveAmbiente}>Cancelar</CButton>
+              <CButton color="danger" onClick={confirmRemoveAmbiente}>Remover</CButton>
+            </CModalFooter>
+          </CModal>
+
+          {/* Modal de confirmação para remoção de item */}
+          <CModal visible={confirmItem !== null} onClose={cancelRemoveItem} alignment="center" backdrop="static" keyboard={false}>
+            <CModalHeader>Confirmar remoção</CModalHeader>
+            <CModalBody>Tem certeza que deseja remover este item?</CModalBody>
+            <CModalFooter>
+              <CButton color="secondary" variant="ghost" onClick={cancelRemoveItem}>Cancelar</CButton>
+              <CButton color="danger" onClick={confirmRemoveItem}>Remover</CButton>
+            </CModalFooter>
+          </CModal>
         </>
       </CCardBody>
     </CCard>

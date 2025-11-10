@@ -36,19 +36,22 @@ import CardAreaComum from './CardAreaComum'
 import CardMateriais from './CardMateriais'
 import CardObservacoes from './CardObservacoes'
 import MenuTabs from './MenuTabs'
+import { useNavigate } from 'react-router-dom'
 import avatar8 from 'src/assets/images/avatars/8.jpg'
 import 'src/views/pages/projeto/Projeto-style.scss'
 import { obras, ambientes, materiais, getDados } from 'src/apiClient'
 
 const Projeto = () => {
   const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
+
+  const navigate = useNavigate()
   const { id } = useParams()
   const [activeTab, setActiveTab] = useState(0)
   const [prefacioData, setPrefacioData] = useState({ nome: '', estado: '', cidade: '', texto: '' });
   const [unidadesData, setUnidadesData] = useState([]);
   const [areacomumData, setAreacomumData] = useState([]);
   const [materialData, setMaterialData] = useState([]);
-  const [observacoesData, setObservacoesData] = useState({observacoes: ''});
+  const [observacoesData, setObservacoesData] = useState({ observacoes: '' });
 
   // Estados para controle de salvamento e carregamento
   const [isLoading, setIsLoading] = useState(false);
@@ -76,7 +79,7 @@ const Projeto = () => {
             nome: dadosObra.nome || '',
             estado: dadosObra.estado || '',
             cidade: dadosObra.cidade || '',
-            texto: dadosObra.texto_prefacio || '', 
+            texto: dadosObra.texto_prefacio || '',
           });
 
           // Assumindo que os ambientes têm um campo 'tipo' para separar
@@ -100,10 +103,11 @@ const Projeto = () => {
         setIsLoading(true);
         try {
           // 1. Busca todos os dados do template 'dados.json'
-          const templateData = await getDados(); 
+          const templateData = await getDados();
 
           // 2. Define os estados com os dados do template
           setPrefacioData(templateData.prefacioData || { nome: '', estado: '', cidade: '', texto: '' });
+          alert(unidadesData);
           setUnidadesData(templateData.unidadesData || []);
           setAreacomumData(templateData.areacomumData || []);
           setMaterialData(templateData.materialData || []);
@@ -160,14 +164,14 @@ const Projeto = () => {
       estado: prefacioData.estado,
       cidade: prefacioData.cidade,
       texto_prefacio: prefacioData.texto,
-      
+
       // Dados de Ambientes (isto é mais complexo)
       // A API pode querer que você salve os ambientes em /ambientes/
       // e não junto com a obra. Isso depende da sua API.
       // Para este exemplo, vou assumir que a API de obra NÃO salva ambientes
       // e que os CardUnidades/CardAreaComum salvam a si mesmos (o que não fazem).
       // Por simplicidade, vamos focar em salvar os dados do 'prefacio'
-      
+
       // VAMOS ASSUMIR que a API aceita um 'patch' só com os dados do prefácio
       observacoes: observacoesData,
       // materiais: materialData, //...etc
@@ -183,7 +187,7 @@ const Projeto = () => {
         response = await obras.create(dadosParaSalvar); //
         console.log('Projeto criado!', response.data);
       }
-      
+
     } catch (error) {
       console.error("Erro ao salvar:", error);
       setSaveError(error.message || 'Falha ao salvar. Tente novamente.');
@@ -254,7 +258,14 @@ const Projeto = () => {
           </CContainer>
         </CRow>
         <hr className="w-100" />
-        <CRow className="div-tabs w-100">
+        <CRow className="div-tabs w-100 align-items-center">
+          <CButton
+            className="btn-sair me-3"
+            onClick={() => navigate('/index')}
+            style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #000000ff' }}
+          >
+            Sair
+          </CButton>
           <MenuTabs activeIndex={activeTab} onChange={setActiveTab} />
           <CButton className="btn-salvar" onClick={handleSave} disabled={isSaving}>
             {isSaving ? 'Salvando...' : (id ? 'Atualizar' : 'Salvar Novo')}

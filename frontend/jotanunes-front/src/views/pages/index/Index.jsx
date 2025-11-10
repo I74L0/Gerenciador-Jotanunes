@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"; //
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom'
 import {
   CButton,
@@ -7,10 +7,6 @@ import {
   CHeader,
   CImage,
   CContainer,
-  CCard,
-  CCardBody,
-  CCardTitle,
-  CCardText,
   CSpinner,
 } from "@coreui/react";
 import './Index-style.css';
@@ -275,4 +271,4 @@ const Index = () => {
   );
 }
 
-export default Index
+export default Index;
