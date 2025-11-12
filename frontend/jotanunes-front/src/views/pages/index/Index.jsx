@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom'
 import {
   CButton,
+  CCardTitle,
+  CCardText,
   CForm,
   CFormSelect,
   CHeader,
