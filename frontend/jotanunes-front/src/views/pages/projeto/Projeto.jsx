@@ -185,7 +185,7 @@ const Projeto = () => {
       } else {
         // Se não temos ID, CRIA (create) um novo projeto
         response = await obras.create(dadosParaSalvar); //
-        console.log('Projeto criado!', response.data);
+        navigate("/index")
       }
 
     } catch (error) {
