@@ -10,9 +10,14 @@ User = get_user_model()
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
+    is_gestor = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_gestor')
+
+    def get_is_gestor(self, obj):
+        return obj.is_superuser or obj.groups.filter(name='Gestores').exists()
 
 
 class UsuarioCreateSerializer(serializers.ModelSerializer):
@@ -55,7 +60,6 @@ class EstadoSerializer(serializers.ModelSerializer):
 
 class CidadeSerializer(serializers.ModelSerializer):
     estado_uf = serializers.CharField(source='estado.uf', read_only=True)
-
     class Meta:
         model = Cidade
         fields = ['id', 'nome', 'estado', 'estado_uf']
@@ -74,11 +78,15 @@ class DescricaoSerializer(serializers.ModelSerializer):
 
 
 class MaterialSerializer(serializers.ModelSerializer):
-    marcas = serializers.PrimaryKeyRelatedField(queryset=Marca.objects.all(), many=True, required=False)
-
+    marcas = serializers.PrimaryKeyRelatedField(
+        many=True, 
+        queryset=Marca.objects.all(), 
+        required=False
+    )
+    
     class Meta:
         model = Material
-        fields = ['id', 'item', 'descricao', 'marcas']
+        fields = ['id', 'descricao', 'dimensao', 'marcas']
 
 
 class ItemSerializer(serializers.ModelSerializer):
@@ -102,7 +110,7 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = [
-            'id', 'nome', 
+            'id', 'nome', 'posicao', 
             'descricoes', 'materiais',
             'descricoes_input', 'materiais_input'
         ]
@@ -135,12 +143,22 @@ class ItemSerializer(serializers.ModelSerializer):
             
         return item
 
+
 class AmbienteSerializer(serializers.ModelSerializer):
-    itens = ItemSerializer(many=True, required=False)
+    itens = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Item.objects.all(),
+        required=False
+    )
+    materiais = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Material.objects.all(),
+        required=False
+    )
 
     class Meta:
         model = Ambiente
-        fields = ['id', 'nome', 'obra', 'torre', 'itens']
+        fields = ['id', 'nome', 'metragem', 'itens', 'materiais']
 
 
 class TorreSerializer(serializers.ModelSerializer):
@@ -153,44 +171,41 @@ class TorreSerializer(serializers.ModelSerializer):
 
 class ObraSerializer(serializers.ModelSerializer):
     torres = TorreSerializer(many=True, required=False)
-    ambientes = AmbienteSerializer(many=True, required=False, help_text="Ambientes que pertencem diretamente à obra, sem torre.")
+    ambientes = AmbienteSerializer(many=True, required=False) 
 
     class Meta:
         model = Obra
-        fields = ['id', 'nome', 'cidade', 'estado', 'endereco_completo', 'descricao', 'status', 'torres', 'ambientes']
+        fields = [
+            'id', 'nome', 'cidade', 'estado', 'endereco_completo', 'descricao', 
+            'status', 'torres', 'ambientes'
+        ]
 
     def create(self, validated_data):
         torres_data = validated_data.pop('torres', [])
-        ambientes_data = validated_data.pop('ambientes', [])
+        ambientes_obra_data = validated_data.pop('ambientes', [])
+        
         obra = Obra.objects.create(**validated_data)
 
         for torre_data in torres_data:
-            ambientes_da_torre_data = torre_data.pop('ambientes', [])
+            ambientes_torre_data = torre_data.pop('ambientes', [])
             torre = Torre.objects.create(obra=obra, **torre_data)
-            self._criar_ambientes_e_filhos(ambientes_da_torre_data, obra, torre)
-
-        self._criar_ambientes_e_filhos(ambientes_data, obra, None)
+            self._criar_ambientes_e_filhos(ambientes_torre_data, obra, torre)
+        
+        self._criar_ambientes_e_filhos(ambientes_obra_data, obra, None)
+        
         return obra
 
     def _criar_ambientes_e_filhos(self, ambientes_data, obra_obj, torre_obj):
         for ambiente_data in ambientes_data:
             itens_data = ambiente_data.pop('itens', [])
+            materiais_data = ambiente_data.pop('materiais', [])
+            
             ambiente = Ambiente.objects.create(obra=obra_obj, torre=torre_obj, **ambiente_data)
-
-            for item_data in itens_data:
-                materiais_data = item_data.pop('materiais', [])
-                descricoes_data = item_data.pop('descricoes', [])
-                item = Item.objects.create(**item_data)  # ← corrigido aqui
-                ambiente.itens.add(item)
-
-                for material_data in materiais_data:
-                    marcas = material_data.pop('marcas', [])
-                    material = Material.objects.create(item=item, **material_data)
-                    if marcas:
-                        material.marcas.set(marcas)
-
-                if descricoes_data:
-                    item.descricoes.set(descricoes_data)
+            
+            if itens_data:
+                ambiente.itens.set(itens_data)
+            if materiais_data:
+                ambiente.materiais.set(materiais_data)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
