@@ -86,7 +86,7 @@ class MaterialSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Material
-        fields = ['id', 'descricao', 'dimensao', 'marcas']
+        fields = ['id', 'descricao', 'marcas']
 
 
 class ItemSerializer(serializers.ModelSerializer):
@@ -110,7 +110,7 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = [
-            'id', 'nome', 'posicao', 
+            'id', 'nome',
             'descricoes', 'materiais',
             'descricoes_input', 'materiais_input'
         ]
@@ -158,7 +158,7 @@ class AmbienteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ambiente
-        fields = ['id', 'nome', 'metragem', 'itens', 'materiais']
+        fields = ['id', 'nome', 'itens', 'materiais']
 
 
 class TorreSerializer(serializers.ModelSerializer):
