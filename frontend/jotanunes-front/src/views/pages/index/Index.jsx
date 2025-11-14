@@ -8,6 +8,8 @@ import {
   CImage,
   CContainer,
   CSpinner,
+  CCardTitle,
+  CCardText
 } from "@coreui/react";
 import './Index-style.css';
 
@@ -136,14 +138,14 @@ const Index = () => {
           .sort((a, b) => getStatusPriority(getStatusClass(a.status)) - getStatusPriority(getStatusClass(b.status)))
           .map((obra) => (
           <div key={obra.id} className="obraItem">
-            <CButton className="abrirProjeto_botao" onClick={() => navigate(`/projeto/${obra.id}`)}>
+            <button className="abrirProjeto_botao" onClick={() => navigate(`/projeto/${obra.id}`)}>
               Abrir Projeto
-            </CButton>
-            <CCardTitle className="tituloProjeto">{obra.nome || `Obra ID: ${obra.id}`}
-            </CCardTitle>
-            <CCardText className="localizacaoProjeto">
+            </button>
+            <h2 className="tituloProjeto">{obra.nome || `Obra ID: ${obra.id}`}
+            </h2>
+            <p className="localizacaoProjeto">
               {obra.cidade && obra.estado ? `${obra.cidade} - ${obra.estado}` : 'Localização não definida'}
-            </CCardText>
+            </p>
             <div className="selecionar-referencia_container">
               <input
                 className="selecionar-referencia"
@@ -167,7 +169,7 @@ const Index = () => {
   };
   
   return (
-    <div className="create-page d-flex flex-column vh-100">
+    <div className="fundo">
       {/* Topbar */}
       <CHeader
         position="sticky"
@@ -188,7 +190,7 @@ const Index = () => {
         className="subbar d-flex justify-content-between align-items-center px-4 py-2 border-bottom bg-light"
       >
         <div className="botao_criarProjeto">
-          <CButton
+          <button
             color="light"
             className="text-danger fw-bold d-flex align-items-center gap-2 border-0"
             onClick={handleTemplateVazio}
@@ -196,14 +198,14 @@ const Index = () => {
           >
             <CImage src="/images/mais.png" alt="Mais" height={20} />
             <span className="text-dark">{selectedRefId ? 'Criar Com Referência' : 'Criar Projeto'}</span>
-          </CButton>
+          </button>
         </div>
 
         <div className="barraPesquisa">
           <input className="form-control" placeholder="Pesquisar" />
         </div>
 
-        <div className="d-flex align-items-center gap-2">
+        <div className="bolinhasJuntas">
           <div 
             className={`circle red ${filtroStatus === 'red' ? 'active-filter' : ''}`}
             onClick={() => setFiltroStatus(filtroStatus === 'red' ? null : 'red')}
@@ -233,8 +235,7 @@ const Index = () => {
       </CHeader>
 
       {/* Conteúdo principal */}
-      <CContainer fluid className="conteudoPrincipal">
-        <div className="ladoEsquerdo"/>
+      <CContainer className="conteudoPrincipal">
         <div className="centro">
           <div className="header2">
             <span className="spanTitulo">Editor de Especificações Técnicas</span>
@@ -253,9 +254,7 @@ const Index = () => {
             {/* 7. Chama a função de renderização */}
             {renderMainContent()}
           </div>
-
         </div>
-        <div className="ladoDireito"/>
       </CContainer>
 
       {/* Footer */}

@@ -7,6 +7,11 @@
   flex-direction: column;
 }
 
+body, html {
+  background: linear-gradient(#BC1F1B, rgb(54.2139534884, 8.9395348837, 7.7860465116));
+}
+
+
 /* Topbar */
 .topbar {
   background: #fff;
@@ -26,7 +31,7 @@
 }
 
 .barraPesquisa {
-  width: 70%;
+  width: 60%;
 }
 
 /* Círculos */
@@ -88,6 +93,11 @@
   gap: 15rem; /* ou o valor que quiser */
 }
 
+.bolinhasJuntas {
+  display: flex;
+  gap: 8px;
+}
+
 /* Conteúdo principal */
 .conteudoPrincipal{
   display: flex;
@@ -101,6 +111,8 @@
   background: linear-gradient(#BC1F1B, rgb(54.2139534884, 8.9395348837, 7.7860465116));
 }
 .centro{
+  margin-left: 15rem;
+  background: white;
   width: 72%;
 }
 
@@ -117,7 +129,7 @@
   background-color: #d2d2d2;
   padding: 0.4rem;
   border-radius: 0 0 10px 10px;
-  width: 30%;
+  width: 23rem;
   position: relative;
   margin-left: -85px;
 }
@@ -136,15 +148,26 @@
 
 .obraItem {
   display: flex;
-  justify-content: left;
-  gap: 5rem;
+  justify-content: flex-start;
   align-items: center;
   background: linear-gradient(to left, #f3f3f3, #dedede);
-  padding: 0.6rem;
+  padding: 20px
+}
+
+.abrirProjeto_botao{
+  margin-right: 1rem;
+  padding: 0.4rem 0.8rem;
+  background-color: #dedede;
+  color: rgb(0, 0, 0);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .tituloProjeto{
+  padding-top: 7px;
   width: 20%;
+  font-size: 1rem;
 }
 
 .localizacaoProjeto{
