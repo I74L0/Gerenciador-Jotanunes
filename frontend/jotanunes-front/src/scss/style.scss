@@ -7,8 +7,18 @@
 @use "@coreui/chartjs/scss/coreui-chartjs";
 @use "vendors/simplebar";
 
+// Prevent zoom issues when DevTools is closed
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   background-color: var(--cui-body-bg);
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 .wrapper {

@@ -1,25 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom'
 import {
-  CButton,
-  CCardTitle,
-  CCardText,
-  CForm,
   CFormSelect,
-  CHeader,
   CImage,
-  CContainer,
   CSpinner,
-  CCardTitle,
-  CCardText
 } from "@coreui/react";
 import './Index-style.css';
-
 import { obras } from "../../../apiClient";
 
 const Index = () => {
   const navigate = useNavigate();
-
   const [obrasLista, setObrasLista] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -101,7 +91,7 @@ const Index = () => {
     carregarObras();
   }, []);
 
-  // Função para renderizar o conteúdo principal
+  // Função para renderizar as obras
   const renderMainContent = () => {
     if (isLoading) {
       return (
@@ -141,7 +131,8 @@ const Index = () => {
           .map((obra) => (
           <div key={obra.id} className="obraItem">
             <button className="abrirProjeto_botao" onClick={() => navigate(`/projeto/${obra.id}`)}>
-              Abrir Projeto
+              <p className="IconeAquivo">{">"}</p>
+              <p className="abrirProjeto_botao_texto">Abrir Projeto</p>
             </button>
             <h2 className="tituloProjeto">{obra.nome || `Obra ID: ${obra.id}`}
             </h2>
@@ -173,23 +164,19 @@ const Index = () => {
   return (
     <div className="fundo">
       {/* Topbar */}
-      <CHeader
-        position="sticky"
-        className="topbar d-flex justify-content-between align-items-center px-4 py-2 border-bottom bg-white"
-      >
-        <div>
-          <CImage src="/images/Logo Vermelha.png" alt="Logo" height={45} width={150} />
+      <header className="header_conteiner">
+        <div className="logo">
+          <img src="/images/Logo Vermelha.png" alt="Logo" height={45} width={150} />
         </div>
-        <div className="d-flex align-items-center gap-2">
+        <div className="usuario_container">
           <span>Usuário</span>
-          <div className="user-icon">👤</div>
+          <div className="user-icon"></div>
         </div>
-      </CHeader>
-
+      </header>
+    
       {/* Subbar */}
-      <CHeader
-        position="sticky"
-        className="subbar d-flex justify-content-between align-items-center px-4 py-2 border-bottom bg-light"
+      <header
+        className="header2_conteiner"
       >
         <div className="botao_criarProjeto">
           <button
@@ -234,34 +221,30 @@ const Index = () => {
           ></div>
           <div className="filter">⚲</div>
         </div>
-      </CHeader>
+      </header>
 
       {/* Conteúdo principal */}
-      <CContainer className="conteudoPrincipal">
-        <div className="centro">
-          <div className="header2">
-            <span className="spanTitulo">Editor de Especificações Técnicas</span>
-            <div className="filtros">
-              <CForm className="d-flex gap-3 align-items-center">
-                <CFormSelect style={{ width: "200px" }}>
-                  <option>Estado</option>
-                </CFormSelect>
-                <CFormSelect style={{ width: "200px" }}>
-                  <option>Cidade</option>
-                </CFormSelect>
-              </CForm>
-            </div>
-          </div>
-          <div className="main-content-placeholder" style={{ minHeight: 420 }}>
-            {/* 7. Chama a função de renderização */}
-            {renderMainContent()}
+      <section className="conteudoPrincipal">
+        <div className="header3_conteiner">
+          <span className="spanTitulo">Editor de Especificações Técnicas</span>
+          <div className="filtros">
+            <CFormSelect style={{ width: "200px" }}>
+              <option>Estado</option>
+            </CFormSelect>
+            <CFormSelect style={{ width: "200px" }}>
+              <option>Cidade</option>
+            </CFormSelect>
           </div>
         </div>
-      </CContainer>
+        <div className="main-content-placeholder" style={{ minHeight: 420 }}>
+          {/* 7. Chama a função de renderização */}
+          {renderMainContent()}
+        </div>
+      </section>
 
       {/* Footer */}
-      <div className="footer p-2">
-        <div className="legend d-flex gap-4">
+      <div className="footer">
+        <div className="legendas_container">
           <div className="legend-item"><div className="legend-circle red"></div>Recusado</div>
           <div className="legend-item"><div className="legend-circle blue"></div>Em análise</div>
           <div className="legend-item"><div className="legend-circle orange"></div>Não Finalizado</div>

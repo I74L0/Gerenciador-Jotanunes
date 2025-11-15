@@ -5,6 +5,9 @@ html {
   box-sizing: border-box;
   --bgColorMenu: #1d1d27;
   --duration: .7s;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 html *, html *::before, html *::after {
@@ -13,6 +16,9 @@ html *, html *::before, html *::after {
 
 body {
   overflow-y: scroll;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 .container {
