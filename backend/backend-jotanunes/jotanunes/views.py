@@ -5,10 +5,10 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-#from weasyprint import HTML
 from django_filters.rest_framework import DjangoFilterBackend
 import re
-
+from .serializers import MyTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Obra, Torre, Ambiente, Item, Material, Marca, Descricao
 from .permissions import IsGestor
 from .serializers import (
@@ -17,6 +17,8 @@ from .serializers import (
     UsuarioSerializer, UsuarioLoginSerializer
 )
 
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

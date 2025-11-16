@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate, get_user_model
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.relations import PrimaryKeyRelatedField
 from .models import (
     Obra, Ambiente, Material, Marca, Item, Descricao, Torre,
@@ -19,6 +20,18 @@ class UsuarioSerializer(serializers.ModelSerializer):
     def get_is_gestor(self, obj):
         return obj.is_superuser or obj.groups.filter(name='Gestores').exists()
 
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        
+        user = self.user
+        
+        user_data = UsuarioSerializer(user).data
+        
+        data['user'] = user_data
+        
+        return data
 
 class UsuarioCreateSerializer(serializers.ModelSerializer):
     class Meta:
