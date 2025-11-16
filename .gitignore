@@ -1,3 +1,4 @@
 # Ignorando arquivos de cache
 backend/backend-jotanunes/jotanunes/migrations/__pycache__/
 backend/backend-jotanunes/jotanunes/__pycache__/
+backend/backend-jotanunes/residencia/__pycache__
