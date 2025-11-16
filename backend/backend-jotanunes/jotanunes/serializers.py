@@ -11,14 +11,18 @@ User = get_user_model()
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
-    is_gestor = serializers.SerializerMethodField()
+    role = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_gestor')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'role')
 
-    def get_is_gestor(self, obj):
-        return obj.is_superuser or obj.groups.filter(name='Gestores').exists()
+    def get_role(self, obj):
+        if obj.is_superuser:
+            return "admin"
+        if obj.groups.filter(name='Gestores').exists():
+            return "gestor"
+        return "user"
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     
