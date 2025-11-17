@@ -16,20 +16,86 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react'
-import { IoIosAddCircle } from "react-icons/io";
+import { IoIosAddCircle } from 'react-icons/io'
 import { FaCheck } from 'react-icons/fa'
 import { BsXLg } from 'react-icons/bs'
+import DescricaoPopup from '../../../components/DescricaoPopup'
 
-// Importa o componente DescricaoPopup compartilhado
-import DescricaoPopup from '../../../components/DescricaoPopup';
+function decodeJwt(token) {
+  try {
+    const payload = token.split('.')[1]
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+    const json = atob(base64)
+    return JSON.parse(decodeURIComponent(json))
+  } catch {
+    return null
+  }
+}
+
+function detectUserRole() {
+  try {
+    if (window && window.__USER__ && window.__USER__.role) return String(window.__USER__.role)
+    const keys = [
+      'user',
+      'auth',
+      'authUser',
+      'currentUser',
+      'profile',
+      'usuario',
+      'app_user',
+      'USER',
+    ]
+    for (const k of keys) {
+      const raw = localStorage.getItem(k)
+      if (!raw) continue
+      try {
+        const parsed = JSON.parse(raw)
+        if (parsed && parsed.role) return String(parsed.role)
+        if (parsed && parsed.user && parsed.user.role) return String(parsed.user.role)
+      } catch {}
+    }
+    const accessCandidates = [
+      localStorage.getItem('access'),
+      localStorage.getItem('token'),
+      localStorage.getItem('authTokens'),
+      localStorage.getItem('auth_token'),
+    ]
+    for (const t of accessCandidates) {
+      if (!t) continue
+      const p = decodeJwt(t)
+      if (p && p.role) return String(p.role)
+    }
+    const cookieMatch = document.cookie.match(/user=([^;]+)/)
+    if (cookieMatch) {
+      try {
+        const parsed = JSON.parse(decodeURIComponent(cookieMatch[1]))
+        if (parsed && parsed.role) return String(parsed.role)
+      } catch {}
+    }
+  } catch {}
+  return null
+}
 
 export default function CardUnidades({ ambientes, setAmbientes }) {
   const [popupTarget, setPopupTarget] = useState(null)
   const [confirmEnvIdx, setConfirmEnvIdx] = useState(null)
   const [confirmItem, setConfirmItem] = useState(null)
+  const [role, setRole] = useState(null)
+
+  useEffect(() => {
+    const r = detectUserRole()
+    setRole(r ? r.toLowerCase() : null)
+  }, [])
+
+  const showStatus = role === 'gestor'
 
   const adicionarAmbiente = () => {
-    const novo = { nome: `Novo Ambiente ${ambientes.length + 1}`, editando: true, aberto: true, items: [] }
+    const novo = {
+      nome: `Novo Ambiente ${ambientes.length + 1}`,
+      editando: true,
+      aberto: true,
+      items: [],
+    }
     setAmbientes([...ambientes, novo])
   }
 
@@ -107,19 +173,18 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
 
   useEffect(() => {
     const handler = (e) => {
-      if (!popupTarget) return;
-      const popupEl = document.querySelector('[data-descricao-popup="true"]');
-      const clickedInsidePopup = popupEl && popupEl.contains(e.target);
-      const clickedTextarea = popupTarget.ref && popupTarget.ref.contains && popupTarget.ref.contains(e.target);
-
+      if (!popupTarget) return
+      const popupEl = document.querySelector('[data-descricao-popup="true"]')
+      const clickedInsidePopup = popupEl && popupEl.contains(e.target)
+      const clickedTextarea =
+        popupTarget.ref && popupTarget.ref.contains && popupTarget.ref.contains(e.target)
       if (!clickedInsidePopup && !clickedTextarea) {
-        setPopupTarget(null);
+        setPopupTarget(null)
       }
-    };
-
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [popupTarget]);
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [popupTarget])
 
   return (
     <CCard className="h-100 w-75">
@@ -186,14 +251,14 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                   </div>
                 </CRow>
 
-                <CCollapse className='div-collapse' visible={amb.aberto}>
+                <CCollapse className="div-collapse" visible={amb.aberto}>
                   <CCard>
                     <CTable bordered>
                       <CTableHead>
                         <CTableRow>
                           <CTableHeaderCell>Item</CTableHeaderCell>
                           <CTableHeaderCell>Descrição</CTableHeaderCell>
-                          <CTableHeaderCell>Status</CTableHeaderCell>
+                          {showStatus && <CTableHeaderCell>Status</CTableHeaderCell>}
                           <CTableHeaderCell>Ações</CTableHeaderCell>
                         </CTableRow>
                       </CTableHead>
@@ -217,18 +282,18 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                               <textarea
                                 className="auto-expand"
                                 rows="1"
-                                ref={(el) => linha.descricaoRef = el}
+                                ref={(el) => (linha.descricaoRef = el)}
                                 value={linha.descricao}
                                 onClick={(e) => {
-                                  e.stopPropagation();
-                                  setPopupTarget({ ambIdx: idx, itemIdx: i, ref: e.target });
+                                  e.stopPropagation()
+                                  setPopupTarget({ ambIdx: idx, itemIdx: i, ref: e.target })
                                 }}
                                 onChange={(e) =>
                                   atualizarLinha(idx, i, 'descricao', e.target.value)
                                 }
                                 onInput={(e) => {
-                                  e.target.style.height = 'auto';
-                                  e.target.style.height = e.target.scrollHeight + 'px';
+                                  e.target.style.height = 'auto'
+                                  e.target.style.height = e.target.scrollHeight + 'px'
                                 }}
                               />
                               {popupTarget &&
@@ -237,37 +302,40 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                                   <DescricaoPopup
                                     referenceElement={popupTarget.ref}
                                     onSelect={(desc) => {
-                                      atualizarLinha(idx, i, 'descricao', desc);
-                                      setPopupTarget(null);
+                                      atualizarLinha(idx, i, 'descricao', desc)
+                                      setPopupTarget(null)
                                       setTimeout(() => {
                                         if (linha.descricaoRef) {
-                                          linha.descricaoRef.style.height = 'auto';
-                                          linha.descricaoRef.style.height = linha.descricaoRef.scrollHeight + 'px';
+                                          linha.descricaoRef.style.height = 'auto'
+                                          linha.descricaoRef.style.height =
+                                            linha.descricaoRef.scrollHeight + 'px'
                                         }
-                                      }, 0);
+                                      }, 0)
                                     }}
                                     onAdd={(novo) => {
-                                      atualizarLinha(idx, i, 'descricao', novo);
-                                      setPopupTarget(null);
+                                      atualizarLinha(idx, i, 'descricao', novo)
+                                      setPopupTarget(null)
                                     }}
                                     onClose={() => setPopupTarget(null)}
                                   />
                                 )}
                             </CTableDataCell>
 
-                            <CTableDataCell
-                              style={{ textAlign: 'center', cursor: 'pointer' }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleStatus(idx, i);
-                              }}
-                            >
-                              {linha.status ? (
-                                <FaCheck color="green" />
-                              ) : (
-                                <BsXLg color="red" strokeWidth={1} />
-                              )}
-                            </CTableDataCell>
+                            {showStatus && (
+                              <CTableDataCell
+                                style={{ textAlign: 'center', cursor: 'pointer' }}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  toggleStatus(idx, i)
+                                }}
+                              >
+                                {linha.status ? (
+                                  <FaCheck color="green" />
+                                ) : (
+                                  <BsXLg color="red" strokeWidth={1} />
+                                )}
+                              </CTableDataCell>
+                            )}
 
                             <CTableDataCell>
                               <CButton
@@ -281,12 +349,8 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
                           </CTableRow>
                         ))}
                         <CTableRow>
-                          <CTableDataCell colSpan={4}>
-                            <CButton
-                              color="success"
-                              size="sm"
-                              onClick={() => adicionarLinha(idx)}
-                            >
+                          <CTableDataCell colSpan={showStatus ? 4 : 3}>
+                            <CButton color="success" size="sm" onClick={() => adicionarLinha(idx)}>
                               + Adicionar Linha
                             </CButton>
                           </CTableDataCell>
@@ -299,11 +363,17 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
             ))}
           </div>
 
-          {/* Modal de confirmação para remoção de ambiente */}
-          <CModal visible={confirmEnvIdx !== null} onClose={cancelRemoveAmbiente} alignment="center" backdrop="static" keyboard={false}>
+          <CModal
+            visible={confirmEnvIdx !== null}
+            onClose={cancelRemoveAmbiente}
+            alignment="center"
+            backdrop="static"
+            keyboard={false}
+          >
             <CModalHeader>Confirmar remoção</CModalHeader>
             <CModalBody>
-              Tem certeza que deseja remover o ambiente "{confirmEnvIdx !== null ? ambientes[confirmEnvIdx].nome : ''}" e todos os seus itens?
+              Tem certeza que deseja remover o ambiente "
+              {confirmEnvIdx !== null ? ambientes[confirmEnvIdx].nome : ''}" e todos os seus itens?
             </CModalBody>
             <CModalFooter>
               <CButton color="secondary" variant="ghost" onClick={cancelRemoveAmbiente}>
@@ -315,12 +385,15 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
             </CModalFooter>
           </CModal>
 
-          {/* Modal de confirmação para remoção de linha/item */}
-          <CModal visible={confirmItem !== null} onClose={cancelRemoveItem} alignment="center" backdrop="static" keyboard={false}>
+          <CModal
+            visible={confirmItem !== null}
+            onClose={cancelRemoveItem}
+            alignment="center"
+            backdrop="static"
+            keyboard={false}
+          >
             <CModalHeader>Confirmar remoção</CModalHeader>
-            <CModalBody>
-              Tem certeza que deseja remover este item?
-            </CModalBody>
+            <CModalBody>Tem certeza que deseja remover este item?</CModalBody>
             <CModalFooter>
               <CButton color="secondary" variant="ghost" onClick={cancelRemoveItem}>
                 Cancelar
