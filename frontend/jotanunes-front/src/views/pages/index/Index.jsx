@@ -21,7 +21,7 @@ const Index = () => {
   // FILTRO
   const [filtroStatus, setFiltroStatus] = useState(null);
 
-  // ======== PERFIL (copiado do primeiro código) ========
+  // PERFIL 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const userEmail = "usuario@gmail.com";
 
