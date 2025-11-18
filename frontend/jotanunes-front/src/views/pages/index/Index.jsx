@@ -6,7 +6,7 @@ import {
   CSpinner,
 } from "@coreui/react";
 import './Index-style.css';
-import { obras } from "../../../apiClient";
+import { obras, handleLogout } from "../../../apiClient";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -25,7 +25,6 @@ const Index = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const userEmail = "usuario@gmail.com";
 
-  const handleLogout = () => navigate("/login");
   const handleVerPerfil = () => navigate("/perfil");
   // ======================================================
 

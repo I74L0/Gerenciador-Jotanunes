@@ -171,7 +171,7 @@ export const login = async (username, password) => {
     
     return response // Retorna a resposta completa caso o componente precise dela
   } catch (error) {
-    // Limpa tokens em caso de falha de login (opcional, mas seguro)
+    // Limpa tokens em caso de falha de login
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
     setAuthToken(null)
@@ -185,6 +185,7 @@ export const refreshToken = (refreshToken) => apiClient.post('/token/refresh/', 
 export const handleLogout = () => {
  localStorage.removeItem('accessToken')
  localStorage.removeItem('refreshToken')
+ localStorage.removeItem('descricoesSalvas')
  setAuthToken(null)
  
  // Redireciona para a página de login
