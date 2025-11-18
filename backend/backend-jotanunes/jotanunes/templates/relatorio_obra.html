@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Especificação Técnica - {{ obra.nome }}</title>
+
+  <style>
+    /* A4 */
+    @page { size: A4; margin: 28mm 20mm; }
+    body { font-family: "Arial", "Helvetica", sans-serif; color:#222; margin:0; }
+    .page { width: 100%; box-sizing: border-box; }
+
+    /* header */
+    header { position: relative; margin-bottom: 18px; text-align: center; }
+    .logo-top { position: absolute; right: 0; top: 0; width: 120px; }
+    h1.title { font-size: 13px; letter-spacing: 1px; margin: 6px 0 16px 0; font-weight:700; }
+    .meta { font-size: 12px; line-height: 1.45; max-width: 640px; margin: 0 auto 8px auto; text-align:left; }
+
+    /* sections */
+    .section-title { font-weight: 700; margin-top: 16px; font-size: 13px; }
+    .subsection { margin-top: 8px; font-size: 12px; font-weight:600; }
+    p.lead { font-size: 12px; line-height: 1.45; max-width:640px; margin:6px auto 12px auto; text-align:left; }
+
+    /* tables look like the doc */
+    table.spec {
+      width: 640px;
+      max-width: 100%;
+      margin: 8px auto 14px auto;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    table.spec th, table.spec td {
+      border: 1px solid #aaa;
+      padding: 6px 8px;
+      vertical-align: top;
+    }
+    table.spec th {
+      background: #f5f5f5;
+      font-weight:700;
+      text-align: left;
+    }
+
+    /* small text and footer */
+    .note { font-size: 11px; color:#444; max-width:640px; margin:8px auto; text-align:left; }
+    footer { text-align:center; margin-top:26px; }
+    footer img { width: 140px; }
+
+    /* ensure page breaks nicely for PDF generation */
+    .avoid-break { page-break-inside: avoid; }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <img src="{{ logo_url|default:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1Z4ELUUV0T1wG5ctczMSAdkiuOTng_OKHbg&s' }}" alt="logo" class="logo-top">
+      <h1 class="title">ESPECIFICAÇÃO TÉCNICA</h1>
+
+      <div class="meta">
+        <p><strong>Empreendimento:</strong> {{ obra.nome }}</p>
+        <p><strong>Localização:</strong> {{ obra.localizacao|default:obra.endereco_completo }}</p>
+      </div>
+
+      <p class="lead">
+        <strong>Descrição do empreendimento:</strong>
+        {{ obra.descricao|default:"Constituído de 333 unidades residenciais distribuídas da seguinte forma: três torres com 14 pavimentos (térreo + 13 pavimentos), com 08 unidades por andar no tipo e 07 unidades no térreo, formando um total de 333 unidades residenciais;" }}
+      </p>
+    </header>
+
+    <!-- Fixed main section -->
+    <div class="section">
+      <div class="section-title">1. UNIDADES PRIVATIVAS</div>
+    </div>
+
+    <!-- Loop ambientes (PASSAR AMBIENTES ORDENADOS PELO VIEW) -->
+    {% comment %}
+      O view deve passar 'ambientes' já ordenado alfabeticamente:
+      ambientes = obra.ambientes.order_by('nome')
+    {% endcomment %}
+
+    {% for ambiente in ambientes %}
+      <div class="avoid-break">
+        <div class="subsection">{{ forloop.counter }}. {{ ambiente.nome }}</div>
+
+        <table class="spec">
+          <thead>
+            <tr><th style="width:28%;">Item</th><th>Descrição</th></tr>
+          </thead>
+          <tbody>
+            {% comment %}
+              Aqui assumimos que:
+                - ambiente.itens.all() retorna itens relacionados
+                - cada item possui 'nome'
+                - e existe tabela Descricao ligada ao item (item.descricoes.all())
+              Caso seu modelo seja diferente, adapte os nomes.
+            {% endcomment %}
+
+            {% for item in ambiente.itens.all %}
+              <tr>
+                <td>{{ item.nome }}</td>
+                <td>
+                  {# Descrições (strings longas) #}
+                  {% for d in item.descricoes.all %}
+                    {{ d.detalhe }}{% if not forloop.last %}<br>{% endif %}
+                  {% empty %}
+                    {# fallback: tenta usar item.observacoes ou material padrão #}
+                    {{ item.observacoes|default:"—" }}
+                  {% endfor %}
+                </td>
+              </tr>
+            {% empty %}
+              {# Se não houver itens cadastrados no DB, exibir conteúdo padrão do documento enviado (por ambiente) #}
+              {% if ambiente.nome|lower contains "sala" %}
+                <tr><td>Piso</td><td>Porcelanato ou laminado</td></tr>
+                <tr><td>Parede</td><td>Pintura PVA látex branco sobre gesso ou massa de regularização PVA.</td></tr>
+                <tr><td>Teto</td><td>Pintura PVA látex branco sobre gesso ou massa de regularização PVA.</td></tr>
+                <tr><td>Rodapé</td><td>Porcelanato ou Laminado, h=5cm</td></tr>
+                <tr><td>Soleira</td><td>Mármore ou granito.</td></tr>
+                <tr><td>Peitoril</td><td>Metálico</td></tr>
+                <tr><td>Esquadria</td><td>Alumínio pintado de branco</td></tr>
+                <tr><td>Vidro</td><td>Liso incolor.</td></tr>
+                <tr><td>Porta</td><td>Porta semi–ôca comum pintada c/ esmalte sintético.</td></tr>
+                <tr><td>Ferragem</td><td>Acabamento cromado.</td></tr>
+                <tr><td>Inst. Elétrica</td><td>Pontos de luz no teto, tomadas de corrente e interruptores</td></tr>
+                <tr><td>Inst. Comunic.</td><td>Pontos secos de comunicação e de antena de TV.</td></tr>
+              {% elif ambiente.nome|lower contains "circulação" %}
+                <tr><td>Piso</td><td>Porcelanato ou laminado</td></tr>
+                <tr><td>Parede</td><td>Pintura PVA látex branco sobre gesso ou massa de regularização PVA.</td></tr>
+                <tr><td>Teto</td><td>Pintura PVA látex branco sobre gesso ou massa de regularização PVA.</td></tr>
+                <tr><td>Rodapé</td><td>Porcelanato ou Laminado, h=5cm</td></tr>
+                <tr><td>Inst. Elétrica</td><td>Pontos de luz no teto, tomadas de corrente e interruptores</td></tr>
+              {% else %}
+                <tr><td colspan="2" style="color:#666;">Nenhum item cadastrado para este ambiente.</td></tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endfor %}
+
+    <!-- Área Comum / Marcas / Observações fixas (padrão do documento) -->
+    <div class="section">
+      <h3 class="subsection">ÁREA COMUM / Descritivo</h3>
+
+      <table class="spec">
+        <thead><tr><th style="width:28%;">Material</th><th>Marcas</th></tr></thead>
+        <tbody>
+          {% if marcas_list %}
+            {% for m in marcas_list %}
+              <tr><td>{{ m.material }}</td><td>{{ m.marcas|join:", " }}</td></tr>
+            {% endfor %}
+          {% else %}
+            <tr><td>Cerâmica</td><td>Incesa, Portobello, Arielle, Tecnogres, Pamesa, Camelo Fior, Biancogrês, Pointer.</td></tr>
+            <tr><td>Porcelanato</td><td>Portobello, Arielle, Tecnogres, Pamesa, Biancogrês, Elizabeth, Ceusa, Pointer, Villagres.</td></tr>
+            <tr><td>Laminado</td><td>Eucatex, Durafloor ou Espaçofloor.</td></tr>
+            <tr><td>Esquadria</td><td>Esaf, Alumasa, Atlantica, Ramassol ou Unicasa.</td></tr>
+            <tr><td>Ferragem</td><td>Silvana, Stam, Arouca, Soprano, Aliança, Imab.</td></tr>
+            <tr><td>Inst. Elétrica</td><td>Alumbra, Steck, Ilumi, Schneider, Margirius ou Fame.</td></tr>
+            <tr><td>Louças</td><td>Celite, Deca, Incepa.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+
+      <p class="note">
+        Observações Gerais: Os materiais especificados podem ser substituídos em função de dificuldade de fornecimento pelo fabricante.
+        Mármores, granitos e pedras naturais, por serem materiais provenientes da natureza podem apresentar manchas e diferenças de tonalidades.
+        Madeiras devido a natureza do material, podem apresentar variação de tonalidade, nós e pequenas fissuras devido a variação de umidade.
+        Haverá predisposição para ar condicionado tipo Split High Wall em todos os quartos das unidades habitacionais.
+      </p>
+    </div>
+
+    <footer>
+      <img src="{{ logo_footer_url|default:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1Z4ELUUV0T1wG5ctczMSAdkiuOTng_OKHbg&s' }}" alt="Jotanunes">
+    </footer>
+  </div>
+</body>
+</html>
