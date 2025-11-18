@@ -87,6 +87,17 @@ body {
   position: relative;
 }
 
+.btn-sair {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.btn-sair:hover {
+  color: white;
+  background-color: $primary;
+}
+
 .btn-salvar {
   position: absolute;
   align-self: center;

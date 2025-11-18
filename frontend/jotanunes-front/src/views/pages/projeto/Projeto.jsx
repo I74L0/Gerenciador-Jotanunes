@@ -196,7 +196,6 @@ const Projeto = () => {
           <CButton
             className="btn-sair me-3"
             onClick={() => navigate('/index')}
-            style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #000000ff' }}
           >
             Sair
           </CButton>
