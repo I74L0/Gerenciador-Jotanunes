@@ -67,10 +67,10 @@ const Login = () => {
         <CImage src="/images/Logo Vermelha.png" alt="JotaNunes Logo" height={48} />
       </CHeader>
       <div className='background fg-1 d-flex align-items-center vw-100'>
-        <CCol className='col-image'>
-          <CImage src="images/JOTANUNES-PEROLAS-DO-MAR.jpg" height={1080} width={1980} alt="JotaNunes Logo"/>
-        </CCol>
-        <CCol className="d-flex justify-content-center align-items-center">
+        <div className='col-image'>
+          <CImage src="images/JOTA-NUNES-MARBELLO-FACHADA-NOTURNA-scaled.webp" alt="JotaNunes Logo"/>
+        </div>
+        <div className="col-login">
           <CCol md={8}>
             <CCardGroup>
               <CCard className="p-4">
@@ -114,7 +114,7 @@ const Login = () => {
               </CCard>
             </CCardGroup>
           </CCol>
-        </CCol>
+        </div>
       </div>
     </div>
   )

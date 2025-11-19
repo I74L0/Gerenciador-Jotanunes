@@ -8,9 +8,15 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CModal,
+  CModalHeader,
+  CModalBody,
+  CModalFooter,
 } from '@coreui/react'
+import { useState } from 'react'
 
 export default function CardMateriais({ materiais, setMateriais }) {
+  const [confirmItem, setConfirmItem] = useState(null)
 
   const adicionarMaterial = () => {
     const novoMaterial = {
@@ -22,7 +28,17 @@ export default function CardMateriais({ materiais, setMateriais }) {
   }
 
   const removerMaterial = (index) => {
-    setMateriais(materiais.filter((_, i) => i !== index))
+    setConfirmItem(index)
+  }
+
+  const confirmRemoveItem = () => {
+    if (confirmItem === null) return
+    setMateriais(materiais.filter((_, i) => i !== confirmItem))
+    setConfirmItem(null)
+  }
+
+  const cancelRemoveItem = () => {
+    setConfirmItem(null)
   }
 
   const atualizarNomeMaterial = (index, novoNome) => {
@@ -38,8 +54,7 @@ export default function CardMateriais({ materiais, setMateriais }) {
   }
 
   return (
-    <CCard className="h-100 w-75">
-      <CCardBody className="p-0">
+    <section className="section__section">
         <CTable hover>
           <CTableHead>
             <CTableRow>
@@ -85,7 +100,26 @@ export default function CardMateriais({ materiais, setMateriais }) {
             </CTableRow>
           </CTableBody>
         </CTable>
-      </CCardBody>
-    </CCard>
+
+      {/* Modal de confirmação para remoção de material */}
+      <CModal
+        visible={confirmItem !== null}
+        onClose={cancelRemoveItem}
+        alignment="center"
+        backdrop="static"
+        keyboard={false}
+      >
+        <CModalHeader>Confirmar remoção</CModalHeader>
+        <CModalBody>Tem certeza que deseja remover este item?</CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" variant="ghost" onClick={cancelRemoveItem}>
+            Cancelar
+          </CButton>
+          <CButton color="danger" onClick={confirmRemoveItem}>
+            Remover
+          </CButton>
+        </CModalFooter>
+      </CModal>
+    </section>
   )
 }

@@ -14,8 +14,37 @@ export default function DescricaoPopup({ referenceElement, onSelect, onAdd, onCl
   const [search, setSearch] = useState('');
   const [items, setItems] = useState(['']);
   const [popperElement, setPopperElement] = useState(null);
+  const [popperOffset, setPopperOffset] = useState([0, 10]);
+
+  // Responsividade: ajustar offset com base no tamanho da tela
+  useEffect(() => {
+    const atualizarOffset = () => {
+      const width = window.innerWidth;
+      
+      if (width < 600) {
+        setPopperOffset([34, -200]);
+      } else if (width < 1060) {
+        setPopperOffset([36, -190]);
+      } else {
+        setPopperOffset([-8, 8]);
+      }
+    };
+
+    atualizarOffset();
+    window.addEventListener('resize', atualizarOffset);
+    return () => window.removeEventListener('resize', atualizarOffset);
+  }, []);
+
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: 'right-start',
+    modifiers: [
+      {
+        name: 'offset',
+        options: {
+          offset: popperOffset, // Usa o offset dinâmico
+        },
+      },
+    ],
   });
 
   // 2. MODIFICAR O useEffect para carregar da API

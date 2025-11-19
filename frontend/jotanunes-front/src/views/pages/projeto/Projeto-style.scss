@@ -1,6 +1,12 @@
 @use "src/scss/_variables.scss" as *;
 @use  "sass:color";
 
+// Remove markers de listas e dropdowns globalmente
+::marker {
+  display: none !important;
+  content: none !important;
+}
+
 html {
   box-sizing: border-box;
   --bgColorMenu: #1d1d27;
@@ -14,13 +20,26 @@ html *, html *::before, html *::after {
   box-sizing: inherit;
 }
 
-body {
-  overflow-y: scroll;
-  -webkit-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-  text-size-adjust: 100%;
+// Remove o marker/pontinho do dropdown
+.dropdown-toggle::marker,
+details > summary::marker,
+summary::marker {
+  display: none;
 }
 
+.dropdown-toggle::before,
+.dropdown-toggle::after {
+  list-style: none;
+}
+
+.body__card-prefacio {
+  height: 98%;
+  width: 75%;
+  padding: 1rem;
+  border: 1px solid lightgray;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
 .container {
   margin-left: 0;
   margin-right: 0;
@@ -124,16 +143,25 @@ body {
   text-decoration: underline;
 }
 
+.adicionar-ambiente{
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
 .lista-ambientes {
-  margin-top: 10px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
 }
 
 .linha-ambiente {
   width: 100%;
-  border: 1px solid #e0e0e0 !important;
-  background-color: #dcdcdc !important;
+  background: linear-gradient(to left, #e9e9e9, #cecece);
   padding: 14px 18px;
-  margin-bottom: 1rem;
+  margin-bottom: 0.2rem;
   display: flex;
 }
 
@@ -207,6 +235,11 @@ body {
   gap: 16px;
 }
 
+.prefacio-wrapper h5 {
+  margin: 0;
+  padding: 0
+}
+
 .prefacio-linha {
   display: flex;
   gap: 20px;
@@ -216,8 +249,9 @@ body {
 
 .prefacio-label {
   display: flex;
+  width: 330px;
+  justify-content: flex-start;
   align-items: center;
-  gap: 8px;
   font-weight: 500;
 }
 
@@ -225,18 +259,9 @@ body {
   border: 1px solid #ccc;
   border-radius: 6px;
   padding: 6px 8px;
+  margin-left: 1rem;
   font-size: 1rem;
-  min-width: 180px;
-}
-
-.prefacio-textarea {
   width: 100%;
-  min-height: 200px;
-  resize: vertical;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 10px;
-  font-size: 1rem;
 }
 
 .wrapper {
@@ -249,9 +274,11 @@ body {
   display: table;
   table-layout: fixed;
   width: 100%;
+  margin: 0;
+  padding: 0;
   -webkit-transform: translateY(5px);
   transform: translateY(5px);
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 
   >li {
     transition-duration: .25s;
@@ -325,3 +352,211 @@ body {
   padding-top: 5px;
 }
 
+.body__body {
+ width: 100%;
+ height: 100%;
+}
+
+.header {
+  width: 100%;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  height: 22vh;
+}
+
+.header__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1rem;
+}
+
+.header__header__user {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.header__header__user p {
+  margin: 0;
+}
+
+.header hr {
+  width: 98%;
+  margin: 0;
+  margin-left: 1%;
+}
+
+.header__menu {
+  margin: 0;
+  padding: 0;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  gap: 5rem;
+}
+
+.header__menu__item {
+  list-style: none;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgb(84, 84, 84);
+  border-radius: 8px;
+  background-color: white;
+  color: rgb(33, 33, 33);
+  transition: 0.5s;
+}
+
+.header__menu__tabs {
+  width: 85vw;
+}
+
+.content {
+  padding: 0 !important;
+  margin: 0 !important;
+  position: absolute;
+  top: 22vh;
+  height: 78vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
+}
+
+.content::-webkit-scrollbar {
+  position: relative;
+}
+
+.section__section {
+  height: 100%;
+  max-height: 100%;
+  width: 75%;
+  background-color: white;
+}
+
+@media screen and (max-width: 1000px) {
+  .section__section {
+    width:
+     90%;
+  }
+  .content {
+    width: 100%;
+    height: 83vh;
+    top: 17vh;
+  }
+  .header__menu{
+    gap: 1rem;
+  }
+  .header{
+    height: 17vh;
+  }
+  .prefacio-label {
+    width: 80%;
+  }
+  .prefacio-input {
+    margin-left: 3rem;
+  }
+  .body__card-prefacio {
+    width: 90%;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .body__card-prefacio {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 0;
+  }
+  .nome-ambiente {
+    width: 200px
+  }
+  .linha-ambiente{
+    padding: 0.6rem 0.2rem;
+    margin-bottom: 0.2rem;
+  }
+  .section__section hr {
+    margin: 0.8rem !important;
+    margin-top: 0 !important;
+  }
+  .header__header hr{
+    margin-top: 20px !important;
+  }
+  .adicionar-ambiente{
+    margin: 0;
+    padding: 0.8rem 0.2rem;
+  }
+  .btn-ghost-danger{
+    padding: 0px 8px;
+  }
+  .acao-remover {
+    margin: 0;
+    padding: 0;
+  }
+
+  .header {
+    height: 18vh;
+  }
+  .header__header{
+    margin: 0;
+    padding: 0;
+    padding-top: 0.5rem;
+  }
+
+  .header__header__logo {
+    transform: scale(70%);
+  }
+
+  .header__header__user {
+    padding-right: 1rem;
+  }
+  .header__menu{
+    padding: 0;
+  }
+  .header__menu__item{
+    transform: scale(70%);
+  }
+
+  .content {
+    top: 17vh;
+    height: 83%;
+    max-height: 83%;
+    width: 104vw;
+    padding: 0;
+  }
+
+  .content::-webkit-scrollbar {
+    position: none;
+  }
+  .section__section {
+    width: 100%;
+  }
+  .prefacio-label {
+    width: 95%;
+  }
+  .prefacio-input {
+    margin-left: 1.2rem;
+  }
+  .form-control{
+    font-size: 0.8rem;
+  }
+  .table-hover {
+    font-size: 0.8rem;
+  }
+  .btn-sm{
+    font-size: 0.7rem;
+    padding: 4px 4px;
+  }
+  .table-hover tbody tr td {
+    padding: 6px 4px;
+  }
+}
