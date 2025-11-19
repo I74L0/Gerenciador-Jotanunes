@@ -62,6 +62,7 @@ class ObraViewSet(viewsets.ModelViewSet):
             self.permission_classes = [permissions.IsAuthenticated, IsGestor]
         return super().get_permissions()
 
+
     @action(detail=True, methods=['post'], url_path='finalizar')
     def finalizar_obra(self, request, pk=None):
         """
@@ -88,6 +89,7 @@ class ObraViewSet(viewsets.ModelViewSet):
                 {'error': f'Ocorreu um erro: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+            
     @action(detail=True, methods=['post'], url_path='duplicar')
     def duplicar(self, request, pk=None):
         try:

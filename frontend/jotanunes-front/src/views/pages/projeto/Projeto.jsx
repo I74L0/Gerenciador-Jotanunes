@@ -125,6 +125,37 @@ const Projeto = () => {
     carregarDadosDoProjeto();
   }, [id, referenciaId]);
 
+   const protectiveSave = async () => {
+    setIsSaving(true);
+    setSaveError(null);
+
+    const dadosParaSalvar = {
+      nome: prefacioData.nome,
+      estado: prefacioData.estado,
+      cidade: prefacioData.cidade,
+      texto_prefacio: prefacioData.texto,
+      observacoes: observacoesData,
+      status: 'NAO_FINALIZADO',
+    };
+     try {
+      let response;
+      if (id) {
+        response = await obras.partialUpdate(id, dadosParaSalvar); // Usando partialUpdate (PATCH)
+        console.log('Projeto atualizado!', response.data);
+      } else {
+        // Se não temos ID, CRIA (create) um novo projeto
+        response = await obras.create(dadosParaSalvar); //
+        navigate("/index")
+      }
+
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      setSaveError(error.message || 'Falha ao salvar. Tente novamente.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     setSaveError(null);
@@ -137,7 +168,6 @@ const Projeto = () => {
       observacoes: observacoesData,
       status: 'EM_ANALISE',
     };
-
      try {
       let response;
       if (id) {
@@ -195,7 +225,8 @@ const Projeto = () => {
         <CRow className="div-tabs w-100 align-items-center">
           <CButton
             className="btn-sair me-3"
-            onClick={() => navigate('/index')}
+            onClick={protectiveSave}
+            
           >
             Sair
           </CButton>
