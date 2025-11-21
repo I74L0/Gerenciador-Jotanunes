@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django_filters.rest_framework import DjangoFilterBackend
 import re
+from rest_framework.views import APIView
 from .serializers import MyTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Obra, Torre, Ambiente, Item, Material, Marca, Descricao
@@ -14,7 +15,7 @@ from .permissions import IsGestor
 from .serializers import (
     ObraSerializer, TorreSerializer, AmbienteSerializer, 
     ItemSerializer, MaterialSerializer, MarcaSerializer, DescricaoSerializer,
-    UsuarioSerializer, UsuarioLoginSerializer
+    UsuarioSerializer, UsuarioLoginSerializer, UsuarioUpdateSerializer
 )
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -221,3 +222,25 @@ class DescricaoViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['detalhe']
+
+class PerfilView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UsuarioSerializer(request.user)
+        return Response(serializer.data)
+
+    def patch(self, request):
+        user = request.user
+        
+        serializer = UsuarioUpdateSerializer(user, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "success": True, 
+                "message": "Perfil atualizado com sucesso!",
+                "user": serializer.data
+            })
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

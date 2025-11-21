@@ -4,7 +4,7 @@ from django.contrib.auth import views as auth_views
 from rest_framework_simplejwt.views import TokenRefreshView
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
-from jotanunes.views import MyTokenObtainPairView
+from jotanunes.views import MyTokenObtainPairView, PerfilView
 
 urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
@@ -19,4 +19,5 @@ urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path('api/perfil/', PerfilView.as_view(), name='perfil_usuario'),
 ]

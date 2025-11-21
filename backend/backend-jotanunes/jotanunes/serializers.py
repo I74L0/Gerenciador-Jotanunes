@@ -228,3 +228,20 @@ class ObraSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['ambientes'] = AmbienteSerializer(instance.ambientes.filter(torre__isnull=True), many=True).data
         return representation
+    
+class UsuarioUpdateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False)
+    
+    class Meta:
+        model = User
+        fields = ['first_name', 'email', 'password']
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        instance = super().update(instance, validated_data)
+
+        if password:
+            instance.set_password(password)
+            instance.save()
+            
+        return instance
