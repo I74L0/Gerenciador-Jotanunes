@@ -77,44 +77,20 @@ function detectUserRole() {
   return null
 }
 
-export default function CardUnidades({ ambientes, setAmbientes }) {
+export default function CardUnidades({ ambientes, setAmbientes, showStatus: parentShowStatus }) {
   const [popupTarget, setPopupTarget] = useState(null)
   const [confirmEnvIdx, setConfirmEnvIdx] = useState(null)
   const [confirmItem, setConfirmItem] = useState(null)
   const [role, setRole] = useState(null)
 
   useEffect(() => {
-    let mounted = true
+    // somente precisa detectar localmente se o pai não forneceu a prop
+    if (typeof parentShowStatus !== 'undefined') return
+    const r = detectUserRole()
+    setRole(r ? r.toLowerCase() : null)
+  }, [parentShowStatus])
 
-    const fetchRole = async () => {
-      // Tenta obter role via endpoint /api/perfil; se falhar, usa detectUserRole() como fallback
-      try {
-        const res = await perfil.get()
-        const remoteRole =
-          res && res.data && (res.data.role || (res.data.user && res.data.user.role))
-            ? String(res.data.role || res.data.user.role).toLowerCase()
-            : null
-        alert(remoteRole)
-        if (mounted && remoteRole) {
-          setRole(remoteRole)
-          return
-        }
-      } catch (err) {
-        // ignora e cai para o fallback
-      }
-
-      const localRole = detectUserRole()
-      if (mounted) setRole(localRole ? localRole.toLowerCase() : null)
-    }
-
-    fetchRole()
-
-    return () => {
-      mounted = false
-    }
-  }, [])
-
-  const showStatus = role === 'gestor'
+  const showStatus = typeof parentShowStatus !== 'undefined' ? parentShowStatus : role === 'gestor'
 
   const adicionarAmbiente = () => {
     const novo = {

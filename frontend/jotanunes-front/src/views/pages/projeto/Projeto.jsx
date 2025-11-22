@@ -38,7 +38,7 @@ import CardObservacoes from './CardObservacoes'
 import MenuTabs from './MenuTabs'
 import avatar8 from 'src/assets/images/avatars/8.jpg'
 import 'src/views/pages/projeto/Projeto-style.scss'
-import { obras, ambientes, getDados } from 'src/apiClient'
+import { obras, ambientes, getDados, perfil } from 'src/apiClient'
 
 const Projeto = () => {
   const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
@@ -57,6 +57,95 @@ const Projeto = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [userRole, setUserRole] = useState(null)
+  const [showStatus, setShowStatus] = useState(false)
+  
+  function decodeJwt(token) {
+    try {
+      const payload = token.split('.')[1]
+      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+      const json = atob(base64)
+      return JSON.parse(decodeURIComponent(json))
+    } catch {
+      return null
+    }
+  }
+  function detectUserRole() {
+    try {
+      if (window && window.__USER__ && window.__USER__.role) return String(window.__USER__.role)
+      const keys = [
+        'user',
+        'auth',
+        'authUser',
+        'currentUser',
+        'profile',
+        'usuario',
+        'app_user',
+        'USER',
+      ]
+      for (const k of keys) {
+        const raw = localStorage.getItem(k)
+        if (!raw) continue
+        try {
+          const parsed = JSON.parse(raw)
+          if (parsed && parsed.role) return String(parsed.role)
+          if (parsed && parsed.user && parsed.user.role) return String(parsed.user.role)
+        } catch {}
+      }
+      const accessCandidates = [
+        localStorage.getItem('access'),
+        localStorage.getItem('token'),
+        localStorage.getItem('authTokens'),
+        localStorage.getItem('auth_token'),
+        localStorage.getItem('accessToken'),
+      ]
+      for (const t of accessCandidates) {
+        if (!t) continue
+        const p = decodeJwt(t)
+        if (p && p.role) return String(p.role)
+      }
+      const cookieMatch = document.cookie.match(/user=([^;]+)/)
+      if (cookieMatch) {
+        try {
+          const parsed = JSON.parse(decodeURIComponent(cookieMatch[1]))
+          if (parsed && parsed.role) return String(parsed.role)
+        } catch {}
+      }
+    } catch {}
+    return null
+  }
+
+  useEffect(() => {
+    let mounted = true
+    const fetchRole = async () => {
+      try {
+        const res = await perfil.get()
+        const remoteRole =
+          res && res.data && (res.data.role || (res.data.user && res.data.user.role))
+            ? String(res.data.role || res.data.user.role).toLowerCase()
+            : null
+        if (mounted && remoteRole) {
+          setUserRole(remoteRole)
+          setShowStatus(remoteRole === 'gestor')
+          return
+        }
+      } catch (err) {
+        // ignore, fallback abaixo
+      }
+
+      const localRole = detectUserRole()
+      if (mounted) {
+        const lr = localRole ? localRole.toLowerCase() : null
+        setUserRole(lr)
+        setShowStatus(lr === 'gestor')
+      }
+    }
+
+    fetchRole()
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   useEffect(() => {
     const carregarDadosDoProjeto = async () => {
@@ -211,11 +300,22 @@ const Projeto = () => {
                   <CAvatar src={avatar8} size="lg" />
                 </CDropdownToggle>
                 <CDropdownMenu className="pt-0" placement="bottom-end">
-                  <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">Account</CDropdownHeader>
-                  <CDropdownItem href="#"><CIcon icon={cilUser} className="me-2" />Profile</CDropdownItem>
-                  <CDropdownItem href="#"><CIcon icon={cilSettings} className="me-2" />Settings</CDropdownItem>
+                  <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">
+                    Account
+                  </CDropdownHeader>
+                  <CDropdownItem href="#">
+                    <CIcon icon={cilUser} className="me-2" />
+                    Profile
+                  </CDropdownItem>
+                  <CDropdownItem href="#">
+                    <CIcon icon={cilSettings} className="me-2" />
+                    Settings
+                  </CDropdownItem>
                   <CDropdownDivider />
-                  <CDropdownItem href="#"><CIcon icon={cilLockLocked} className="me-2" />Logout</CDropdownItem>
+                  <CDropdownItem href="#">
+                    <CIcon icon={cilLockLocked} className="me-2" />
+                    Logout
+                  </CDropdownItem>
                 </CDropdownMenu>
               </CDropdown>
             </CRow>
@@ -223,16 +323,12 @@ const Projeto = () => {
         </CRow>
         <hr className="w-100" />
         <CRow className="div-tabs w-100 align-items-center">
-          <CButton
-            className="btn-sair me-3"
-            onClick={protectiveSave}
-            
-          >
+          <CButton className="btn-sair me-3" onClick={protectiveSave}>
             Sair
           </CButton>
           <MenuTabs activeIndex={activeTab} onChange={setActiveTab} />
           <CButton className="btn-salvar" onClick={handleSave} disabled={isSaving}>
-            {isSaving ? 'Salvando...' : (id ? 'Atualizar' : 'Salvar Novo')}
+            {isSaving ? 'Salvando...' : id ? 'Atualizar' : 'Salvar Novo'}
           </CButton>
         </CRow>
       </CHeader>
@@ -245,10 +341,26 @@ const Projeto = () => {
 
       <div className="background w-100 d-flex justify-content-center align-items-center flex-grow-1">
         {activeTab === 0 && <CardPrefacio prefacio={prefacioData} setPrefacio={setPrefacioData} />}
-        {activeTab === 1 && <CardUnidades ambientes={unidadesData} setAmbientes={setUnidadesData} />}
-        {activeTab === 2 && <CardAreaComum ambientes={areacomumData} setAmbientes={setAreacomumData} />}
-        {activeTab === 3 && <CardMateriais materiais={materialData} setMateriais={setMaterialData} />}
-        {activeTab === 4 && <CardObservacoes observacoes={observacoesData} setObservacoes={setObservacoesData} />}
+        {activeTab === 1 && (
+          <CardUnidades
+            ambientes={unidadesData}
+            setAmbientes={setUnidadesData}
+            showStatus={showStatus}
+          />
+        )}
+        {activeTab === 2 && (
+          <CardAreaComum
+            ambientes={areacomumData}
+            setAmbientes={setAreacomumData}
+            showStatus={showStatus}
+          />
+        )}
+        {activeTab === 3 && (
+          <CardMateriais materiais={materialData} setMateriais={setMaterialData} />
+        )}
+        {activeTab === 4 && (
+          <CardObservacoes observacoes={observacoesData} setObservacoes={setObservacoesData} />
+        )}
       </div>
     </div>
   )
