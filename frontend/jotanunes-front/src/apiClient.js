@@ -463,4 +463,22 @@ export const torres = {
   destroy: (id) => apiClient.delete(`/torres/${id}/`),
 }
 
+// --- Funções do Endpoint: /api/perfil ---
+export const perfil = {
+  /**
+   * Obtém o perfil do usuário autenticado (GET /api/perfil/)
+   */
+  get: () => apiClient.get('/perfil/'),
+
+  /**
+   * Atualiza completamente o perfil (PUT /api/perfil/)
+   */
+  update: (data) => apiClient.put('/perfil/', data),
+
+  /**
+   * Atualização parcial (PATCH /api/perfil/)
+   */
+  partialUpdate: (data) => apiClient.patch('/perfil/', data),
+}
+
 export default apiClient
