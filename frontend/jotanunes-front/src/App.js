@@ -20,6 +20,10 @@ const Index = React.lazy(() => import('./views/pages/index/Index'))
 const Login = React.lazy(() => import('src/views/pages/login/Login'))
 const Page404 = React.lazy(() => import('./views/pages/page404/Page404'))
 const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
+const Perfil = React.lazy(() => import('src/views/pages/perfil/Perfil'))
+
+const AlterarSenha = React.lazy(() => import('src/views/pages/perfil/AlterarSenha'))
+
 
 const ProtectedRoute = ({ children }) => {
   // Verifica se o token existe no localStorage
@@ -73,6 +77,22 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+           path="/perfil"
+           element={
+              <ProtectedRoute>
+                <Perfil />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+           path="/alterar-senha"
+           element={
+             <ProtectedRoute>
+            <AlterarSenha />
+           </ProtectedRoute>
+  }
+/>
 
           {/* --- Rotas Públicas --- */}
           <Route exact path="/login" name="Login Page" element={<Login />} />
