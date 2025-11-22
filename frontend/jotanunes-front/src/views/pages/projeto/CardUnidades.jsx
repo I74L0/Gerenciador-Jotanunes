@@ -20,6 +20,7 @@ import { IoIosAddCircle } from 'react-icons/io'
 import { FaCheck } from 'react-icons/fa'
 import { BsXLg } from 'react-icons/bs'
 import DescricaoPopup from '../../../components/DescricaoPopup'
+import { perfil } from 'src/apiClient'
 
 function decodeJwt(token) {
   try {
@@ -76,18 +77,20 @@ function detectUserRole() {
   return null
 }
 
-export default function CardUnidades({ ambientes, setAmbientes }) {
+export default function CardUnidades({ ambientes, setAmbientes, showStatus: parentShowStatus }) {
   const [popupTarget, setPopupTarget] = useState(null)
   const [confirmEnvIdx, setConfirmEnvIdx] = useState(null)
   const [confirmItem, setConfirmItem] = useState(null)
   const [role, setRole] = useState(null)
 
   useEffect(() => {
+    // somente precisa detectar localmente se o pai não forneceu a prop
+    if (typeof parentShowStatus !== 'undefined') return
     const r = detectUserRole()
     setRole(r ? r.toLowerCase() : null)
-  }, [])
+  }, [parentShowStatus])
 
-  const showStatus = role === 'gestor'
+  const showStatus = typeof parentShowStatus !== 'undefined' ? parentShowStatus : role === 'gestor'
 
   const adicionarAmbiente = () => {
     const novo = {
