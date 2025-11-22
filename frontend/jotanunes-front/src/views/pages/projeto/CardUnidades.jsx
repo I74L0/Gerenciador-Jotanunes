@@ -20,6 +20,7 @@ import { IoIosAddCircle } from 'react-icons/io'
 import { FaCheck } from 'react-icons/fa'
 import { BsXLg } from 'react-icons/bs'
 import DescricaoPopup from '../../../components/DescricaoPopup'
+import { perfil } from 'src/apiClient'
 
 function decodeJwt(token) {
   try {
@@ -83,8 +84,34 @@ export default function CardUnidades({ ambientes, setAmbientes }) {
   const [role, setRole] = useState(null)
 
   useEffect(() => {
-    const r = detectUserRole()
-    setRole(r ? r.toLowerCase() : null)
+    let mounted = true
+
+    const fetchRole = async () => {
+      // Tenta obter role via endpoint /api/perfil; se falhar, usa detectUserRole() como fallback
+      try {
+        const res = await perfil.get()
+        const remoteRole =
+          res && res.data && (res.data.role || (res.data.user && res.data.user.role))
+            ? String(res.data.role || res.data.user.role).toLowerCase()
+            : null
+        alert(remoteRole)
+        if (mounted && remoteRole) {
+          setRole(remoteRole)
+          return
+        }
+      } catch (err) {
+        // ignora e cai para o fallback
+      }
+
+      const localRole = detectUserRole()
+      if (mounted) setRole(localRole ? localRole.toLowerCase() : null)
+    }
+
+    fetchRole()
+
+    return () => {
+      mounted = false
+    }
   }, [])
 
   const showStatus = role === 'gestor'
