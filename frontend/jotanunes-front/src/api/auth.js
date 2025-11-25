@@ -40,7 +40,18 @@ export const attemptRefresh = async () => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-    return res.data // espera { access, refresh? }
+
+    // --- MUDANÇA AQUI: SALVAR OS NOVOS TOKENS ---
+    const { access, refresh } = res.data
+    localStorage.setItem('accessToken', access)
+    if (refresh) {
+      localStorage.setItem('refreshToken', refresh) // Se a API retornar um novo refresh
+    }
+    // O `apiClient` principal deve ser reconfigurado com o novo token aqui,
+    // se não estiver lendo do localStorage em cada requisição.
+    // --- FIM DA MUDANÇA ---
+
+    return res.data // retorna { access, refresh? }
   } catch (err) {
     return null
   }

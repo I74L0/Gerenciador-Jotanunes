@@ -6,7 +6,7 @@ import {
   CSpinner,
 } from "@coreui/react";
 import './Index-style.css';
-import { obras, handleLogout } from '../../../api'
+import { obras, handleLogout, attemptRefresh } from '../../../api'
 
 const Index = () => {
   const navigate = useNavigate();
@@ -81,20 +81,29 @@ const Index = () => {
   useEffect(() => {
     const carregarObras = async () => {
       try {
-        setIsLoading(true);
-        setError(null);
+        setIsLoading(true)
+        setError(null)
 
-        const response = await obras.list();
-        setObrasLista(response.data);
+        // Tenta atualizar o token antes de fazer a requisição.
+        // Se o token estiver expirado, `attemptRefresh` tentará obter um novo.
+        // `attemptRefresh` é importado do seu arquivo `auth.js`.
+        await attemptRefresh()
+
+        const response = await obras.list()
+        setObrasLista(response.data)
       } catch (error) {
-        setError("Falha ao carregar as obras. Tente novamente.");
+        // Se `obras.list()` falhar (por exemplo, com 401 mesmo após o refresh
+        // ter falhado), ele cai no erro. Seu código de API (não visível)
+        // deve lidar com o 401 forçando um `handleLogout` se o `attemptRefresh`
+        // retornar `null`.
+        setError('Falha ao carregar as obras. Tente novamente.')
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    carregarObras();
-  }, []);
+    carregarObras()
+  }, [])
 
   const renderMainContent = () => {
     if (isLoading) {
