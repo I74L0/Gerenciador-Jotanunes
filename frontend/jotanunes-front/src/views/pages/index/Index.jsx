@@ -6,7 +6,7 @@ import {
   CSpinner,
 } from "@coreui/react";
 import './Index-style.css';
-import { obras, handleLogout } from "../../../apiClient";
+import { obras, handleLogout } from '../../../api'
 
 const Index = () => {
   const navigate = useNavigate();

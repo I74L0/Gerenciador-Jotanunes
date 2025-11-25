@@ -38,11 +38,9 @@ import CardObservacoes from './CardObservacoes'
 import MenuTabs from './MenuTabs'
 import avatar8 from 'src/assets/images/avatars/8.jpg'
 import 'src/views/pages/projeto/Projeto-style.scss'
-import { obras, ambientes, getDados, perfil } from 'src/apiClient'
+import { obras, ambientes, perfil, getDados } from '../../../api'
 
 const Projeto = () => {
-  const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
-
   const navigate = useNavigate()
   const { id } = useParams()
   const [searchParams] = useSearchParams()

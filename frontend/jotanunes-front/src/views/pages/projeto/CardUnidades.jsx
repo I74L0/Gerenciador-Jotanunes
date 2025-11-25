@@ -20,7 +20,6 @@ import { IoIosAddCircle } from 'react-icons/io'
 import { FaCheck } from 'react-icons/fa'
 import { BsXLg } from 'react-icons/bs'
 import DescricaoPopup from '../../../components/DescricaoPopup'
-import { perfil } from 'src/apiClient'
 
 function decodeJwt(token) {
   try {

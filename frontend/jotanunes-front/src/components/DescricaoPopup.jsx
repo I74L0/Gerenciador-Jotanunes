@@ -3,7 +3,7 @@ import { usePopper } from 'react-popper';
 import { IoIosAddCircle } from 'react-icons/io'; // Assumindo que você tem essa dependência
 
 // 1. IMPORTAR a função de API
-import { descricoes } from '../apiClient'; 
+import { descricoes } from '../api';
 
 // Variável para armazenar as descrições base carregadas da API
 // Usaremos um 'ref' ou 'let' fora do componente para evitar carregar a base
