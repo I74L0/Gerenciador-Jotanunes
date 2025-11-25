@@ -212,9 +212,18 @@ const Projeto = () => {
     carregarDadosDoProjeto();
   }, [id, referenciaId]);
 
-   const protectiveSave = async () => {
-    setIsSaving(true);
-    setSaveError(null);
+  const protectiveSave = async () => {
+    // 1. Verifica se o campo 'nome' do prefácio está preenchido
+    if (!prefacioData.nome) {
+      // Se não houver nome, apenas redireciona e encerra a função
+      console.log('Nome do projeto ausente. Redirecionando sem salvar.')
+      navigate('/index')
+      return
+    }
+
+    // 2. Se houver nome, procede com a lógica de salvamento
+    setIsSaving(true)
+    setSaveError(null)
 
     const dadosParaSalvar = {
       nome: prefacioData.nome,
@@ -223,25 +232,28 @@ const Projeto = () => {
       texto_prefacio: prefacioData.texto,
       observacoes: observacoesData,
       status: 'NAO_FINALIZADO',
-    };
-     try {
-      let response;
+    }
+    try {
+      let response
       if (id) {
-        response = await obras.partialUpdate(id, dadosParaSalvar); // Usando partialUpdate (PATCH)
-        console.log('Projeto atualizado!', response.data);
+        response = await obras.partialUpdate(id, dadosParaSalvar) // Usando partialUpdate (PATCH)
+        console.log('Projeto atualizado!', response.data)
+        // Após salvar, redireciona o usuário (se for o caso de 'Sair')
+        navigate('/index')
       } else {
         // Se não temos ID, CRIA (create) um novo projeto
-        response = await obras.create(dadosParaSalvar); //
-        navigate("/index")
+        // Nota: A lógica atual já redireciona no 'create'
+        response = await obras.create(dadosParaSalvar)
+        console.log('Novo projeto criado!', response.data)
+        navigate('/index')
       }
-
     } catch (error) {
-      console.error("Erro ao salvar:", error);
-      setSaveError(error.message || 'Falha ao salvar. Tente novamente.');
+      console.error('Erro ao salvar:', error)
+      setSaveError(error.message || 'Falha ao salvar. Tente novamente.')
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
   const handleSave = async () => {
     setIsSaving(true);
