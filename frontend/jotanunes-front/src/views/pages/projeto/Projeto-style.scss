@@ -77,7 +77,7 @@ summary::marker {
 .circle-icon {
   font-size: 2rem;
   color: $primary;
-  margin: 0 10px;
+  margin: 0;
   padding: 0 0;
 }
 
@@ -106,30 +106,6 @@ summary::marker {
   position: relative;
 }
 
-.btn-sair {
-  background-color: #fff;
-  color: #000;
-  border: 1px solid #000;
-}
-
-.btn-sair:hover {
-  color: white;
-  background-color: $primary;
-}
-
-.btn-salvar {
-  position: absolute;
-  align-self: center;
-  right: 1rem;
-  border: 1px solid black;
-  transition: 0.5s;
-}
-
-.btn-salvar:hover {
-  color: white;
-  background-color: $primary;
-}
-
 @keyframes strok {
   100% {
     stroke-dashoffset: 400;
@@ -146,17 +122,12 @@ summary::marker {
   margin: 0;
 }
 
-.add-ambiente {
-  cursor: pointer;
-}
-
-.add-ambiente:hover p {
-  text-decoration: underline;
-}
-
-.adicionar-ambiente{
+.adicionar-ambiente {
+  display: block;
+  position: relative;
   justify-content: space-between;
   align-items: center;
+  margin-left: 1rem;
   margin-top: 1rem;
 }
 
@@ -424,6 +395,11 @@ summary::marker {
   background-color: white;
   color: rgb(33, 33, 33);
   transition: 0.5s;
+}
+
+.header__menu__item:hover {
+  color: white;
+  background-color: $primary;
 }
 
 .header__menu__tabs {
