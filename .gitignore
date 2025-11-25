@@ -4,3 +4,4 @@ backend/backend-jotanunes/jotanunes/__pycache__/
 backend/backend-jotanunes/residencia/__pycache__/
 .vscode/
 node_modules/
+venv/

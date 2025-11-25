@@ -286,15 +286,14 @@ const Projeto = () => {
   }
 
   return (
-    <div className="body bg-body-tertiary vh-100 d-flex flex-column align-items-center">
-      <CHeader position="sticky" className="d-flex w-100 p-4 pb-0">
-        <CRow className="header-row w-100 justify-content-between align-items-center">
-          <CContainer>
+    <div className='body__body'>
+      <header className='header'>
+        <div className="header__header">
+          <div className='header__header__logo'>
             <CImage src="/images/Logo Vermelha.png" alt="JotaNunes Logo" height={48} />
-          </CContainer>
-          <CContainer className="d-flex">
-            <CRow>
-              <CHeaderText className="text-secondary">Maria Joaquina</CHeaderText>
+          </div>
+          <div className="header__header__user">
+              <p className="text-secondary">Usuário</p>
               <CDropdown variant="nav-item">
                 <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
                   <CAvatar src={avatar8} size="lg" />
@@ -318,20 +317,22 @@ const Projeto = () => {
                   </CDropdownItem>
                 </CDropdownMenu>
               </CDropdown>
-            </CRow>
-          </CContainer>
-        </CRow>
-        <hr className="w-100" />
-        <CRow className="div-tabs w-100 align-items-center">
-          <CButton className="btn-sair me-3" onClick={protectiveSave}>
+          </div>
+        </div>
+        <hr/>
+        <ul className="header__menu">
+          <li className="header__menu__item"
+            onClick={protectiveSave}
+          >
             Sair
-          </CButton>
+          </li>
           <MenuTabs activeIndex={activeTab} onChange={setActiveTab} />
-          <CButton className="btn-salvar" onClick={handleSave} disabled={isSaving}>
-            {isSaving ? 'Salvando...' : id ? 'Atualizar' : 'Salvar Novo'}
-          </CButton>
-        </CRow>
-      </CHeader>
+          <li className="header__menu__item" 
+            onClick={handleSave} disabled={isSaving}>
+            {/*isSaving ? 'Salvando...' : (id ? 'Atualizar' : 'Salvar Novo')*/"Enviar"}
+          </li>
+        </ul>
+      </header>
 
       {saveError && (
         <CContainer className="w-75 p-2 bg-danger-light text-danger border rounded">
@@ -339,7 +340,7 @@ const Projeto = () => {
         </CContainer>
       )}
 
-      <div className="background w-100 d-flex justify-content-center align-items-center flex-grow-1">
+      <section className="content background">
         {activeTab === 0 && <CardPrefacio prefacio={prefacioData} setPrefacio={setPrefacioData} />}
         {activeTab === 1 && (
           <CardUnidades
@@ -361,7 +362,7 @@ const Projeto = () => {
         {activeTab === 4 && (
           <CardObservacoes observacoes={observacoesData} setObservacoes={setObservacoesData} />
         )}
-      </div>
+      </section>
     </div>
   )
 }

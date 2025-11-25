@@ -86,13 +86,13 @@ const App = () => {
             }
           />
           <Route
-           path="/alterar-senha"
-           element={
-             <ProtectedRoute>
-            <AlterarSenha />
-           </ProtectedRoute>
-  }
-/>
+            path="/alterar-senha"
+            element={
+              <ProtectedRoute>
+                <AlterarSenha />
+              </ProtectedRoute>
+            }
+          />
 
           {/* --- Rotas Públicas --- */}
           <Route exact path="/login" name="Login Page" element={<Login />} />
