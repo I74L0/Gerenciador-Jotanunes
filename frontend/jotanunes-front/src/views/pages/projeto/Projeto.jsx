@@ -168,7 +168,7 @@ const Projeto = () => {
           setUnidadesData(todosAmbientes.filter(a => a.tipo === 'UNIDADE'));
           setAreacomumData(todosAmbientes.filter(a => a.tipo === 'AREA_COMUM'));
           setMaterialData(dadosObra.materiais || []);
-          setObservacoesData(dadosObra.observacoes || { observacoes: '' });
+          setObservacoesData(dadosObra.observacoes || '' );
         } 
         else if (referenciaId) {
           // --- Caso 2: Criar com referência ---
@@ -189,7 +189,7 @@ const Projeto = () => {
           setUnidadesData(todosAmbientes.filter(a => a.tipo === 'UNIDADE'));
           setAreacomumData(todosAmbientes.filter(a => a.tipo === 'AREA_COMUM'));
           setMaterialData(dadosRef.materiais || []);
-          setObservacoesData(dadosRef.observacoes || { observacoes: '' });
+          setObservacoesData(dadosRef.observacoes || '' );
         } 
         else {
           // --- Caso 3: Novo projeto (template padrão) ---
@@ -230,7 +230,7 @@ const Projeto = () => {
       estado: prefacioData.estado,
       cidade: prefacioData.cidade,
       texto_prefacio: prefacioData.texto,
-      observacoes: observacoesData,
+      observacoes: observacoesData.observacoes,
       status: 'NAO_FINALIZADO',
     }
     try {
@@ -264,7 +264,7 @@ const Projeto = () => {
       estado: prefacioData.estado,
       cidade: prefacioData.cidade,
       texto_prefacio: prefacioData.texto,
-      observacoes: observacoesData,
+      observacoes: observacoesData.observacoes,
       status: 'EM_ANALISE',
     };
      try {
@@ -272,6 +272,7 @@ const Projeto = () => {
       if (id) {
         response = await obras.partialUpdate(id, dadosParaSalvar); // Usando partialUpdate (PATCH)
         console.log('Projeto atualizado!', response.data);
+        navigate('/index')
       } else {
         // Se não temos ID, CRIA (create) um novo projeto
         response = await obras.create(dadosParaSalvar); //
@@ -332,8 +333,7 @@ const Projeto = () => {
         <hr/>
         <ul className="header__menu">
           <li className="header__menu__item"
-            onClick={protectiveSave}
-          >
+            onClick={protectiveSave}>
             Sair
           </li>
           <MenuTabs activeIndex={activeTab} onChange={setActiveTab} />
@@ -351,7 +351,7 @@ const Projeto = () => {
       )}
 
       <section className="content background">
-        {activeTab === 0 && <CardPrefacio prefacio={prefacioData} setPrefacio={setPrefacioData} />}
+        {activeTab === 0 && <CardPrefacio prefacio={prefacioData} setPrefacio={setPrefacioData}/>}
         {activeTab === 1 && (
           <CardUnidades
             ambientes={unidadesData}

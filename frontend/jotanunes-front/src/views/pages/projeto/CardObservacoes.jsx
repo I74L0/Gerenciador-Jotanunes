@@ -2,9 +2,7 @@ import React from 'react'
 import { CCard, CCardBody, CRow } from '@coreui/react'
 
 export default function CardObservacoes({ observacoes, setObservacoes }) {
-  const handleChange = (event) => {
-    setObservacoes([{ observacao: event.target.value }])
-  }
+
 
   return (
     <div className="body__card-prefacio">
@@ -17,8 +15,8 @@ export default function CardObservacoes({ observacoes, setObservacoes }) {
       <textarea
         className="w-100 h-75 form-control"
         placeholder="Observações do projeto"
-        value={observacoes.texto}
-        onChange={handleChange}
+        value={observacoes.observacoes}
+        onChange={(e) => setObservacoes({ ...observacoes, observacoes: e.target.value })}
       ></textarea>
     </div>
   )
