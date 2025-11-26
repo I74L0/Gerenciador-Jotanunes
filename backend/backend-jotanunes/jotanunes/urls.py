@@ -4,7 +4,6 @@ from . import views
 
 router = DefaultRouter()
 router.register(r'obras', views.ObraViewSet, basename='obra')
-router.register(r'torres', views.TorreViewSet, basename='torre')
 router.register(r'ambientes', views.AmbienteViewSet, basename='ambiente')
 router.register(r'itens', views.ItemViewSet, basename='item')
 router.register(r'materiais', views.MaterialViewSet, basename='material')

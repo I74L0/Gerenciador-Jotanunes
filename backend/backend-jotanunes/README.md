@@ -95,4 +95,4 @@ Duplicar Obra: POST /api/obras/{id}/duplicar/
 
 Ambientes: GET, POST /api/ambientes/
 
-... e assim por diante para torres, itens, materiais, marcas e descricoes.
+... e assim por diante para itens, materiais, marcas e descricoes.

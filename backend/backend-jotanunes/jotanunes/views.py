@@ -13,7 +13,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Obra, Torre, Ambiente, Item, Material, Marca, Descricao
 from .permissions import IsGestor
 from .serializers import (
-    ObraSerializer, TorreSerializer, AmbienteSerializer, 
+    ObraSerializer, AmbienteSerializer, 
     ItemSerializer, MaterialSerializer, MarcaSerializer, DescricaoSerializer,
     UsuarioSerializer, UsuarioLoginSerializer, UsuarioUpdateSerializer
 )
@@ -63,22 +63,17 @@ class ObraViewSet(viewsets.ModelViewSet):
             self.permission_classes = [permissions.IsAuthenticated, IsGestor]
         return super().get_permissions()
 
-
     @action(detail=True, methods=['post'], url_path='finalizar')
     def finalizar_obra(self, request, pk=None):
-        """
-        Ação personalizada para mudar o status de uma obra
-        de 'NAO_FINALIZADO' para 'EM_ANALISE'.
-        """
         try:
             obra = self.get_object()
-            
+
             if obra.status != 'NAO_FINALIZADO':
                 return Response(
                     {'error': f'A obra com status "{obra.status}" não pode ser movida para "Em Análise".'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
+
             obra.status = 'EM_ANALISE'
             obra.save(update_fields=['status'])
 
@@ -90,14 +85,14 @@ class ObraViewSet(viewsets.ModelViewSet):
                 {'error': f'Ocorreu um erro: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-            
     @action(detail=True, methods=['post'], url_path='duplicar')
     def duplicar(self, request, pk=None):
         try:
             original_obra = self.get_object()
-            
+
             nome_original = original_obra.nome
             match = re.search(r' (\d+\.\d+)$', nome_original)
+
             if match:
                 nome_base = nome_original[:match.start()].strip()
             else:
@@ -112,7 +107,7 @@ class ObraViewSet(viewsets.ModelViewSet):
                     versao_atual = float(match_versao.group(1))
                     if versao_atual > maior_versao:
                         maior_versao = versao_atual
-            
+
             nova_versao = (maior_versao or 1.0) + 1.0
             novo_nome = f"{nome_base} {nova_versao:.1f}"
 
@@ -124,66 +119,39 @@ class ObraViewSet(viewsets.ModelViewSet):
                 descricao=original_obra.descricao,
                 status='EM_ANALISE'
             )
-            
-            
-            mapa_torres = {}
-            for torre in original_obra.torres.all():
-                nova_torre = Torre.objects.create(obra=nova_obra, nome=torre.nome)
-                mapa_torres[torre.id] = nova_torre
-            
-            for ambiente in original_obra.ambientes.filter(torre__isnull=True):
-                self._duplicar_ambiente_e_filhos(ambiente, nova_obra, None)
 
-            for original_torre_id, nova_torre_obj in mapa_torres.items():
-                for ambiente in Ambiente.objects.filter(torre_id=original_torre_id):
-                    self._duplicar_ambiente_e_filhos(ambiente, nova_obra, nova_torre_obj)
+            for ambiente in original_obra.ambientes.all():
+                self._duplicar_ambiente_e_filhos(
+                    ambiente_original=ambiente,
+                    nova_obra=nova_obra
+                )
 
             serializer = self.get_serializer(nova_obra)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-        except Exception as e:
-            return Response({'error': f'Ocorreu um erro durante a duplicação: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def _duplicar_ambiente_e_filhos(self, ambiente_original, nova_obra, nova_torre):
+        except Exception as e:
+            return Response(
+                {'error': f'Ocorreu um erro durante a duplicação: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    def _duplicar_ambiente_e_filhos(self, ambiente_original, nova_obra):
         novo_ambiente = Ambiente.objects.create(
-            obra=nova_obra, 
-            torre=nova_torre, 
+            obra=nova_obra,
             nome=ambiente_original.nome,
         )
+
         for item in ambiente_original.itens.all():
             novo_item = Item.objects.create(
-                ambiente=novo_ambiente, 
-                nome=item.nome, 
+                ambiente=novo_ambiente,
+                nome=item.nome,
             )
             novo_item.descricoes.set(item.descricoes.all())
             for material in item.materiais.all():
                 novo_material = Material.objects.create(
-                    item=novo_item, 
-                    descricao=material.descricao, 
+                    item=novo_item,
+                    descricao=material.descricao,
                 )
                 novo_material.marcas.set(material.marcas.all())
-    
-    @action(detail=True, methods=['get'], url_path='gerar-pdf')
-    def gerar_pdf(self, request, pk=None):
-        try:
-            obra = self.get_object()
-            logo_url = request.build_absolute_uri('/static/img/logo_vermelha.png')
-            contexto = {'obra': obra}
-            html_string = render_to_string('relatorio_obra.html', contexto)
-            pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
-            response = HttpResponse(pdf_file, content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment; filename="Relatorio_{obra.nome}.pdf"'
-            return response
-        except Exception as e:
-            return Response({'error': f'Ocorreu um erro ao gerar o PDF: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-class TorreViewSet(viewsets.ModelViewSet):
-    queryset = Torre.objects.all()
-    serializer_class = TorreSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['obra']
 
 class AmbienteViewSet(viewsets.ModelViewSet):
     queryset = Ambiente.objects.all()

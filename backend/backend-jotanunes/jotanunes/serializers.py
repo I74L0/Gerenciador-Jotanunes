@@ -178,13 +178,6 @@ class AmbienteSerializer(serializers.ModelSerializer):
         fields = ['id', 'nome', 'itens', 'materiais']
 
 
-class TorreSerializer(serializers.ModelSerializer):
-    ambientes = AmbienteSerializer(many=True, required=False)
-
-    class Meta:
-        model = Torre
-        fields = ['id', 'nome', 'ambientes']
-
 
 class ObraSerializer(serializers.ModelSerializer):
     ambientes = AmbienteSerializer(many=True, required=False)
@@ -193,7 +186,7 @@ class ObraSerializer(serializers.ModelSerializer):
         model = Obra
         fields = [
             'id', 'nome', 'cidade', 'estado', 'endereco_completo',
-            'observacao', 'status', 'torres', 'ambientes'
+            'observacao', 'status', 'ambientes'
         ]
 
     def create(self, validated_data):

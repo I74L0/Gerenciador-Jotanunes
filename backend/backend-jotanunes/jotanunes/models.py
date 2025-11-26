@@ -45,12 +45,6 @@ class Obra(models.Model):
     def __str__(self):
         return self.nome
 
-class Torre(models.Model):
-    obra = models.ForeignKey(Obra, related_name='torres', on_delete=models.CASCADE)
-    nome = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f'{self.nome} - {self.obra.nome}'
 
 class Descricao(models.Model):
     detalhe = models.CharField(max_length=255, unique=True)
