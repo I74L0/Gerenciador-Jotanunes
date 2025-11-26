@@ -187,30 +187,40 @@ class TorreSerializer(serializers.ModelSerializer):
 
 
 class ObraSerializer(serializers.ModelSerializer):
-    torres = TorreSerializer(many=True, required=False)
-    ambientes = AmbienteSerializer(many=True, required=False) 
+    ambientes = AmbienteSerializer(many=True, required=False)
 
     class Meta:
         model = Obra
         fields = [
-            'id', 'nome', 'cidade', 'estado', 'endereco_completo', 'descricao', 
-            'status', 'torres', 'ambientes'
+            'id', 'nome', 'cidade', 'estado', 'endereco_completo',
+            'observacao', 'status', 'torres', 'ambientes'
         ]
 
     def create(self, validated_data):
-        torres_data = validated_data.pop('torres', [])
-        ambientes_obra_data = validated_data.pop('ambientes', [])
+        ambientes_data = validated_data.pop('ambientes', [])
         
         obra = Obra.objects.create(**validated_data)
 
-        for torre_data in torres_data:
-            ambientes_torre_data = torre_data.pop('ambientes', [])
-            torre = Torre.objects.create(obra=obra, **torre_data)
-            self._criar_ambientes_e_filhos(ambientes_torre_data, obra, torre)
-        
-        self._criar_ambientes_e_filhos(ambientes_obra_data, obra, None)
-        
+        for ambiente_data in ambientes_data:
+            Ambiente.objects.create(obra=obra, **ambiente_data)
+
         return obra
+
+    def update(self, instance, validated_data):
+        ambientes_data = validated_data.pop('ambientes', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if ambientes_data is not None:
+            instance.ambientes.all().delete()
+
+            for ambiente_data in ambientes_data:
+                Ambiente.objects.create(obra=instance, **ambiente_data)
+
+        return instance
+
 
     def _criar_ambientes_e_filhos(self, ambientes_data, obra_obj, torre_obj):
         for ambiente_data in ambientes_data:
