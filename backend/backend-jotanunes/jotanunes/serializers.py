@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.relations import PrimaryKeyRelatedField
 from .models import (
-    Obra, Ambiente, Material, Marca, Item, Descricao, Torre,
+    Obra, Ambiente, Material, Marca, Item, Descricao,
     Estado, Cidade
 )
 
@@ -191,11 +191,29 @@ class ObraSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         ambientes_data = validated_data.pop('ambientes', [])
-        
         obra = Obra.objects.create(**validated_data)
 
         for ambiente_data in ambientes_data:
-            Ambiente.objects.create(obra=obra, **ambiente_data)
+            itens_data = ambiente_data.pop('itens', [])
+            materiais_data = ambiente_data.pop('materiais', [])
+
+            ambiente = Ambiente.objects.create(obra=obra, **ambiente_data)
+
+            for item_data in itens_data:
+                descricoes = item_data.pop('descricoes', [])
+                materiais = item_data.pop('materiais', [])
+                item = Item.objects.create(ambiente=ambiente, **item_data)
+                item.descricoes.set(descricoes)
+
+                for material_data in materiais:
+                    marcas = material_data.pop('marcas', [])
+                    material = Material.objects.create(item=item, **material_data)
+                    material.marcas.set(marcas)
+
+            for material_data in materiais_data:
+                marcas = material_data.pop('marcas', [])
+                material = Material.objects.create(ambiente=ambiente, **material_data)
+                material.marcas.set(marcas)
 
         return obra
 
@@ -210,27 +228,34 @@ class ObraSerializer(serializers.ModelSerializer):
             instance.ambientes.all().delete()
 
             for ambiente_data in ambientes_data:
-                Ambiente.objects.create(obra=instance, **ambiente_data)
+                itens_data = ambiente_data.pop('itens', [])
+                materiais_data = ambiente_data.pop('materiais', [])
+
+                ambiente = Ambiente.objects.create(obra=instance, **ambiente_data)
+
+                for item_data in itens_data:
+                    descricoes = item_data.pop('descricoes', [])
+                    materiais = item_data.pop('materiais', [])
+                    item = Item.objects.create(ambiente=ambiente, **item_data)
+                    item.descricoes.set(descricoes)
+
+                    for material_data in materiais:
+                        marcas = material_data.pop('marcas', [])
+                        material = Material.objects.create(item=item, **material_data)
+                        material.marcas.set(marcas)
+
+                for material_data in materiais_data:
+                    marcas = material_data.pop('marcas', [])
+                    material = Material.objects.create(ambiente=ambiente, **material_data)
+                    material.marcas.set(marcas)
 
         return instance
 
-
-    def _criar_ambientes_e_filhos(self, ambientes_data, obra_obj, torre_obj):
-        for ambiente_data in ambientes_data:
-            itens_data = ambiente_data.pop('itens', [])
-            materiais_data = ambiente_data.pop('materiais', [])
-            
-            ambiente = Ambiente.objects.create(obra=obra_obj, torre=torre_obj, **ambiente_data)
-            
-            if itens_data:
-                ambiente.itens.set(itens_data)
-            if materiais_data:
-                ambiente.materiais.set(materiais_data)
-
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['ambientes'] = AmbienteSerializer(instance.ambientes.filter(torre__isnull=True), many=True).data
+        representation['ambientes'] = AmbienteSerializer(instance.ambientes.all(), many=True).data
         return representation
+
     
 class UsuarioUpdateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)

@@ -10,7 +10,7 @@ import re
 from rest_framework.views import APIView
 from .serializers import MyTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import Obra, Torre, Ambiente, Item, Material, Marca, Descricao
+from .models import Obra, Ambiente, Item, Material, Marca, Descricao
 from .permissions import IsGestor
 from .serializers import (
     ObraSerializer, AmbienteSerializer, 
@@ -158,7 +158,7 @@ class AmbienteViewSet(viewsets.ModelViewSet):
     serializer_class = AmbienteSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['obra', 'torre']
+    filterset_fields = ['obra']
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()

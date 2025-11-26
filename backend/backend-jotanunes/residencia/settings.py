@@ -193,7 +193,6 @@ JAZZMIN_SETTINGS = {
                 "name": "Projetos",
                 "models": (
                     "jotanunes.obra",
-                    "jotanunes.torre",
                     "jotanunes.ambiente",
                     "jotanunes.item",
                     "jotanunes.material",
@@ -218,7 +217,6 @@ JAZZMIN_SETTINGS = {
         "auth.User": "fas fa-user",
         
         "jotanunes.obra": "fas fa-building",
-        "jotanunes.torre": "fas fa-archway",
         "jotanunes.ambiente": "fas fa-door-open",
         "jotanunes.item": "fas fa-clipboard-list",
         "jotanunes.material": "fas fa-box",

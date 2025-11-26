@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Obra, Torre, Ambiente, Item,
+    Obra, Ambiente, Item,
     Material, Descricao, Marca,
     Estado, Cidade
 )
@@ -35,13 +35,6 @@ class AmbienteAdmin(admin.ModelAdmin):
     @admin.display(description='Itens')
     def get_itens(self, obj):
         return ", ".join([i.nome for i in obj.itens.all()])
-
-
-@admin.register(Torre)
-class TorreAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'obra')
-    search_fields = ['nome', 'obra__nome']
-    list_filter = ('obra',)
 
 
 @admin.register(Obra)

@@ -61,7 +61,6 @@ class Item(models.Model):
 
 class Ambiente(models.Model):
     obra = models.ForeignKey(Obra, related_name='ambientes', on_delete=models.CASCADE, null=True)
-    torre = models.ForeignKey(Torre, related_name='ambientes', on_delete=models.CASCADE, null=True, blank=True)
     nome = models.CharField(max_length=255)
     itens = models.ManyToManyField(Item, related_name='ambientes', blank=True)
 
