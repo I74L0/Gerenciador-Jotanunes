@@ -38,7 +38,7 @@ class Obra(models.Model):
     nome = models.CharField(max_length=255)
     cidade = models.CharField(max_length=100, blank=True)
     estado = models.CharField(max_length=2, blank=True)
-    observacao = models.TextField(null=True, blank=True, verbose_name="Observação / Prefácio")    
+    texto_prefacio = models.TextField(null=True, blank=True)
     endereco_completo = models.TextField("Endereço Completo", blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='NAO_FINALIZADO')
 

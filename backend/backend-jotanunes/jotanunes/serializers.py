@@ -184,10 +184,8 @@ class ObraSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Obra
-        fields = [
-            'id', 'nome', 'cidade', 'estado', 'endereco_completo',
-            'observacao', 'status', 'ambientes'
-        ]
+        fields = ['id', 'nome', 'cidade', 'estado', 'texto_prefacio', 'endereco_completo', 'status', 'ambientes']
+
 
     def create(self, validated_data):
         ambientes_data = validated_data.pop('ambientes', [])
