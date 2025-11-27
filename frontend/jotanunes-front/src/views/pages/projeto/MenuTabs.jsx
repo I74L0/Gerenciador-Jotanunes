@@ -11,8 +11,8 @@ const MenuTabs = ({ activeIndex = 0, onChange = () => {} }) => {
 
   const tabTitles = [
     "Prefácio",
-    "Unidades Privativas",
-    "Área Comum",
+    "Unidades_Privativas",
+    "Área_Comum",
     "Materiais",
     "Observações"
   ];

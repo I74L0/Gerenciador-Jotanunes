@@ -202,7 +202,7 @@ summary::marker {
 
 .prefacio-textarea {
   width: 100%;
-  min-height: 300px;
+  min-height: 280px;
   border: 1px solid #ccc;
   border-radius: 6px;
   padding: 10px;
@@ -344,8 +344,10 @@ summary::marker {
   background-color: white;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: flex-start;
   padding: 0;
+  margin: 0;
   height: 22vh;
 }
 
@@ -354,6 +356,7 @@ summary::marker {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  height: 10vh;
   padding: 1rem;
 }
 
@@ -369,12 +372,17 @@ summary::marker {
 }
 
 .header hr {
+  position: absolute;
+  top: 10vh;
   width: 98%;
   margin: 0;
   margin-left: 1%;
+  z-index: 10;
 }
 
 .header__menu {
+  position: absolute;
+  top: 13.4vh;
   margin: 0;
   padding: 0;
   padding-left: 1rem;
@@ -440,8 +448,16 @@ summary::marker {
     height: 83vh;
     top: 17vh;
   }
+  .header__header{
+    padding: 0 1rem;
+    margin: 0;
+  }
+  .header__header__logo {
+    transform: scale(80%);
+  }
   .header__menu{
-    gap: 1rem;
+    font-size: 0.6rem;
+    top: 10vh;
   }
   .header{
     height: 17vh;
@@ -508,6 +524,7 @@ summary::marker {
   }
   .header__menu{
     padding: 0;
+    gap: 0;
   }
   .header__menu__item{
     transform: scale(70%);
