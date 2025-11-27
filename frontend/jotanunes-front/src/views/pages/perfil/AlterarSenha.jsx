@@ -38,6 +38,7 @@ const AlterarSenhaModal = ({ aberto, fecharModal }) => {
         body: JSON.stringify({
           senha_atual: senhaAtual,
           nova_senha: novaSenha,
+          confirmar_senha: confirmaSenha
         }),
       })
 

@@ -23,9 +23,29 @@ const Index = () => {
 
   // PERFIL 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const userEmail = "usuario@gmail.com";
 
   const handleVerPerfil = () => navigate("/perfil");
+
+  const [permissoes, setPermissoes] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+
+    fetch("http://localhost:8000/api/me/", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then(res => res.json())
+      .then(data => setPermissoes(data))
+      .catch(err => console.error(err));
+  }, []);
+  
+  const podeCriarProjeto =
+  permissoes?.is_superuser || permissoes?.is_criador;
+
+
   // ======================================================
 
   const getStatusClass = (statusRaw) => {
@@ -199,7 +219,6 @@ const Index = () => {
           {/* MENU DE PERFIL */}
           {showProfileMenu && (
             <div className="profile-menu">
-              <p className="profile-email">{userEmail}</p>
               <button onClick={handleVerPerfil} className="profile-btn">Ver Perfil</button>
               <button onClick={handleLogout} className="profile-btn">Sair</button>
             </div>
@@ -210,18 +229,20 @@ const Index = () => {
 
       {/* SUBBAR */}
       <header className="header2_conteiner">
-        <div className="botao_criarProjeto">
-          <button
-            className="text-danger fw-bold d-flex align-items-center gap-2 border-0"
-            onClick={handleTemplateVazio}
-            style={{ backgroundColor: "#f5f6f8" }}
-          >
-            <CImage src="/images/mais.png" alt="Mais" height={20} />
-            <span className="text-dark">
-              {selectedRefId ? 'Criar Com Referência' : 'Criar Projeto'}
-            </span>
-          </button>
-        </div>
+        {podeCriarProjeto && (
+          <div className="botao_criarProjeto">
+            <button
+              className="text-danger fw-bold d-flex align-items-center gap-2 border-0"
+              onClick={handleTemplateVazio}
+              style={{ backgroundColor: "#f5f6f8" }}
+            >
+              <CImage src="/images/mais.png" alt="Mais" height={20} />
+              <span className="text-dark">
+                {selectedRefId ? "Criar Com Referência" : "Criar Projeto"}
+              </span>
+            </button>
+          </div>
+        )}
 
         <div className="barraPesquisa">
           <input className="form-control" placeholder="Pesquisar" />

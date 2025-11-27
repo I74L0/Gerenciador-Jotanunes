@@ -12,4 +12,7 @@ router.register(r'descricoes', views.DescricaoViewSet, basename='descricao')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('alterar-senha/', views.alterar_senha, name='alterar_senha'),
+    path("me/", views.me, name='me'),
+
 ]
