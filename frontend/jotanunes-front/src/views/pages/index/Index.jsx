@@ -213,6 +213,7 @@ const Index = () => {
                   : 'Localização não definida'}
               </p>
 
+              {podeCriarProjeto && (
               <div className="selecionar-referencia_container">
                 <input
                   className="selecionar-referencia"
@@ -221,7 +222,7 @@ const Index = () => {
                   onChange={() => setSelectedRefId(selectedRefId === obra.id ? null : obra.id)}
                 />
               </div>
-
+              )}
               <div className="statusProjeto">
                 <div
                   className={`circle ${getStatusClass(obra.status)}`}
