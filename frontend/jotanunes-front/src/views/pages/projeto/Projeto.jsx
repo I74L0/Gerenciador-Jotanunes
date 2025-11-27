@@ -233,9 +233,15 @@ const Projeto = () => {
       observacoes: observacoesData.observacoes,
       status: 'NAO_FINALIZADO',
     }
+
     try {
       let response
+      let statusTest
       if (id) {
+        statusTest = obras.retrieve(id)
+        if (statusTest.status != 'NAO_FINALIZADO'){
+          dadosParaSalvar.status = statusTest.status
+        }
         response = await obras.partialUpdate(id, dadosParaSalvar) // Usando partialUpdate (PATCH)
         console.log('Projeto atualizado!', response.data)
         // Após salvar, redireciona o usuário (se for o caso de 'Sair')
