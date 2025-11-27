@@ -212,3 +212,51 @@ class PerfilView(APIView):
             })
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def alterar_senha(request):
+    senha_atual = request.data.get("senha_atual")
+    nova_senha = request.data.get("nova_senha")
+
+    if not senha_atual or not nova_senha:
+        return Response(
+            {"detail": "Campos obrigatórios não enviados."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    user = request.user
+
+    if not user.check_password(senha_atual):
+        return Response(
+            {"detail": "Senha atual incorreta."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if len(nova_senha) < 6:
+        return Response(
+            {"detail": "A nova senha deve ter pelo menos 6 caracteres."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    user.set_password(nova_senha)
+    user.save()
+
+    return Response(
+        {"detail": "Senha alterada com sucesso!"},
+        status=status.HTTP_200_OK
+    )
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def me(request):
+    user = request.user
+
+    return Response({
+        "username": user.username,
+        "is_superuser": user.is_superuser,
+        "is_gestor": user.groups.filter(name="Gestores").exists(),
+        "is_criador": user.groups.filter(name="Criadores").exists(),
+        "is_adm": user.groups.filter(name="Adm").exists(),
+    })
