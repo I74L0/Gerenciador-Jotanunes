@@ -44,7 +44,7 @@ const Projeto = () => {
   const navigate = useNavigate()
   const { id } = useParams()
   const [searchParams] = useSearchParams()
-  const referenciaId = searchParams.get('referencia') // <-- Novo
+  const referenciaId = searchParams.get('referencia')
 
   const [activeTab, setActiveTab] = useState(0)
   const [prefacioData, setPrefacioData] = useState({ nome: '', estado: '', cidade: '', texto: '' });
