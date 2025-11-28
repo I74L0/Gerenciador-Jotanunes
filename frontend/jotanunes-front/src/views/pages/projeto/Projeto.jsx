@@ -225,6 +225,7 @@ const Projeto = () => {
     setIsSaving(true)
     setSaveError(null)
 
+
     const dadosParaSalvar = {
       nome: prefacioData.nome,
       estado: prefacioData.estado,
@@ -238,9 +239,11 @@ const Projeto = () => {
       let response
       let statusTest
       if (id) {
-        statusTest = obras.retrieve(id)
-        if (statusTest.status != 'NAO_FINALIZADO'){
-          dadosParaSalvar.status = statusTest.status
+        statusTest = (await obras.retrieve(id)).data
+        if (statusTest.status == 'EM_ANALISE'){
+          console.log('Projetos Em Analise não podem ser editados!')
+          navigate('/index')
+          return
         }
         response = await obras.partialUpdate(id, dadosParaSalvar) // Usando partialUpdate (PATCH)
         console.log('Projeto atualizado!', response.data)
@@ -275,7 +278,14 @@ const Projeto = () => {
     };
      try {
       let response;
+      let statusTest
       if (id) {
+        statusTest = (await obras.retrieve(id)).data
+        if (statusTest.status == 'EM_ANALISE'){
+          console.log('Projetos Em Analise não podem ser editados!')
+          navigate('/index')
+          return
+        }
         response = await obras.partialUpdate(id, dadosParaSalvar); // Usando partialUpdate (PATCH)
         console.log('Projeto atualizado!', response.data);
         navigate('/index')
