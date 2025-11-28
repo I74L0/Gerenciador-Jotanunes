@@ -56,6 +56,7 @@ const Projeto = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
   const [userRole, setUserRole] = useState(null)
+  const [showStatus, setShowStatus] = useState(null)
 
   // Função para pegar o cargo do usuário
   useEffect(() => {
@@ -63,13 +64,12 @@ const Projeto = () => {
     const fetchRole = async () => {
       try {
         const res = await perfil.get()
-        const remoteRole =
+        const role =
           res && res.data && (res.data.role || (res.data.user && res.data.user.role))
             ? String(res.data.role || res.data.user.role).toLowerCase()
             : null
-        if (mounted && remoteRole) {
-          setUserRole(remoteRole)
-          alert("aoba")
+        if (mounted && role) {
+          setUserRole(role)
           return
         }
       } catch (err) {
@@ -310,6 +310,7 @@ const Projeto = () => {
           <CardUnidades
             ambientes={unidadesData}
             setAmbientes={setUnidadesData}
+            showStatus={showStatus}
           />
         )}
         {activeTab === 2 && (
