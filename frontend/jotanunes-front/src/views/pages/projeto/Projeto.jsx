@@ -56,63 +56,8 @@ const Projeto = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
   const [userRole, setUserRole] = useState(null)
-  const [showStatus, setShowStatus] = useState(false)
-  
-  function decodeJwt(token) {
-    try {
-      const payload = token.split('.')[1]
-      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
-      const json = atob(base64)
-      return JSON.parse(decodeURIComponent(json))
-    } catch {
-      return null
-    }
-  }
-  function detectUserRole() {
-    try {
-      if (window && window.__USER__ && window.__USER__.role) return String(window.__USER__.role)
-      const keys = [
-        'user',
-        'auth',
-        'authUser',
-        'currentUser',
-        'profile',
-        'usuario',
-        'app_user',
-        'USER',
-      ]
-      for (const k of keys) {
-        const raw = localStorage.getItem(k)
-        if (!raw) continue
-        try {
-          const parsed = JSON.parse(raw)
-          if (parsed && parsed.role) return String(parsed.role)
-          if (parsed && parsed.user && parsed.user.role) return String(parsed.user.role)
-        } catch {}
-      }
-      const accessCandidates = [
-        localStorage.getItem('access'),
-        localStorage.getItem('token'),
-        localStorage.getItem('authTokens'),
-        localStorage.getItem('auth_token'),
-        localStorage.getItem('accessToken'),
-      ]
-      for (const t of accessCandidates) {
-        if (!t) continue
-        const p = decodeJwt(t)
-        if (p && p.role) return String(p.role)
-      }
-      const cookieMatch = document.cookie.match(/user=([^;]+)/)
-      if (cookieMatch) {
-        try {
-          const parsed = JSON.parse(decodeURIComponent(cookieMatch[1]))
-          if (parsed && parsed.role) return String(parsed.role)
-        } catch {}
-      }
-    } catch {}
-    return null
-  }
 
+  // Função para pegar o cargo do usuário
   useEffect(() => {
     let mounted = true
     const fetchRole = async () => {
@@ -124,18 +69,11 @@ const Projeto = () => {
             : null
         if (mounted && remoteRole) {
           setUserRole(remoteRole)
-          setShowStatus(remoteRole === 'gestor')
+          alert("aoba")
           return
         }
       } catch (err) {
         // ignore, fallback abaixo
-      }
-
-      const localRole = detectUserRole()
-      if (mounted) {
-        const lr = localRole ? localRole.toLowerCase() : null
-        setUserRole(lr)
-        setShowStatus(lr === 'gestor')
       }
     }
 
@@ -362,14 +300,12 @@ const Projeto = () => {
           <CardUnidades
             ambientes={unidadesData}
             setAmbientes={setUnidadesData}
-            showStatus={showStatus}
           />
         )}
         {activeTab === 2 && (
           <CardAreaComum
             ambientes={areacomumData}
             setAmbientes={setAreacomumData}
-            showStatus={showStatus}
           />
         )}
         {activeTab === 3 && (

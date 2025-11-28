@@ -44,6 +44,7 @@ const Index = () => {
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
 
+  // Função para pegar o cargo do usuário
   useEffect(() => {
     const token = localStorage.getItem('accessToken')
 

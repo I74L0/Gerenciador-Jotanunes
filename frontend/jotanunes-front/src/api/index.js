@@ -1,7 +1,8 @@
+export { getRole } from './utils'
+
 export * from './apiClient'
 export * from './auth'
 export * from './dataService'
-
 export * from './services/marcas'
 export * from './services/obras'
 export * from './services/materiais'
