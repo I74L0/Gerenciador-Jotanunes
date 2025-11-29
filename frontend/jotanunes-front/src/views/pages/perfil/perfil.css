@@ -1,26 +1,19 @@
 /* Fundo geral vermelho igual da imagem da esquerda */
 .perfil-bg {
-  min-height: 100vh;
-  width: 100%;
+  height: 100vh;
+  width: 100vw;
   background: linear-gradient(to bottom, #BC1F1B, #3d0706);
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
-.perfil-lateral {
-  width: 30%;
-  background: linear-gradient(#BC1F1B, rgb(54, 9, 7));
-}
-
-.perfil-centro {
-  padding-top: 150px;
-  margin-left: 380px;
-  width: 80%;
-}
-
-.perfil-card {
-  padding: 32px;
+.conteiner{
+  width: 500px;
+  padding: 22px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 6px 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .perfil-campo {
@@ -41,16 +34,29 @@
   border-bottom: 1px solid #645f5f;
 }
 
-
 .card-header {
   background-color: #fff !important;
   color: #000 !important;
   text-align: center;
   border-bottom: none !important;
   margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .logo-card {
-  min-height: 110px;
-  margin-left: -5px;
+  transform: scale(90%);
+  margin-left: -55px;
+  margin-bottom: 15px;
+}
+
+@media screen and (max-width: 600px) {
+  .conteiner{
+    width: 90%;
+    padding: 15px;
+  }
+  .logo-card {
+    transform: scale(70%);
+    margin-left: -30px;
+    margin-bottom: 10px;
+  }
 }

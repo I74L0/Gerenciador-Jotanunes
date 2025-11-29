@@ -59,85 +59,75 @@ const Perfil = () => {
   }, [])
 
   return (
-    <div className="perfil-bg">
-      <div className="perfil-lateral"></div>
+    <div className="perfil-bg justify-content-center align-items-center">
+      <CCard className='conteiner'>
+        <div className="logo-card" style={{ textAlign: 'center', padding: '10px 0' }}>
+          <img
+            src="/images/Logo Vermelha.png"
+            alt="Logo"
+            style={{ height: '90px', width: 'auto' }}
+          />
+        </div>
 
-      <CContainer className="justify-content-center">
-        <CRow className="perfil-centro">
-          <CCol md={6}>
-            <CCard>
-              <div className="logo-card" style={{ textAlign: 'center', padding: '10px 0' }}>
-                <img
-                  src="/images/Logo Vermelha.png"
-                  alt="Logo"
-                  style={{ height: '90px', width: 'auto' }}
-                />
+        <CCardHeader>
+          <h4 style={{ textAlign: 'center' }}>Meu Perfil</h4>
+        </CCardHeader>
+
+        <CCardBody className="perfil-card">
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              <CSpinner color="primary" /> Carregando...
+            </div>
+          ) : error ? (
+            <CAlert color="danger" style={{ textAlign: 'center' }}>
+              {error}
+            </CAlert>
+          ) : (
+            <>
+              <div className="perfil-campo">
+                <span>Usuário:</span>
+                <p>{usuario.username}</p>
               </div>
 
-              <CCardHeader>
-                <h4 style={{ textAlign: 'center' }}>Meu Perfil</h4>
-              </CCardHeader>
+              <div className="perfil-campo">
+                <span>Email:</span>
+                <p>{usuario.email}</p>
+              </div>
 
-              <CCardBody className="perfil-card">
-                {loading ? (
-                  <div style={{ textAlign: 'center', padding: '20px' }}>
-                    <CSpinner color="primary" /> Carregando...
-                  </div>
-                ) : error ? (
-                  <CAlert color="danger" style={{ textAlign: 'center' }}>
-                    {error}
-                  </CAlert>
-                ) : (
-                  <>
-                    <div className="perfil-campo">
-                      <span>Usuário:</span>
-                      <p>{usuario.username}</p>
-                    </div>
+              <div className="perfil-campo">
+                <span>Nome:</span>
+                <p>{usuario.first_name}</p>
+              </div>
 
-                    <div className="perfil-campo">
-                      <span>Email:</span>
-                      <p>{usuario.email}</p>
-                    </div>
+              <div className="perfil-campo">
+                <span>Sobrenome:</span>
+                <p>{usuario.last_name}</p>
+              </div>
 
-                    <div className="perfil-campo">
-                      <span>Nome:</span>
-                      <p>{usuario.first_name}</p>
-                    </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginTop: '20px',
+                }}
+              >
+                <CButton color="secondary" onClick={() => window.history.back()}>
+                  Voltar
+                </CButton>
 
-                    <div className="perfil-campo">
-                      <span>Sobrenome:</span>
-                      <p>{usuario.last_name}</p>
-                    </div>
+                <CButton color="primary" onClick={() => setModalAberto(true)}>
+                  Alterar Senha
+                </CButton>
 
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        marginTop: '20px',
-                      }}
-                    >
-                      <CButton color="secondary" onClick={() => window.history.back()}>
-                        Voltar
-                      </CButton>
-
-                      <CButton color="primary" onClick={() => setModalAberto(true)}>
-                        Alterar Senha
-                      </CButton>
-
-                      <AlterarSenhaModal
-                        aberto={modalAberto}
-                        fecharModal={() => setModalAberto(false)}
-                      />
-                    </div>
-                  </>
-                )}
-              </CCardBody>
-            </CCard>
-          </CCol>
-        </CRow>
-      </CContainer>
-
-      <div className="perfil-lateral"></div>
+                <AlterarSenhaModal
+                  aberto={modalAberto}
+                  fecharModal={() => setModalAberto(false)}
+                />
+              </div>
+            </>
+          )}
+        </CCardBody>
+      </CCard>
     </div>
   )
 }

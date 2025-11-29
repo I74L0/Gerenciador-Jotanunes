@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { CCard, CCardBody, CCardHeader, CForm, CFormInput, CButton, CAlert } from '@coreui/react'
 
@@ -64,7 +65,7 @@ const AlterarSenhaModal = ({ aberto, fecharModal }) => {
 
   if (!aberto) return null
 
-  return (
+  return createPortal(
     <div style={overlayStyle}>
       <CCard style={{ width: '400px' }}>
         <CCardHeader>
@@ -108,21 +109,22 @@ const AlterarSenhaModal = ({ aberto, fecharModal }) => {
           </CForm>
         </CCardBody>
       </CCard>
-    </div>
+    </div>,
+    document.body
   )
 }
 
 const overlayStyle = {
   position: 'fixed',
   top: 0,
-  left: -10,
-  width: '100%',
-  height: '100%',
+  left: 0,
+  width: '100vw',
+  height: '100vh',
   background: 'rgba(0,0,0,0.5)',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  zIndex: 1000,
+  zIndex: 9999,
 }
 
 export default AlterarSenhaModal
