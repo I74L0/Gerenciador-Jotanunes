@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework.relations import PrimaryKeyRelatedField
 from .models import (
     Obra, Ambiente, Material, Marca, Item, Descricao,
     Estado, Cidade
@@ -9,6 +8,10 @@ from .models import (
 
 User = get_user_model()
 
+
+# ---------------------------
+# USUÁRIO
+# ---------------------------
 
 class UsuarioSerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField()
@@ -24,18 +27,13 @@ class UsuarioSerializer(serializers.ModelSerializer):
             return "gestor"
         return "user"
 
+
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    
     def validate(self, attrs):
         data = super().validate(attrs)
-        
-        user = self.user
-        
-        user_data = UsuarioSerializer(user).data
-        
-        data['user'] = user_data
-        
+        data['user'] = UsuarioSerializer(self.user).data
         return data
+
 
 class UsuarioCreateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,8 +42,7 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
-        return user
+        return User.objects.create_user(**validated_data)
 
 
 class UsuarioLoginSerializer(serializers.Serializer):
@@ -54,20 +51,21 @@ class UsuarioLoginSerializer(serializers.Serializer):
     user = serializers.SerializerMethodField(read_only=True)
 
     def validate(self, data):
-        username = data.get('username')
-        password = data.get('password')
-        user = authenticate(username=username, password=password)
+        user = authenticate(username=data.get('username'), password=data.get('password'))
         if user is None:
-            raise serializers.ValidationError("Credenciais inválidas. Verifique o usuário e a senha.")
+            raise serializers.ValidationError("Credenciais inválidas.")
         if not user.is_active:
             raise serializers.ValidationError("Este usuário está inativo.")
         data['user'] = user
         return data
 
     def get_user(self, obj):
-        user = obj.get('user')
-        return UsuarioSerializer(user).data
+        return UsuarioSerializer(obj.get('user')).data
 
+
+# ---------------------------
+# ESTADO / CIDADE
+# ---------------------------
 
 class EstadoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -77,10 +75,15 @@ class EstadoSerializer(serializers.ModelSerializer):
 
 class CidadeSerializer(serializers.ModelSerializer):
     estado_uf = serializers.CharField(source='estado.uf', read_only=True)
+
     class Meta:
         model = Cidade
         fields = ['id', 'nome', 'estado', 'estado_uf']
 
+
+# ---------------------------
+# MARCA / DESCRIÇÃO / MATERIAL / ITEM
+# ---------------------------
 
 class MarcaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -95,33 +98,42 @@ class DescricaoSerializer(serializers.ModelSerializer):
 
 
 class MaterialSerializer(serializers.ModelSerializer):
-    marcas = serializers.PrimaryKeyRelatedField(
-        many=True, 
-        queryset=Marca.objects.all(), 
-        required=False
-    )
-    
+    item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all(), allow_null=True, required=False)
+
     class Meta:
         model = Material
-        fields = ['id', 'descricao', 'marcas']
+        fields = ['id', 'item', 'descricao', 'marcas']
+
+    def create(self, validated_data):
+        marcas = validated_data.pop('marcas', [])
+        material = Material.objects.create(**validated_data)
+        if marcas:
+            material.marcas.set(marcas)
+        return material
+
+    def update(self, instance, validated_data):
+        marcas = validated_data.pop('marcas', None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        if marcas is not None:
+            instance.marcas.set(marcas)
+        return instance
 
 
 class ItemSerializer(serializers.ModelSerializer):
     descricoes = DescricaoSerializer(many=True, read_only=True)
     materiais = MaterialSerializer(many=True, read_only=True)
-    
+
     descricoes_input = serializers.ListField(
-        child=serializers.CharField(allow_blank=True), 
-        write_only=True, 
+        child=serializers.CharField(allow_blank=True),
+        write_only=True,
         required=False
     )
-    
-    materiais_input = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=Material.objects.all(),
+    materiais_input = serializers.ListField(
+        child=serializers.IntegerField(),
         write_only=True,
-        required=False,
-        source='materiais'
+        required=False
     )
 
     class Meta:
@@ -133,33 +145,65 @@ class ItemSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'descricoes', 'materiais']
 
-    def create(self, validated_data):
-        descricoes_input_list = validated_data.pop('descricoes_input', [])
-        materiais_objs = validated_data.pop('materiais', [])
-        
-        item = Item.objects.create(**validated_data)
-        
-        descricoes_objs_a_ligar = []
-        if descricoes_input_list:
-            for item_str in descricoes_input_list:
-                if not item_str:
-                    continue
-                try:
-                    desc_id = int(item_str)
-                    desc_obj = Descricao.objects.get(pk=desc_id)
-                    descricoes_objs_a_ligar.append(desc_obj)
-                except (ValueError, TypeError, Descricao.DoesNotExist):
-                    desc_obj, _ = Descricao.objects.get_or_create(detalhe=item_str)
-                    descricoes_objs_a_ligar.append(desc_obj)
-        
-        if descricoes_objs_a_ligar:
-            item.descricoes.set(descricoes_objs_a_ligar)
+    def _get_or_create_descricoes(self, descricoes_input):
+        result = []
+        for valor in descricoes_input:
+            if not valor:
+                continue
 
-        if materiais_objs:
-            item.materiais.set(materiais_objs)
-            
+            try:
+                desc_id = int(valor)
+                desc_obj = Descricao.objects.get(pk=desc_id)
+            except Exception:
+                desc_obj, _ = Descricao.objects.get_or_create(detalhe=valor)
+
+            result.append(desc_obj)
+        return result
+
+    def create(self, validated_data):
+        descricoes_input = validated_data.pop('descricoes_input', [])
+        materiais_input = validated_data.pop('materiais_input', [])
+
+        item = Item.objects.create(**validated_data)
+
+        if descricoes_input:
+            descricoes_objs = self._get_or_create_descricoes(descricoes_input)
+            item.descricoes.set(descricoes_objs)
+
+        if materiais_input:
+            materiais_objs = Material.objects.filter(pk__in=materiais_input)
+            for m in materiais_objs:
+                m.item = item
+                m.save()
+
         return item
 
+    def update(self, instance, validated_data):
+        descricoes_input = validated_data.pop('descricoes_input', None)
+        materiais_input = validated_data.pop('materiais_input', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        if descricoes_input is not None:
+            descricoes_objs = self._get_or_create_descricoes(descricoes_input)
+            instance.descricoes.set(descricoes_objs)
+
+        if materiais_input is not None:
+            Material.objects.filter(item=instance).update(item=None)
+            materiais_objs = Material.objects.filter(pk__in=materiais_input)
+            for m in materiais_objs:
+                m.item = instance
+                m.save()
+
+        return instance
+
+
+# ---------------------------
+# AMBIENTE / OBRA
+# ---------------------------
 
 class AmbienteSerializer(serializers.ModelSerializer):
     itens = serializers.PrimaryKeyRelatedField(
@@ -167,51 +211,44 @@ class AmbienteSerializer(serializers.ModelSerializer):
         queryset=Item.objects.all(),
         required=False
     )
-    materiais = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=Material.objects.all(),
-        required=False
-    )
 
     class Meta:
         model = Ambiente
-        fields = ['id', 'nome', 'itens', 'materiais']
-
+        fields = ['id', 'nome', 'tipo', 'itens']
 
 
 class ObraSerializer(serializers.ModelSerializer):
+    cidade = serializers.SlugRelatedField(
+        slug_field='nome',
+        queryset=Cidade.objects.all()
+    )
+    estado = serializers.SlugRelatedField(
+        slug_field='uf',
+        queryset=Estado.objects.all()
+    )
+
     ambientes = AmbienteSerializer(many=True, required=False)
 
     class Meta:
         model = Obra
-        fields = ['id', 'nome', 'cidade', 'estado', 'texto_prefacio', 'endereco_completo', 'status', 'ambientes']
-
+        fields = [
+            'id', 'nome', 'cidade', 'estado',
+            'texto_prefacio', 'endereco_completo',
+            'observacao_final', 'status',
+            'ambientes'
+        ]
 
     def create(self, validated_data):
         ambientes_data = validated_data.pop('ambientes', [])
         obra = Obra.objects.create(**validated_data)
 
         for ambiente_data in ambientes_data:
-            itens_data = ambiente_data.pop('itens', [])
-            materiais_data = ambiente_data.pop('materiais', [])
-
+            itens_pks = ambiente_data.pop('itens', [])
             ambiente = Ambiente.objects.create(obra=obra, **ambiente_data)
 
-            for item_data in itens_data:
-                descricoes = item_data.pop('descricoes', [])
-                materiais = item_data.pop('materiais', [])
-                item = Item.objects.create(ambiente=ambiente, **item_data)
-                item.descricoes.set(descricoes)
-
-                for material_data in materiais:
-                    marcas = material_data.pop('marcas', [])
-                    material = Material.objects.create(item=item, **material_data)
-                    material.marcas.set(marcas)
-
-            for material_data in materiais_data:
-                marcas = material_data.pop('marcas', [])
-                material = Material.objects.create(ambiente=ambiente, **material_data)
-                material.marcas.set(marcas)
+            if itens_pks:
+                itens_qs = Item.objects.filter(pk__in=itens_pks)
+                ambiente.itens.set(itens_qs)
 
         return obra
 
@@ -220,44 +257,35 @@ class ObraSerializer(serializers.ModelSerializer):
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+
         instance.save()
 
         if ambientes_data is not None:
             instance.ambientes.all().delete()
 
             for ambiente_data in ambientes_data:
-                itens_data = ambiente_data.pop('itens', [])
-                materiais_data = ambiente_data.pop('materiais', [])
-
+                itens_pks = ambiente_data.pop('itens', [])
                 ambiente = Ambiente.objects.create(obra=instance, **ambiente_data)
 
-                for item_data in itens_data:
-                    descricoes = item_data.pop('descricoes', [])
-                    materiais = item_data.pop('materiais', [])
-                    item = Item.objects.create(ambiente=ambiente, **item_data)
-                    item.descricoes.set(descricoes)
-
-                    for material_data in materiais:
-                        marcas = material_data.pop('marcas', [])
-                        material = Material.objects.create(item=item, **material_data)
-                        material.marcas.set(marcas)
-
-                for material_data in materiais_data:
-                    marcas = material_data.pop('marcas', [])
-                    material = Material.objects.create(ambiente=ambiente, **material_data)
-                    material.marcas.set(marcas)
+                if itens_pks:
+                    itens_qs = Item.objects.filter(pk__in=itens_pks)
+                    ambiente.itens.set(itens_qs)
 
         return instance
 
     def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['ambientes'] = AmbienteSerializer(instance.ambientes.all(), many=True).data
-        return representation
+        data = super().to_representation(instance)
+        data['ambientes'] = AmbienteSerializer(instance.ambientes.all(), many=True).data
+        return data
 
-    
+
+# ---------------------------
+# USUÁRIO UPDATE
+# ---------------------------
+
 class UsuarioUpdateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
-    
+
     class Meta:
         model = User
         fields = ['first_name', 'email', 'password']
@@ -269,5 +297,5 @@ class UsuarioUpdateSerializer(serializers.ModelSerializer):
         if password:
             instance.set_password(password)
             instance.save()
-            
+
         return instance

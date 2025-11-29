@@ -152,12 +152,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = '/staticfiles/'
-STATIC_ROOT = '/app/staticfiles'
+STATIC_URL = '/static/'
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
 
 # Pasta para onde o collectstatic vai copiar TODOS os arquivos para produção
 # Default primary key field type

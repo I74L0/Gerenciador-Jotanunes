@@ -21,9 +21,9 @@ class Estado(models.Model):
 class Cidade(models.Model):
     nome = models.CharField(max_length=100, verbose_name="Nome da Cidade")
     estado = models.ForeignKey(
-        Estado, 
-        on_delete=models.CASCADE, 
-        related_name="cidades", 
+        Estado,
+        on_delete=models.CASCADE,
+        related_name="cidades",
         verbose_name="Estado"
     )
 
@@ -36,15 +36,23 @@ class Cidade(models.Model):
 
 class Obra(models.Model):
     nome = models.CharField(max_length=255)
-    cidade = models.CharField(max_length=100, blank=True)
-    estado = models.CharField(max_length=2, blank=True)
+
+    estado = models.ForeignKey(Estado, on_delete=models.SET_NULL, null=True, blank=True)
+    cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True, blank=True)
+
     texto_prefacio = models.TextField(null=True, blank=True)
     endereco_completo = models.TextField("Endereço Completo", blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='NAO_FINALIZADO')
+
+    observacao_final = models.TextField(null=True, blank=True)
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='NAO_FINALIZADO'
+    )
 
     def __str__(self):
         return self.nome
-
 
 class Descricao(models.Model):
     detalhe = models.CharField(max_length=255, unique=True)
@@ -59,13 +67,25 @@ class Item(models.Model):
     def __str__(self):
         return self.nome
 
+TIPO_AMBIENTE_CHOICES = [
+    ('PRIVATIVO', 'Unidade Privativa'),
+    ('COMUM', 'Área Comum'),
+]
+
+
 class Ambiente(models.Model):
-    obra = models.ForeignKey(Obra, related_name='ambientes', on_delete=models.CASCADE, null=True)
+    obra = models.ForeignKey(Obra, related_name='ambientes', on_delete=models.CASCADE)
     nome = models.CharField(max_length=255)
+
+    tipo = models.CharField(
+        max_length=20,
+        choices=TIPO_AMBIENTE_CHOICES
+    )
+
     itens = models.ManyToManyField(Item, related_name='ambientes', blank=True)
 
     def __str__(self):
-        return self.nome
+        return f"{self.nome} ({self.tipo})"
 
 class Marca(models.Model):
     nome = models.CharField(max_length=255, unique=True)
@@ -74,7 +94,14 @@ class Marca(models.Model):
         return self.nome
 
 class Material(models.Model):
-    item = models.ForeignKey(Item, related_name='materiais', on_delete=models.CASCADE)
+    item = models.ForeignKey(
+        Item,
+        related_name='materiais',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
     descricao = models.CharField(max_length=255, blank=True, null=True)
     marcas = models.ManyToManyField(Marca, related_name='materiais', blank=True)
 
