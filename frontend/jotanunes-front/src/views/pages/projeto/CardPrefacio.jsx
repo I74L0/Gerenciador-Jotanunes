@@ -24,6 +24,7 @@ export default function CardPrefacio({ prefacio, setPrefacio }) {
             <input
               type="text"
               className="prefacio-input"
+              maxLength={2}
               value={prefacio.estado}
               onChange={(e) => setPrefacio({ ...prefacio, estado: e.target.value })}
             />

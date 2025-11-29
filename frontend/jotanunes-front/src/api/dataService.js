@@ -1,7 +1,7 @@
 let cache = null
 
 const fetchDados = () =>
-  fetch('/dados.json')
+  fetch('/template.json')
     .then((res) => {
       if (!res.ok) throw new Error('Falha ao carregar dados.json')
       return res.json()
@@ -11,52 +11,52 @@ const fetchDados = () =>
       return JSON.parse(JSON.stringify(d))
     })
 
-export const getDados = () => {
+export const getTemplate = () => {
   if (cache) return Promise.resolve(JSON.parse(JSON.stringify(cache)))
   return fetchDados()
 }
 
 export const getPrefacio = () =>
-  getDados().then((d) => JSON.parse(JSON.stringify(d.prefacioData || {})))
+  getTemplate().then((d) => JSON.parse(JSON.stringify(d.prefacioData || {})))
 
 export const getUnidades = () =>
-  getDados().then((d) => JSON.parse(JSON.stringify(d.unidadesData || [])))
+  getTemplate().then((d) => JSON.parse(JSON.stringify(d.unidadesData || [])))
 
 export const getAreaComum = () =>
-  getDados().then((d) => JSON.parse(JSON.stringify(d.areacomumData || [])))
+  getTemplate().then((d) => JSON.parse(JSON.stringify(d.areacomumData || [])))
 
 export const getMateriais = () =>
-  getDados().then((d) => JSON.parse(JSON.stringify(d.materialData || [])))
+  getTemplate().then((d) => JSON.parse(JSON.stringify(d.materialData || [])))
 
 export const getObservacoes = () =>
-  getDados().then((d) => JSON.parse(JSON.stringify(d.observacoesData || [])))
+  getTemplate().then((d) => JSON.parse(JSON.stringify(d.observacoesData || [])))
 
 export const setPrefacio = (novo) =>
-  getDados().then(() => {
+  getTemplate().then(() => {
     cache.prefacioData = novo
     return JSON.parse(JSON.stringify(cache.prefacioData))
   })
 
 export const setUnidades = (novo) =>
-  getDados().then(() => {
+  getTemplate().then(() => {
     cache.unidadesData = novo
     return JSON.parse(JSON.stringify(cache.unidadesData))
   })
 
 export const setAreaComum = (novo) =>
-  getDados().then(() => {
+  getTemplate().then(() => {
     cache.areacomumData = novo
     return JSON.parse(JSON.stringify(cache.areacomumData))
   })
 
 export const setMateriais = (novo) =>
-  getDados().then(() => {
+  getTemplate().then(() => {
     cache.materialData = novo
     return JSON.parse(JSON.stringify(cache.materialData))
   })
 
 export const setObservacoes = (novo) =>
-  getDados().then(() => {
+  getTemplate().then(() => {
     cache.observacoesData = novo
     return JSON.parse(JSON.stringify(cache.observacoesData))
   })

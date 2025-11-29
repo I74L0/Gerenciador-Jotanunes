@@ -38,7 +38,7 @@ import CardObservacoes from './CardObservacoes'
 import MenuTabs from './MenuTabs'
 import avatar8 from 'src/assets/images/avatars/8.jpg'
 import 'src/views/pages/projeto/Projeto-style.scss'
-import { obras, ambientes, perfil, getDados } from '../../../api'
+import { obras, ambientes, perfil, getTemplate } from '../../../api'
 
 const Projeto = () => {
   const navigate = useNavigate()
@@ -131,7 +131,7 @@ const Projeto = () => {
         } 
         else {
           // --- Caso 3: Novo projeto (template padrão) ---
-          const templateData = await getDados();
+          const templateData = await getTemplate();
           setPrefacioData(templateData.prefacioData || { nome: '', estado: '', cidade: '', texto: '' });
           setUnidadesData(templateData.unidadesData || []);
           setAreacomumData(templateData.areacomumData || []);
@@ -206,6 +206,8 @@ const Projeto = () => {
     setIsSaving(true);
     setSaveError(null);
 
+    console.log('Salvando dados do projeto...', { prefacioData, unidadesData, areacomumData, materialData, observacoesData });
+    
     const dadosParaSalvar = {
       nome: prefacioData.nome,
       estado: prefacioData.estado,
