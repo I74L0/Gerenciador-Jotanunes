@@ -74,7 +74,7 @@ TIPO_AMBIENTE_CHOICES = [
 
 
 class Ambiente(models.Model):
-    obra = models.ForeignKey(Obra, related_name='ambientes', on_delete=models.CASCADE)
+    obra = models.ForeignKey(Obra, related_name='ambientes', on_delete=models.CASCADE, null=True, blank=True)
     nome = models.CharField(max_length=255)
 
     tipo = models.CharField(
