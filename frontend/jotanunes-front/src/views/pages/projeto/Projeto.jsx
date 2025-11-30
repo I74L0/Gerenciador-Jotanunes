@@ -158,6 +158,22 @@ const Projeto = () => {
     return true
   }
 
+  const getMappedAmbientes = () => {
+    const MapUnidades = unidadesData.map((unidade) => ({
+      nome: unidade.nome,
+      itens: [],
+      tipo: 'PRIVATIVO',
+    }))
+
+    const MapAreaComum = areacomumData.map((area) => ({
+      nome: area.nome,
+      itens: [],
+      tipo: 'COMUM',
+    }))
+
+    return [...MapUnidades, ...MapAreaComum]
+  }  
+
   const protectiveSave = async () => {
     if (!prefacioData.nome) {
       console.log('Nome do projeto ausente. Redirecionando sem salvar.')
@@ -172,6 +188,8 @@ const Projeto = () => {
     setIsSaving(true)
     setSaveError(null)
 
+    const ambientes = getMappedAmbientes()
+
     const dadosParaSalvar = {
       nome: prefacioData.nome,
       estado: prefacioData.estado,
@@ -179,40 +197,8 @@ const Projeto = () => {
       texto_prefacio: prefacioData.texto,
       observacoes: observacoesData.observacoes,
       status: 'NAO_FINALIZADO',
-      ambientes: []
+      ambientes: ambientes
     }
-
-    const tempAmbiente = unidadesData.map((unidade) => ({
-      nome: unidade.nome,
-      itens: [],
-      // itens: unidade.items.map((item) => ({
-      //   item: item.item,
-      //   descricao: item.descricao,
-      // })),
-      tipo: 'PRIVATIVO',
-    }))
-
-    const tempAreaComum = areacomumData.map((area) => ({
-      nome: area.nome,
-      itens: [],
-      // itens: area.items.map((item) => ({
-      //   item: item.item,
-      //   descricao: item.descricao,
-      // })),
-      tipo: 'COMUM',
-    }))
-
-    const ambientes = [...tempAmbiente, ...tempAreaComum]
-    console.log('Ambientes para salvar:', ambientes)
-    dadosParaSalvar.ambientes = ambientes
-
-    // console.log('Salvando dados do projeto antes de sair...', {
-    //   prefacioData,
-    //   unidadesData,
-    //   areacomumData,
-    //   materialData,
-    //   observacoesData,
-    // })
 
     console.log('Salvando dados do projeto antes de sair...', dadosParaSalvar)
     
@@ -249,14 +235,8 @@ const Projeto = () => {
 
     setIsSaving(true)
     setSaveError(null)
-
-    console.log('Salvando dados do projeto...', {
-      prefacioData,
-      unidadesData,
-      areacomumData,
-      materialData,
-      observacoesData,
-    })
+    
+    const ambientes = getMappedAmbientes()
 
     const dadosParaSalvar = {
       nome: prefacioData.nome,
@@ -265,7 +245,11 @@ const Projeto = () => {
       texto_prefacio: prefacioData.texto,
       observacoes: observacoesData.observacoes,
       status: 'EM_ANALISE',
+      ambientes: ambientes
     }
+
+    console.log('Salvando dados do projeto...', dadosParaSalvar)
+
     try {
       let response
       let statusTest
