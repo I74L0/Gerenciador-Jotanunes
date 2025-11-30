@@ -96,12 +96,7 @@ const Perfil = () => {
 
               <div className="perfil-campo">
                 <span>Nome:</span>
-                <p>{usuario.first_name}</p>
-              </div>
-
-              <div className="perfil-campo">
-                <span>Sobrenome:</span>
-                <p>{usuario.last_name}</p>
+                <p>{usuario.first_name} {usuario.last_name}</p>
               </div>
 
               <div

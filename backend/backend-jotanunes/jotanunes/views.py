@@ -9,13 +9,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 import re
 from rest_framework import generics
 from rest_framework.views import APIView
-from weasyprint import HTML, CSS
 import tempfile
 import os
 from django.templatetags.static import static
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from weasyprint import HTML
 
 from .serializers import MyTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -88,6 +86,7 @@ class ObraViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'], url_path='gerar-pdf')
     def gerar_pdf(self, request, pk=None):
+        from weasyprint import HTML, CSS
         obra = self.get_object()
 
         if not self.pode_gerar_pdf(request.user):

@@ -60,6 +60,7 @@ const Index = () => {
   }, [])
 
   const podeCriarProjeto = permissoes?.is_superuser || permissoes?.is_criador
+  const podeAdministrar = permissoes?.is_superuser
 
   const getStatusClass = (statusRaw) => {
     if (!statusRaw) return 'orange'
@@ -262,6 +263,14 @@ const Index = () => {
               <button onClick={handleVerPerfil} className="profile-btn">
                 Ver Perfil
               </button>
+              {podeAdministrar &&(
+                <button
+                onClick={() => (window.location.href = "http://127.0.0.1:8000/admin/")} 
+                className="profile-btn"
+                >
+                Administrador
+              </button>
+              )}
               <button onClick={handleLogout} className="profile-btn">
                 Sair
               </button>
