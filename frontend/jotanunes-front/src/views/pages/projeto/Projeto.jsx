@@ -16,7 +16,7 @@ import {
   CHeaderText,
   CButton,
   useColorModes,
-  CSpinner
+  CSpinner,
 } from '@coreui/react'
 import {
   cilBell,
@@ -27,7 +27,7 @@ import {
   cilLockLocked,
   cilSettings,
   cilTask,
-  cilUser
+  cilUser,
 } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import CardPrefacio from './CardPrefacio'
@@ -47,18 +47,17 @@ const Projeto = () => {
   const referenciaId = searchParams.get('referencia')
 
   const [activeTab, setActiveTab] = useState(0)
-  const [prefacioData, setPrefacioData] = useState({ nome: '', estado: '', cidade: '', texto: '' });
-  const [unidadesData, setUnidadesData] = useState([]);
-  const [areacomumData, setAreacomumData] = useState([]);
-  const [materialData, setMaterialData] = useState([]);
-  const [observacoesData, setObservacoesData] = useState({ observacoes: '' });
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState(null);
+  const [prefacioData, setPrefacioData] = useState({ nome: '', estado: '', cidade: '', texto: '' })
+  const [unidadesData, setUnidadesData] = useState([])
+  const [areacomumData, setAreacomumData] = useState([])
+  const [materialData, setMaterialData] = useState([])
+  const [observacoesData, setObservacoesData] = useState({ observacoes: '' })
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState(null)
   const [userRole, setUserRole] = useState(null)
   const [showStatus, setShowStatus] = useState(null)
 
-  // Função para pegar o cargo do usuário
   useEffect(() => {
     let mounted = true
     const fetchRole = async () => {
@@ -72,9 +71,7 @@ const Projeto = () => {
           setUserRole(role)
           return
         }
-      } catch (err) {
-        // ignore, fallback abaixo
-      }
+      } catch (err) {}
     }
 
     fetchRole()
@@ -85,84 +82,95 @@ const Projeto = () => {
 
   useEffect(() => {
     const carregarDadosDoProjeto = async () => {
-      setIsLoading(true);
+      setIsLoading(true)
       try {
         if (id) {
-          // --- Caso 1: Projeto existente ---
           const [obraRes, ambientesRes] = await Promise.all([
             obras.retrieve(id),
             ambientes.list(id),
-          ]);
-          const dadosObra = obraRes.data;
+          ])
+          const dadosObra = obraRes.data
 
           setPrefacioData({
             nome: dadosObra.nome || '',
             estado: dadosObra.estado || '',
             cidade: dadosObra.cidade || '',
             texto: dadosObra.texto_prefacio || '',
-          });
+          })
 
-          const todosAmbientes = ambientesRes.data || [];
-          setUnidadesData(todosAmbientes.filter(a => a.tipo === 'UNIDADE'));
-          setAreacomumData(todosAmbientes.filter(a => a.tipo === 'AREA_COMUM'));
-          setMaterialData(dadosObra.materiais || []);
-          setObservacoesData(dadosObra.observacoes || '' );
-        } 
-        else if (referenciaId) {
-          // --- Caso 2: Criar com referência ---
+          const todosAmbientes = ambientesRes.data || []
+          setUnidadesData(todosAmbientes.filter((a) => a.tipo === 'UNIDADE'))
+          setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'AREA_COMUM'))
+          setMaterialData(dadosObra.materiais || [])
+          setObservacoesData(dadosObra.observacoes || '')
+        } else if (referenciaId) {
           const [obraRes, ambientesRes] = await Promise.all([
             obras.retrieve(referenciaId),
             ambientes.list(referenciaId),
-          ]);
-          const dadosRef = obraRes.data;
+          ])
+          const dadosRef = obraRes.data
 
           setPrefacioData({
             nome: `${dadosRef.nome} (Cópia)`,
             estado: dadosRef.estado || '',
             cidade: dadosRef.cidade || '',
             texto: dadosRef.texto_prefacio || '',
-          });
+          })
 
-          const todosAmbientes = ambientesRes.data || [];
-          setUnidadesData(todosAmbientes.filter(a => a.tipo === 'UNIDADE'));
-          setAreacomumData(todosAmbientes.filter(a => a.tipo === 'AREA_COMUM'));
-          setMaterialData(dadosRef.materiais || []);
-          setObservacoesData(dadosRef.observacoes || '' );
-        } 
-        else {
-          // --- Caso 3: Novo projeto (template padrão) ---
-          const templateData = await getTemplate();
-          setPrefacioData(templateData.prefacioData || { nome: '', estado: '', cidade: '', texto: '' });
-          setUnidadesData(templateData.unidadesData || []);
-          setAreacomumData(templateData.areacomumData || []);
-          setMaterialData(templateData.materialData || []);
-          const obsTemplate = templateData.observacoesData && templateData.observacoesData[0];
-          setObservacoesData({ observacoes: obsTemplate ? obsTemplate.observacao : '' });
+          const todosAmbientes = ambientesRes.data || []
+          setUnidadesData(todosAmbientes.filter((a) => a.tipo === 'UNIDADE'))
+          setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'AREA_COMUM'))
+          setMaterialData(dadosRef.materiais || [])
+          setObservacoesData(dadosRef.observacoes || '')
+        } else {
+          const templateData = await getTemplate()
+          setPrefacioData(
+            templateData.prefacioData || { nome: '', estado: '', cidade: '', texto: '' },
+          )
+          setUnidadesData(templateData.unidadesData || [])
+          setAreacomumData(templateData.areacomumData || [])
+          setMaterialData(templateData.materialData || [])
+          const obsTemplate = templateData.observacoesData && templateData.observacoesData[0]
+          setObservacoesData({ observacoes: obsTemplate ? obsTemplate.observacao : '' })
         }
       } catch (error) {
-        console.error("Falha ao carregar dados do projeto:", error);
-        setSaveError("Não foi possível carregar os dados.");
+        console.error('Falha ao carregar dados do projeto:', error)
+        setSaveError('Não foi possível carregar os dados.')
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    carregarDadosDoProjeto();
-  }, [id, referenciaId]);
+    carregarDadosDoProjeto()
+  }, [id, referenciaId])
+
+  const validarEstadoCidade = () => {
+    if (
+      !prefacioData.estado ||
+      !prefacioData.estado.toString().trim() ||
+      !prefacioData.cidade ||
+      !prefacioData.cidade.toString().trim()
+    ) {
+      setSaveError('Os campos Estado e Cidade não podem ficar vazios.')
+      setActiveTab(0)
+      return false
+    }
+    return true
+  }
 
   const protectiveSave = async () => {
-    // 1. Verifica se o campo 'nome' do prefácio está preenchido
     if (!prefacioData.nome) {
-      // Se não houver nome, apenas redireciona e encerra a função
       console.log('Nome do projeto ausente. Redirecionando sem salvar.')
       navigate('/index')
       return
     }
 
-    // 2. Se houver nome, procede com a lógica de salvamento
+    if (!validarEstadoCidade()) {
+      return
+    }
+
     setIsSaving(true)
     setSaveError(null)
-
 
     const dadosParaSalvar = {
       nome: prefacioData.nome,
@@ -173,23 +181,22 @@ const Projeto = () => {
       status: 'NAO_FINALIZADO',
     }
 
+    console.log('Salvando dados do projeto antes de sair...', dadosParaSalvar)
+
     try {
       let response
       let statusTest
       if (id) {
         statusTest = (await obras.retrieve(id)).data
-        if (statusTest.status == 'EM_ANALISE'){
+        if (statusTest.status == 'EM_ANALISE') {
           console.log('Projetos Em Analise não podem ser editados!')
           navigate('/index')
           return
         }
-        response = await obras.partialUpdate(id, dadosParaSalvar) // Usando partialUpdate (PATCH)
+        response = await obras.partialUpdate(id, dadosParaSalvar)
         console.log('Projeto atualizado!', response.data)
-        // Após salvar, redireciona o usuário (se for o caso de 'Sair')
         navigate('/index')
       } else {
-        // Se não temos ID, CRIA (create) um novo projeto
-        // Nota: A lógica atual já redireciona no 'create'
         response = await obras.create(dadosParaSalvar)
         console.log('Novo projeto criado!', response.data)
         navigate('/index')
@@ -203,11 +210,21 @@ const Projeto = () => {
   }
 
   const handleSave = async () => {
-    setIsSaving(true);
-    setSaveError(null);
+    if (!validarEstadoCidade()) {
+      return
+    }
 
-    console.log('Salvando dados do projeto...', { prefacioData, unidadesData, areacomumData, materialData, observacoesData });
-    
+    setIsSaving(true)
+    setSaveError(null)
+
+    console.log('Salvando dados do projeto...', {
+      prefacioData,
+      unidadesData,
+      areacomumData,
+      materialData,
+      observacoesData,
+    })
+
     const dadosParaSalvar = {
       nome: prefacioData.nome,
       estado: prefacioData.estado,
@@ -215,33 +232,31 @@ const Projeto = () => {
       texto_prefacio: prefacioData.texto,
       observacoes: observacoesData.observacoes,
       status: 'EM_ANALISE',
-    };
-     try {
-      let response;
+    }
+    try {
+      let response
       let statusTest
       if (id) {
         statusTest = (await obras.retrieve(id)).data
-        if (statusTest.status == 'EM_ANALISE'){
+        if (statusTest.status == 'EM_ANALISE') {
           console.log('Projetos Em Analise não podem ser editados!')
           navigate('/index')
           return
         }
-        response = await obras.partialUpdate(id, dadosParaSalvar); // Usando partialUpdate (PATCH)
-        console.log('Projeto atualizado!', response.data);
+        response = await obras.partialUpdate(id, dadosParaSalvar)
+        console.log('Projeto atualizado!', response.data)
         navigate('/index')
       } else {
-        // Se não temos ID, CRIA (create) um novo projeto
-        response = await obras.create(dadosParaSalvar); //
-        navigate("/index")
+        response = await obras.create(dadosParaSalvar) //
+        navigate('/index')
       }
-
     } catch (error) {
-      console.error("Erro ao salvar:", error);
-      setSaveError(error.message || 'Falha ao salvar. Tente novamente.');
+      console.error('Erro ao salvar:', error)
+      setSaveError(error.message || 'Falha ao salvar. Tente novamente.')
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
   if (isLoading) {
     return (
@@ -249,65 +264,63 @@ const Projeto = () => {
         <CSpinner color="primary" />
         <span className="ms-3">Carregando Projeto...</span>
       </div>
-    );
+    )
   }
 
   return (
-    <div className='body__body'>
-      <header className='header'>
+    <div className="body__body">
+      <header className="header">
         <div className="header__header">
-          <div className='header__header__logo'>
+          <div className="header__header__logo">
             <CImage src="/images/Logo Vermelha.png" alt="JotaNunes Logo" height={48} />
           </div>
           <div className="header__header__user">
-              <p className="text-secondary">Usuário</p>
-              <CDropdown variant="nav-item">
-                <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
-                  <CAvatar src={avatar8} size="lg" />
-                </CDropdownToggle>
-                <CDropdownMenu className="pt-0" placement="bottom-end">
-                  <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">
-                    Account
-                  </CDropdownHeader>
-                  <CDropdownItem href="#">
-                    <CIcon icon={cilUser} className="me-2" />
-                    Profile
-                  </CDropdownItem>
-                  <CDropdownItem href="#">
-                    <CIcon icon={cilSettings} className="me-2" />
-                    Settings
-                  </CDropdownItem>
-                  <CDropdownDivider />
-                  <CDropdownItem href="#">
-                    <CIcon icon={cilLockLocked} className="me-2" />
-                    Logout
-                  </CDropdownItem>
-                </CDropdownMenu>
-              </CDropdown>
+            <p className="text-secondary">Usuário</p>
+            <CDropdown variant="nav-item">
+              <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
+                <CAvatar src={avatar8} size="lg" />
+              </CDropdownToggle>
+              <CDropdownMenu className="pt-0" placement="bottom-end">
+                <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">
+                  Account
+                </CDropdownHeader>
+                <CDropdownItem href="#">
+                  <CIcon icon={cilUser} className="me-2" />
+                  Profile
+                </CDropdownItem>
+                <CDropdownItem href="#">
+                  <CIcon icon={cilSettings} className="me-2" />
+                  Settings
+                </CDropdownItem>
+                <CDropdownDivider />
+                <CDropdownItem href="#">
+                  <CIcon icon={cilLockLocked} className="me-2" />
+                  Logout
+                </CDropdownItem>
+              </CDropdownMenu>
+            </CDropdown>
           </div>
         </div>
-        <hr/>
+        <hr />
         <ul className="header__menu">
-          <li className="header__menu__item"
-            onClick={protectiveSave}>
+          <li className="header__menu__item" onClick={protectiveSave}>
             Sair
           </li>
           <MenuTabs activeIndex={activeTab} onChange={setActiveTab} />
-          <li className="header__menu__item" 
-            onClick={handleSave} disabled={isSaving}>
-            {/*isSaving ? 'Salvando...' : (id ? 'Atualizar' : 'Salvar Novo')*/"Enviar"}
+          <li className="header__menu__item" onClick={handleSave} disabled={isSaving}>
+            {'Enviar'}
           </li>
         </ul>
       </header>
 
       {saveError && (
-        <CContainer className="w-75 p-2 bg-danger-light text-danger border rounded">
+        <CContainer className="d-flex w-75 p-2 bg-danger-light text-danger border rounded z-3">
           Erro: {saveError}
         </CContainer>
       )}
 
       <section className="content background">
-        {activeTab === 0 && <CardPrefacio prefacio={prefacioData} setPrefacio={setPrefacioData}/>}
+        {activeTab === 0 && <CardPrefacio prefacio={prefacioData} setPrefacio={setPrefacioData} />}
         {activeTab === 1 && (
           <CardUnidades
             ambientes={unidadesData}
@@ -316,10 +329,7 @@ const Projeto = () => {
           />
         )}
         {activeTab === 2 && (
-          <CardAreaComum
-            ambientes={areacomumData}
-            setAmbientes={setAreacomumData}
-          />
+          <CardAreaComum ambientes={areacomumData} setAmbientes={setAreacomumData} />
         )}
         {activeTab === 3 && (
           <CardMateriais materiais={materialData} setMateriais={setMaterialData} />

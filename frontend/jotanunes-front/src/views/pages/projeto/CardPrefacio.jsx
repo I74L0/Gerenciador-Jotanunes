@@ -16,6 +16,7 @@ export default function CardPrefacio({ prefacio, setPrefacio }) {
               className="prefacio-input"
               value={prefacio.nome}
               onChange={(e) => setPrefacio({ ...prefacio, nome: e.target.value })}
+              placeholder='Deixe vazio para não salvar projeto'
             />
           </label>
 
