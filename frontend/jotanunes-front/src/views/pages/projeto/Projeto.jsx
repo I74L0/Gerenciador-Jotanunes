@@ -38,7 +38,7 @@ import CardObservacoes from './CardObservacoes'
 import MenuTabs from './MenuTabs'
 import avatar8 from 'src/assets/images/avatars/8.jpg'
 import 'src/views/pages/projeto/Projeto-style.scss'
-import { obras, ambientes, perfil, getTemplate } from '../../../api'
+import { obras, ambientes, perfil, getTemplate, itens } from '../../../api'
 
 const Projeto = () => {
   const navigate = useNavigate()
@@ -179,10 +179,43 @@ const Projeto = () => {
       texto_prefacio: prefacioData.texto,
       observacoes: observacoesData.observacoes,
       status: 'NAO_FINALIZADO',
+      ambientes: []
     }
 
-    console.log('Salvando dados do projeto antes de sair...', dadosParaSalvar)
+    const tempAmbiente = unidadesData.map((unidade) => ({
+      nome: unidade.nome,
+      itens: [],
+      // itens: unidade.items.map((item) => ({
+      //   item: item.item,
+      //   descricao: item.descricao,
+      // })),
+      tipo: 'PRIVATIVO',
+    }))
 
+    const tempAreaComum = areacomumData.map((area) => ({
+      nome: area.nome,
+      itens: [],
+      // itens: area.items.map((item) => ({
+      //   item: item.item,
+      //   descricao: item.descricao,
+      // })),
+      tipo: 'COMUM',
+    }))
+
+    const ambientes = [...tempAmbiente, ...tempAreaComum]
+    console.log('Ambientes para salvar:', ambientes)
+    dadosParaSalvar.ambientes = ambientes
+
+    // console.log('Salvando dados do projeto antes de sair...', {
+    //   prefacioData,
+    //   unidadesData,
+    //   areacomumData,
+    //   materialData,
+    //   observacoesData,
+    // })
+
+    console.log('Salvando dados do projeto antes de sair...', dadosParaSalvar)
+    
     try {
       let response
       let statusTest
