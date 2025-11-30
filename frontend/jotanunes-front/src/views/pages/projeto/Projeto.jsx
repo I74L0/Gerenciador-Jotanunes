@@ -38,7 +38,7 @@ import CardObservacoes from './CardObservacoes'
 import MenuTabs from './MenuTabs'
 import avatar8 from 'src/assets/images/avatars/8.jpg'
 import 'src/views/pages/projeto/Projeto-style.scss'
-import { obras, ambientes, perfil, getTemplate, itens } from '../../../api'
+import { obras, handleLogout, ambientes, perfil, getTemplate, itens } from '../../../api'
 
 const Projeto = () => {
   const navigate = useNavigate()
@@ -57,6 +57,12 @@ const Projeto = () => {
   const [saveError, setSaveError] = useState(null)
   const [userRole, setUserRole] = useState(null)
   const [showStatus, setShowStatus] = useState(null)
+  const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const handleVerPerfil = () => navigate('/perfil')
+  const [permissoes, setPermissoes] = useState(null)
+  
+  const podeAdministrar = permissoes?.is_superuser
+
 
   useEffect(() => {
     let mounted = true
@@ -84,6 +90,22 @@ const Projeto = () => {
     const carregarDadosDoProjeto = async () => {
       setIsLoading(true)
       try {
+        const token = localStorage.getItem("accessToken")
+
+        const permissaoRes = await fetch("http://localhost:8000/api/me/", {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        })
+
+        if (!permissaoRes.ok) throw new Error("Erro ao buscar permissões")
+        
+        const dadosPermissoes = await permissaoRes.json()
+        setPermissoes({
+          is_superuser: dadosPermissoes.is_superuser,
+          is_gestor: dadosPermissoes.is_gestor,
+          is_criador: dadosPermissoes.is_criador,
+        })
         if (id) {
           const [obraRes, ambientesRes] = await Promise.all([
             obras.retrieve(id),
@@ -291,31 +313,37 @@ const Projeto = () => {
           <div className="header__header__logo">
             <CImage src="/images/Logo Vermelha.png" alt="JotaNunes Logo" height={48} />
           </div>
-          <div className="header__header__user">
-            <p className="text-secondary">Usuário</p>
-            <CDropdown variant="nav-item">
-              <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
-                <CAvatar src={avatar8} size="lg" />
-              </CDropdownToggle>
-              <CDropdownMenu className="pt-0" placement="bottom-end">
-                <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">
-                  Account
-                </CDropdownHeader>
-                <CDropdownItem href="#">
-                  <CIcon icon={cilUser} className="me-2" />
-                  Profile
-                </CDropdownItem>
-                <CDropdownItem href="#">
-                  <CIcon icon={cilSettings} className="me-2" />
-                  Settings
-                </CDropdownItem>
-                <CDropdownDivider />
-                <CDropdownItem href="#">
-                  <CIcon icon={cilLockLocked} className="me-2" />
-                  Logout
-                </CDropdownItem>
-              </CDropdownMenu>
-            </CDropdown>
+          <div className="usuario_container position-relative">
+            <span>Usuário</span>
+
+            {/* ÍCONE */}
+            <div
+              className="user-icon"
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              style={{ cursor: 'pointer' }}
+            >
+              👤
+            </div>
+
+            {/* MENU DE PERFIL */}
+            {showProfileMenu && (
+              <div className="profile-menu">
+                <button onClick={handleVerPerfil} className="profile-btn">
+                  Ver Perfil
+                </button>
+                {podeAdministrar &&(
+                  <button
+                  onClick={() => (window.location.href = "http://127.0.0.1:8000/admin/")} 
+                  className="profile-btn"
+                  >
+                  Administrador
+                </button>
+                )}
+                <button onClick={handleLogout} className="profile-btn">
+                  Sair
+                </button>
+              </div>
+            )}
           </div>
         </div>
         <hr />

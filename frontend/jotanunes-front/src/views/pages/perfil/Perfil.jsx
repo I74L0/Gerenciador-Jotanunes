@@ -24,39 +24,60 @@ const Perfil = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [modalAberto, setModalAberto] = useState(false)
+  const [permissoes, setPermissoes] = useState(null)
+
+  const cargo =
+  permissoes?.is_superuser
+    ? "Administrador"
+    : permissoes?.is_gestor
+    ? "Gestor"
+    : permissoes?.is_criador
+    ? "Criador"
+    : "Usuário";
+
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken')
+    const token = localStorage.getItem('accessToken');
 
     if (!token) {
-      setError('Usuário não autenticado. Faça login novamente.')
-      setLoading(false)
-      return
+      setError('Usuário não autenticado. Faça login novamente.');
+      setLoading(false);
+      return;
     }
 
+    // Buscar perfil
     fetch('http://localhost:8000/api/perfil/', {
-      headers: {
-        Authorization: 'Bearer ' + token,
-      },
+      headers: { Authorization: 'Bearer ' + token }
     })
-      .then((res) => {
-        if (!res.ok) throw new Error('Erro ao buscar usuário')
-        return res.json()
-      })
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         setUsuario({
           username: data.username,
           email: data.email,
           first_name: data.first_name,
           last_name: data.last_name,
-        })
-        setLoading(false)
+        });
+      });
+
+    // Buscar permissões
+    fetch('http://localhost:8000/api/me/', {
+      headers: { Authorization: 'Bearer ' + token }
+    })
+      .then(res => res.json())
+      .then(data => {
+        setPermissoes({
+          is_superuser: data.is_superuser,
+          is_gestor: data.is_gestor,
+          is_criador: data.is_criador,
+        });
+        setLoading(false);
       })
       .catch(() => {
-        setError('Não foi possível carregar os dados do usuário.')
-        setLoading(false)
-      })
-  }, [])
+        setError('Erro ao carregar dados.');
+        setLoading(false);
+      });
+  }, []);
+
 
   return (
     <div className="perfil-bg justify-content-center align-items-center">
@@ -85,7 +106,7 @@ const Perfil = () => {
           ) : (
             <>
               <div className="perfil-campo">
-                <span>Usuário:</span>
+                <span>Usuário ({cargo}):</span>
                 <p>{usuario.username}</p>
               </div>
 
