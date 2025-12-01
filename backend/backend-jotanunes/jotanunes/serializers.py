@@ -236,6 +236,8 @@ class ObraSerializer(serializers.ModelSerializer):
 
         return obra
     def update(self, instance, validated_data):
+        ambientes_data = validated_data.pop("ambientes", None)
+        materiais_data = validated_data.pop("materiais", None)
 
         if "estado" in validated_data:
             estado_input = validated_data.pop("estado")
@@ -250,7 +252,6 @@ class ObraSerializer(serializers.ModelSerializer):
 
         instance.save()
 
-        ambientes_data = validated_data.get("ambientes", None)
         if ambientes_data is not None:
             instance.ambientes.all().delete()
             for ambiente_data in ambientes_data:
@@ -260,7 +261,13 @@ class ObraSerializer(serializers.ModelSerializer):
                     item = ItemSerializer().create(item_data)
                     ambiente.itens.add(item)
 
+        if materiais_data is not None:
+            instance.materiais.clear()
+            for material_data in materiais_data:
+                MaterialSerializer().create(material_data)
+
         return instance
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data["ambientes"] = AmbienteSerializer(instance.ambientes.all(), many=True).data
