@@ -12,8 +12,6 @@ from rest_framework.views import APIView
 import tempfile
 import os
 from django.templatetags.static import static
-from django.http import HttpResponse
-from django.template.loader import render_to_string
 
 from .serializers import MyTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -57,7 +55,7 @@ def usuario_perfil_view(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def usuario_logout_view(request):
-    return Response({"detail": "Logout bem-sucedido. O token deve ser descartado no cliente."}, status=status.HTTP_200_OK)
+    return Response({"detail": "Logout concluído."}, status=status.HTTP_200_OK)
 
 
 class ObraViewSet(viewsets.ModelViewSet):
@@ -75,7 +73,6 @@ class ObraViewSet(viewsets.ModelViewSet):
             self.permission_classes = [permissions.IsAuthenticated, IsGestor]
         else:
             self.permission_classes = [permissions.IsAuthenticated, IsGestor]
-
         return super().get_permissions()
 
     def pode_gerar_pdf(self, user):
@@ -86,27 +83,28 @@ class ObraViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'], url_path='gerar-pdf')
     def gerar_pdf(self, request, pk=None):
-        from weasyprint import HTML, CSS
+        from weasyprint import HTML
+
         obra = self.get_object()
 
         if not self.pode_gerar_pdf(request.user):
-            return HttpResponse("Você não tem permissão para gerar PDF.", status=403)
+            return HttpResponse("Sem permissão para gerar PDF.", status=403)
 
-        # Carregar ambientes
-        ambientes = (
+        ambientes_privativos = (
             obra.ambientes
-                .prefetch_related(
-                    "itens__materiais__marcas",
-                    "itens__descricoes"
-                )
-                .all()
+                .filter(tipo="PRIVATIVO")
+                .prefetch_related("itens__materiais__marcas", "itens__descricoes")
         )
 
-        # Forçar logos sempre
+        ambientes_comuns = (
+            obra.ambientes
+                .filter(tipo="COMUM")
+                .prefetch_related("itens__materiais__marcas", "itens__descricoes")
+        )
+
         logo_url = request.build_absolute_uri(static("img/logo_vermelha.png"))
         logo_footer_url = logo_url
 
-        # ----------- CALCULAR LOCALIZAÇÃO -----------
         if obra.cidade and obra.estado:
             localizacao = f"{obra.cidade.nome} - {obra.estado.uf}"
         elif obra.cidade:
@@ -116,28 +114,27 @@ class ObraViewSet(viewsets.ModelViewSet):
         else:
             localizacao = "Localização não informada"
 
-        # ----------- MATERIAIS E MARCAS (ÁREA COMUM) -----------
         materiais = Material.objects.prefetch_related("marcas").all()
 
-        marcas_list = []
-        for m in materiais:
-            marcas_list.append({
-                "material": m.descricao or m.item.nome if m.item else "—",
-                "marcas": [marca.nome for marca in m.marcas.all()],
-            })
+        marcas_list = [
+            {
+                "material": m.descricao or (m.item.nome if m.item else "—"),
+                "marcas": [marca.nome for marca in m.marcas.all()]
+            }
+            for m in materiais
+        ]
 
-        # ----------- RENDER TEMPLATE -----------
         html_string = render_to_string("relatorio_projeto.html", {
             "obra": obra,
-            "ambientes": ambientes,
-            "localizacao": localizacao,       # <--- AGORA VAI
-            "marcas_list": marcas_list,       # <--- AGORA VAI
+            "localizacao": localizacao,
+            "ambientes_privativos": ambientes_privativos,
+            "ambientes_comuns": ambientes_comuns,
+            "marcas_list": marcas_list,
             "observacoes": obra.observacao_final or "",
             "logo_url": logo_url,
             "logo_footer_url": logo_footer_url,
         })
 
-        # Criar PDF
         tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
         tmp_path = tmp.name
         tmp.close()
@@ -153,7 +150,6 @@ class ObraViewSet(viewsets.ModelViewSet):
         response["Content-Disposition"] = f'attachment; filename="especificacao_{obra.id}.pdf"'
         return response
 
-
     @action(detail=True, methods=['post'], url_path='finalizar')
     def finalizar_obra(self, request, pk=None):
         try:
@@ -161,18 +157,16 @@ class ObraViewSet(viewsets.ModelViewSet):
 
             if obra.status != 'NAO_FINALIZADO':
                 return Response(
-                    {'error': f'A obra com status "{obra.status}" não pode ser movida para "Em Análise".'},
+                    {'error': f'A obra com status "{obra.status}" não pode ser finalizada.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
             obra.status = 'EM_ANALISE'
             obra.save(update_fields=['status'])
-
-            serializer = self.get_serializer(obra)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(self.get_serializer(obra).data)
 
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': str(e)}, status=500)
 
     @action(detail=True, methods=['post'], url_path='duplicar')
     def duplicar(self, request, pk=None):
@@ -182,10 +176,7 @@ class ObraViewSet(viewsets.ModelViewSet):
             nome_original = original_obra.nome
             match = re.search(r' (\d+\.\d+)$', nome_original)
 
-            if match:
-                nome_base = nome_original[:match.start()].strip()
-            else:
-                nome_base = nome_original.strip()
+            nome_base = nome_original[:match.start()].strip() if match else nome_original.strip()
 
             obras_relacionadas = Obra.objects.filter(nome__startswith=nome_base)
             maior_versao = 0.0
@@ -210,16 +201,12 @@ class ObraViewSet(viewsets.ModelViewSet):
             )
 
             for ambiente in original_obra.ambientes.all():
-                self._duplicar_ambiente_e_filhos(
-                    ambiente_original=ambiente,
-                    nova_obra=nova_obra
-                )
+                self._duplicar_ambiente_e_filhos(ambiente, nova_obra)
 
-            serializer = self.get_serializer(nova_obra)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(self.get_serializer(nova_obra).data, status=201)
 
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': str(e)}, status=500)
 
     def _duplicar_ambiente_e_filhos(self, ambiente_original, nova_obra):
         novo_ambiente = Ambiente.objects.create(
@@ -229,16 +216,14 @@ class ObraViewSet(viewsets.ModelViewSet):
         )
 
         for item in ambiente_original.itens.all():
-            novo_item = Item.objects.create(
-                nome=item.nome
-            )
+            novo_item = Item.objects.create(nome=item.nome)
             novo_item.descricoes.set(item.descricoes.all())
             novo_ambiente.itens.add(novo_item)
 
             for material in item.materiais.all():
                 novo_material = Material.objects.create(
                     item=novo_item,
-                    descricao=material.descricao,
+                    descricao=material.descricao
                 )
                 novo_material.marcas.set(material.marcas.all())
 
@@ -256,8 +241,7 @@ class AmbienteViewSet(viewsets.ModelViewSet):
         qs = Ambiente.objects.filter(tipo="PRIVATIVO")
         if obra_id:
             qs = qs.filter(obra_id=obra_id)
-        serializer = AmbienteSerializer(qs, many=True)
-        return Response(serializer.data)
+        return Response(AmbienteSerializer(qs, many=True).data)
 
     @action(detail=False, methods=['get'], url_path='area-comum')
     def ambientes_area_comum(self, request):
@@ -265,8 +249,7 @@ class AmbienteViewSet(viewsets.ModelViewSet):
         qs = Ambiente.objects.filter(tipo="COMUM")
         if obra_id:
             qs = qs.filter(obra_id=obra_id)
-        serializer = AmbienteSerializer(qs, many=True)
-        return Response(serializer.data)
+        return Response(AmbienteSerializer(qs, many=True).data)
 
 
 class ItemViewSet(viewsets.ModelViewSet):
@@ -307,45 +290,38 @@ class PerfilView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        serializer = UsuarioSerializer(request.user)
-        return Response(serializer.data)
+        return Response(UsuarioSerializer(request.user).data)
 
     def patch(self, request):
-        user = request.user
-        serializer = UsuarioUpdateSerializer(user, data=request.data, partial=True)
+        serializer = UsuarioUpdateSerializer(request.user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response({
                 "success": True,
-                "message": "Perfil atualizado com sucesso!",
+                "message": "Perfil atualizado!",
                 "user": serializer.data
             })
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=400)
 
 
 class AmbientesPrivativosListCreateView(generics.ListCreateAPIView):
     serializer_class = AmbienteSerializer
 
     def get_queryset(self):
-        return Ambiente.objects.filter(
-            tipo_ambiente="privativo"
-        )
+        return Ambiente.objects.filter(tipo="PRIVATIVO")
 
     def perform_create(self, serializer):
-        serializer.save(tipo_ambiente="privativo")
+        serializer.save(tipo="PRIVATIVO")
 
 
 class AmbientesAreaComumListCreateView(generics.ListCreateAPIView):
     serializer_class = AmbienteSerializer
 
     def get_queryset(self):
-        return Ambiente.objects.filter(
-            tipo_ambiente="comum"
-        )
+        return Ambiente.objects.filter(tipo="COMUM")
 
     def perform_create(self, serializer):
-        serializer.save(tipo_ambiente="comum")
-
+        serializer.save(tipo="COMUM")
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -354,20 +330,20 @@ def alterar_senha(request):
     nova_senha = request.data.get("nova_senha")
 
     if not senha_atual or not nova_senha:
-        return Response({"detail": "Campos obrigatórios não enviados."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "Campos obrigatórios ausentes."}, status=400)
 
     user = request.user
 
     if not user.check_password(senha_atual):
-        return Response({"detail": "Senha atual incorreta."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "Senha atual incorreta."}, status=400)
 
     if len(nova_senha) < 6:
-        return Response({"detail": "A nova senha deve ter pelo menos 6 caracteres."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "A nova senha deve ter ao menos 6 caracteres."}, status=400)
 
     user.set_password(nova_senha)
     user.save()
 
-    return Response({"detail": "Senha alterada com sucesso!"}, status=status.HTTP_200_OK)
+    return Response({"detail": "Senha alterada com sucesso!"})
 
 
 @api_view(["GET"])

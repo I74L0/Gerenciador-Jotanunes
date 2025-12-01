@@ -1,151 +1,233 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Especificação Técnica - {{ obra.nome }}</title>
+    <meta charset="UTF-8">
+    <title>Especificação do Projeto - {{ obra.nome }}</title>
 
-  <style>
-    @page { size: A4; margin: 28mm 20mm; }
-    body { font-family: "Arial", "Helvetica", sans-serif; color:#222; margin:0; }
-    .page { width: 100%; box-sizing: border-box; }
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
 
-    header { position: relative; margin-bottom: 18px; text-align: center; }
-    .logo-top { position: absolute; right: 0; top: 0; width: 120px; }
-    h1.title { font-size: 13px; letter-spacing: 1px; margin: 6px 0 16px 0; font-weight:700; }
+        .logo {
+            width: 180px;
+            margin-bottom: 20px;
+        }
 
-    .meta { font-size: 12px; line-height: 1.45; max-width: 640px; margin: 0 auto 8px auto; text-align:left; }
+        h1, h2, h3 {
+            color: #333;
+            margin-top: 30px;
+        }
 
-    .section-title { font-weight: 700; margin-top: 16px; font-size: 13px; }
-    .subsection { margin-top: 8px; font-size: 12px; font-weight:600; }
-    p.lead { font-size: 12px; line-height: 1.45; max-width:640px; margin:6px auto 12px auto; text-align:left; }
+        .section-title {
+            background: #f1f1f1;
+            padding: 8px 12px;
+            border-left: 4px solid #c00000;
+            font-size: 20px;
+            margin-top: 40px;
+        }
 
-    table.spec {
-      width: 640px;
-      max-width: 100%;
-      margin: 8px auto 14px auto;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
-    table.spec th, table.spec td {
-      border: 1px solid #aaa;
-      padding: 6px 8px;
-      vertical-align: top;
-    }
-    table.spec th { background: #f5f5f5; font-weight:700; text-align: left; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            margin-bottom: 25px;
+        }
 
-    .note { font-size: 11px; color:#444; max-width:640px; margin:8px auto; text-align:left; }
-    footer { text-align:center; margin-top:26px; }
-    footer img { width: 140px; }
+        table, th, td {
+            border: 1px solid #999;
+        }
 
-    .avoid-break { page-break-inside: avoid; }
-  </style>
+        th {
+            background: #e9e9e9;
+            padding: 6px;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        td {
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .footer-logo {
+            width: 140px;
+            margin-top: 30px;
+        }
+
+        .observacoes {
+            margin-top: 30px;
+            padding: 15px;
+            background: #fafafa;
+            border-left: 4px solid #c00000;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-  <div class="page">
-    <header>
-      <img src="{{ logo_url }}" alt="logo" class="logo-top">
-      <h1 class="title">ESPECIFICAÇÃO TÉCNICA</h1>
 
-      <div class="meta">
-        <p><strong>Empreendimento:</strong> {{ obra.nome }}</p>
-        <p><strong>Localização:</strong> {{ localizacao }}</p>
-      </div>
+    <img src="{{ logo_url }}" class="logo" alt="Logo">
 
-      <p class="lead">
-        <strong>Descrição do empreendimento:</strong>
-        {{ obra.texto_prefacio|default:"Descrição não informada." }}
-      </p>
-    </header>
+    <h1>Especificação do Projeto</h1>
 
-    <div class="section">
-      <div class="section-title">1. UNIDADES PRIVATIVAS</div>
+    <p><strong>Nome da Obra:</strong> {{ obra.nome }}</p>
+    <p><strong>Localização:</strong> {{ localizacao }}</p>
+
+    {% if obra.endereco_completo %}
+    <p><strong>Endereço:</strong> {{ obra.endereco_completo }}</p>
+    {% endif %}
+
+    {% if obra.texto_prefacio %}
+    <div class="observacoes">
+        <strong>Prefácio:</strong><br>
+        {{ obra.texto_prefacio|linebreaks }}
     </div>
+    {% endif %}
 
-    {% for ambiente in ambientes %}
-      <div class="avoid-break">
-        <div class="subsection">{{ forloop.counter }}. {{ ambiente.nome }}</div>
+    <h2 class="section-title">1. UNIDADES PRIVATIVAS</h2>
 
-        <table class="spec">
-          <thead>
-            <tr><th style="width:28%;">Item</th><th>Descrição</th></tr>
-          </thead>
-          <tbody>
+    {% if ambientes_privativos %}
+        {% for ambiente in ambientes_privativos %}
+            <h3>{{ ambiente.nome }}</h3>
 
-            {% for item in ambiente.itens.all %}
-              <tr>
-                <td>{{ item.nome }}</td>
-                <td>
-                  {% for d in item.descricoes.all %}
-                    {{ d.detalhe }}{% if not forloop.last %}<br>{% endif %}
-                  {% empty %}
-                    —
-                  {% endfor %}
-                </td>
-              </tr>
-            {% empty %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Descrição</th>
+                        <th>Materiais</th>
+                        <th>Marcas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in ambiente.itens.all %}
+                        <tr>
+                            <td>{{ item.nome }}</td>
+                            <td>
+                                {% for desc in item.descricoes.all %}
+                                    • {{ desc.detalhe }}<br>
+                                {% empty %}
+                                    —
+                                {% endfor %}
+                            </td>
 
-              {% if "sala" in ambiente.nome|lower %}
-                <tr><td>Piso</td><td>Porcelanato ou laminado</td></tr>
-                <tr><td>Parede</td><td>Pintura PVA látex branco sobre gesso.</td></tr>
-                <tr><td>Teto</td><td>Pintura PVA branco.</td></tr>
-                <tr><td>Rodapé</td><td>Porcelanato ou Laminado, h=5cm</td></tr>
-                <tr><td>Soleira</td><td>Mármore ou granito.</td></tr>
-                <tr><td>Peitoril</td><td>Metálico</td></tr>
-                <tr><td>Esquadria</td><td>Alumínio branco</td></tr>
-                <tr><td>Vidro</td><td>Liso incolor.</td></tr>
-                <tr><td>Porta</td><td>Semi–ôca com esmalte sintético.</td></tr>
-                <tr><td>Ferragem</td><td>Cromado.</td></tr>
-                <tr><td>Inst. Elétrica</td><td>Pontos de luz e tomadas</td></tr>
-                <tr><td>Inst. Comunic.</td><td>Ponto de TV e comunicação.</td></tr>
+                            <td>
+                                {% for mat in item.materiais.all %}
+                                    • {{ mat.descricao }}<br>
+                                {% empty %}
+                                    —
+                                {% endfor %}
+                            </td>
 
-              {% elif "circulação" in ambiente.nome|lower %}
-                <tr><td>Piso</td><td>Porcelanato ou laminado</td></tr>
-                <tr><td>Parede</td><td>Pintura PVA branco.</td></tr>
-                <tr><td>Teto</td><td>Pintura PVA branco.</td></tr>
-                <tr><td>Rodapé</td><td>Porcelanato ou Laminado</td></tr>
-                <tr><td>Inst. Elétrica</td><td>Pontos de luz e interruptores</td></tr>
+                            <td>
+                                {% for mat in item.materiais.all %}
+                                    {% for mc in mat.marcas.all %}
+                                        • {{ mc.nome }}<br>
+                                    {% endfor %}
+                                {% empty %}
+                                    —
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+    {% else %}
+        <p>Nenhum ambiente privativo cadastrado.</p>
+    {% endif %}
 
-              {% else %}
-                <tr><td colspan="2" style="color:#666;">Nenhum item cadastrado para este ambiente.</td></tr>
-              {% endif %}
+    <h2 class="section-title">2. ÁREA COMUM</h2>
 
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% endfor %}
+    {% if ambientes_comuns %}
+        {% for ambiente in ambientes_comuns %}
+            <h3>{{ ambiente.nome }}</h3>
 
-    <div class="section">
-      <h3 class="subsection">ÁREA COMUM / Descritivo</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Descrição</th>
+                        <th>Materiais</th>
+                        <th>Marcas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in ambiente.itens.all %}
+                        <tr>
+                            <td>{{ item.nome }}</td>
+                            <td>
+                                {% for desc in item.descricoes.all %}
+                                    • {{ desc.detalhe }}<br>
+                                {% empty %}
+                                    —
+                                {% endfor %}
+                            </td>
 
-      <table class="spec">
-        <thead><tr><th style="width:28%;">Material</th><th>Marcas</th></tr></thead>
+                            <td>
+                                {% for mat in item.materiais.all %}
+                                    • {{ mat.descricao }}<br>
+                                {% empty %}
+                                    —
+                                {% endfor %}
+                            </td>
+
+                            <td>
+                                {% for mat in item.materiais.all %}
+                                    {% for mc in mat.marcas.all %}
+                                        • {{ mc.nome }}<br>
+                                    {% endfor %}
+                                {% empty %}
+                                    —
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+    {% else %}
+        <p>Nenhum ambiente de área comum cadastrado.</p>
+    {% endif %}
+
+    <h2 class="section-title">3. MATERIAIS E MARCAS (GERAL)</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Material</th>
+                <th>Marcas</th>
+            </tr>
+        </thead>
         <tbody>
-          {% if marcas_list %}
             {% for m in marcas_list %}
-              <tr><td>{{ m.material }}</td><td>{{ m.marcas|join:", " }}</td></tr>
+            <tr>
+                <td>{{ m.material }}</td>
+                <td>
+                    {% for marca in m.marcas %}
+                        • {{ marca }}<br>
+                    {% empty %}
+                        —
+                    {% endfor %}
+                </td>
+            </tr>
+            {% empty %}
+                <tr><td colspan="2">Nenhum material encontrado.</td></tr>
             {% endfor %}
-          {% else %}
-            <tr><td>Cerâmica</td><td>Incepa, Portobello, Pointer...</td></tr>
-            <tr><td>Porcelanato</td><td>Portobello, Arielle, Ceusa...</td></tr>
-            <tr><td>Laminado</td><td>Eucatex, Durafloor...</td></tr>
-            <tr><td>Esquadria</td><td>Esaf, Alumasa, Unicasa...</td></tr>
-            <tr><td>Ferragem</td><td>Silvana, Stam, Soprano...</td></tr>
-            <tr><td>Inst. Elétrica</td><td>Alumbra, Steck...</td></tr>
-            <tr><td>Louças</td><td>Deca, Celite...</td></tr>
-          {% endif %}
         </tbody>
-      </table>
+    </table>
 
-      <p class="note">
-        Observações Gerais: {{ observacoes|default:"Nenhuma observação adicional." }}
-      </p>
+
+    {% if observacoes %}
+    <div class="observacoes">
+        <strong>Observações Finais:</strong><br>
+        {{ observacoes|linebreaks }}
     </div>
+    {% endif %}
 
-    <footer>
-      <img src="{{ logo_footer_url }}" alt="footer">
-    </footer>
-  </div>
+    <br><br>
+    <img src="{{ logo_footer_url }}" class="footer-logo" alt="Logo Rodapé">
+
 </body>
 </html>
