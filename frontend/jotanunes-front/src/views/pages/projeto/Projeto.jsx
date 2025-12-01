@@ -87,31 +87,45 @@ const Projeto = () => {
   }, [])
 
   useEffect(() => {
+    const normalizeAmbientes = (rawAmbientes = []) => {
+      return rawAmbientes.map((a, index) => ({
+        ...a,
+        id: a.id || `${index + 1}.`,
+        nome: a.nome || '',
+        tipo: (a.tipo || '').toUpperCase(),
+        items: Array.isArray(a.items) ? a.items : Array.isArray(a.itens) ? a.itens : [],
+        editando: !!a.editando,
+        aberto: typeof a.aberto === 'boolean' ? a.aberto : false,
+      }))
+    }
+
     const carregarDadosDoProjeto = async () => {
       setIsLoading(true)
       try {
-        const token = localStorage.getItem("accessToken")
+        const token = localStorage.getItem('accessToken')
 
-        const permissaoRes = await fetch("http://localhost:8000/api/me/", {
+        const permissaoRes = await fetch('http://localhost:8000/api/me/', {
           headers: {
-            Authorization: "Bearer " + token,
+            Authorization: 'Bearer ' + token,
           },
         })
 
-        if (!permissaoRes.ok) throw new Error("Erro ao buscar permissões")
-        
+        if (!permissaoRes.ok) throw new Error('Erro ao buscar permissões')
+
         const dadosPermissoes = await permissaoRes.json()
         setPermissoes({
           is_superuser: dadosPermissoes.is_superuser,
           is_gestor: dadosPermissoes.is_gestor,
           is_criador: dadosPermissoes.is_criador,
         })
+
         if (id) {
           const [obraRes, ambientesRes] = await Promise.all([
             obras.retrieve(id),
             ambientes.list(id),
           ])
           const dadosObra = obraRes.data
+          console.log('Dados da obra carregados:', dadosObra)
 
           setPrefacioData({
             nome: dadosObra.nome || '',
@@ -120,9 +134,15 @@ const Projeto = () => {
             texto: dadosObra.texto_prefacio || '',
           })
 
-          const todosAmbientes = ambientesRes.data || []
-          setUnidadesData(todosAmbientes.filter((a) => a.tipo === 'UNIDADE'))
-          setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'AREA_COMUM'))
+          const rawAmbientes =
+            (ambientesRes && (ambientesRes.data || ambientesRes.results || [])) || []
+          const todosAmbientes = normalizeAmbientes(rawAmbientes)
+          console.log('todosAmbientes (normalizados):', todosAmbientes)
+
+          setUnidadesData(
+            todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO'),
+          )
+          setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'COMUM'))
           setMaterialData(dadosObra.materiais || [])
           setObservacoesData(dadosObra.observacao_final || '')
         } else if (referenciaId) {
@@ -139,20 +159,36 @@ const Projeto = () => {
             texto: dadosRef.texto_prefacio || '',
           })
 
-          const todosAmbientes = ambientesRes.data || []
-          setUnidadesData(todosAmbientes.filter((a) => a.tipo === 'UNIDADE'))
-          setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'AREA_COMUM'))
+          const rawAmbientes =
+            (ambientesRes && (ambientesRes.data || ambientesRes.results || [])) || []
+          const todosAmbientes = normalizeAmbientes(rawAmbientes)
+          console.log('todosAmbientes (normalizados) - referencia:', todosAmbientes)
+
+          setUnidadesData(
+            todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO'),
+          )
+          setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'COMUM'))
           setMaterialData(dadosRef.materiais || [])
           setObservacoesData(dadosRef.observacao_final || '')
         } else {
           const templateData = await getTemplate()
-          setPrefacioData(
-            templateData.prefacioData || { nome: '', estado: '', cidade: '', texto: '' },
-          )
-          setUnidadesData(templateData.unidadesData || [])
-          setAreacomumData(templateData.areacomumData || [])
-          setMaterialData(templateData.materialData || [])
+          const pref = templateData.prefacioData || { nome: '', estado: '', cidade: '', texto: '' }
+          setPrefacioData(pref)
+
+          const unidadesRaw = templateData.unidadesData || []
+          const areacomumRaw = templateData.areacomumData || []
+          const materialRaw = templateData.materialData || []
           const obsTemplate = templateData.observacoesData && templateData.observacoesData[0]
+
+          const unidadesNorm = normalizeAmbientes(unidadesRaw)
+          const areacomumNorm = normalizeAmbientes(areacomumRaw)
+
+          console.log('template unidades normalizadas:', unidadesNorm)
+          console.log('template area comum normalizada:', areacomumNorm)
+
+          setUnidadesData(unidadesNorm)
+          setAreacomumData(areacomumNorm)
+          setMaterialData(materialRaw || [])
           setObservacoesData({ observacao_final: obsTemplate ? obsTemplate.observacao : '' })
         }
       } catch (error) {
@@ -164,7 +200,7 @@ const Projeto = () => {
     }
 
     carregarDadosDoProjeto()
-  }, [id, referenciaId])
+  }, [id, referenciaId])  
 
   const validarEstadoCidade = () => {
     if (
