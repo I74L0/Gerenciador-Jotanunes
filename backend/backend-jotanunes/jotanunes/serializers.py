@@ -8,11 +8,6 @@ from .models import (
 
 User = get_user_model()
 
-
-# ===========================================================
-# USUÁRIOS
-# ===========================================================
-
 class UsuarioSerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField()
 
@@ -79,10 +74,6 @@ class UsuarioUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
-# ===========================================================
-# ESTADO & CIDADE
-# ===========================================================
-
 class EstadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Estado
@@ -97,10 +88,6 @@ class CidadeSerializer(serializers.ModelSerializer):
         fields = ["nome", "estado"]
 
 
-# ===========================================================
-# MARCA
-# ===========================================================
-
 class MarcaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Marca
@@ -113,25 +100,14 @@ class MarcaSerializer(serializers.ModelSerializer):
         return super().to_internal_value(data)
 
 
-# ===========================================================
-# DESCRIÇÃO
-# ===========================================================
-
 class DescricaoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Descricao
         fields = ["detalhe"]
 
 
-# ===========================================================
-# MATERIAL
-# ===========================================================
-
 class MaterialSerializer(serializers.ModelSerializer):
-    marcas = serializers.ListField(
-        child=serializers.CharField(),
-    )
-
+    marcas = serializers.ListField(child=serializers.CharField())
     item = serializers.CharField()
 
     class Meta:
@@ -142,9 +118,7 @@ class MaterialSerializer(serializers.ModelSerializer):
         marcas = validated_data.pop("marcas", [])
         item_nome = validated_data.pop("item")
 
-        # cria item caso não exista
         item, _ = Item.objects.get_or_create(nome=item_nome)
-
         material = Material.objects.create(item=item, **validated_data)
 
         for marca_nome in marcas:
@@ -153,16 +127,8 @@ class MaterialSerializer(serializers.ModelSerializer):
 
         return material
 
-
-# ===========================================================
-# ITEM
-# ===========================================================
-
 class ItemSerializer(serializers.ModelSerializer):
-    descricoes = serializers.ListField(
-        child=serializers.CharField(),
-        write_only=True
-    )
+    descricoes = serializers.ListField(child=serializers.CharField(), write_only=True)
 
     class Meta:
         model = Item
@@ -178,10 +144,6 @@ class ItemSerializer(serializers.ModelSerializer):
 
         return item
 
-
-# ===========================================================
-# AMBIENTE
-# ===========================================================
 
 class AmbienteSerializer(serializers.ModelSerializer):
     itens = ItemSerializer(many=True)
@@ -200,14 +162,9 @@ class AmbienteSerializer(serializers.ModelSerializer):
 
         return ambiente
 
-
-# ===========================================================
-# OBRA
-# ===========================================================
-
 class ObraSerializer(serializers.ModelSerializer):
-    cidade = serializers.CharField()
-    estado = serializers.CharField()
+    cidade = serializers.CharField(required=False)
+    estado = serializers.CharField(required=False)
 
     ambientes = AmbienteSerializer(many=True, required=False)
     materiais = MaterialSerializer(many=True, required=False)
@@ -226,46 +183,30 @@ class ObraSerializer(serializers.ModelSerializer):
             "ambientes",
             "materiais",
         ]
-
-    # ---------------------------------------------
-    # 🔍 RESOLVE ESTADO (UF ou Nome)
-    # ---------------------------------------------
-    def _resolve_estado(self, estado_input):
-        if not estado_input:
+    def _resolve_estado(self, value):
+        if not value:
             return None
 
-        # Tenta pela UF (ex: "SE")
-        estado = Estado.objects.filter(uf__iexact=estado_input).first()
-
-        # Tenta pelo nome (ex: "Sergipe")
-        if not estado:
-            estado = Estado.objects.filter(nome__iexact=estado_input).first()
+        estado = (
+            Estado.objects.filter(uf__iexact=value).first()
+            or Estado.objects.filter(nome__iexact=value).first()
+        )
 
         if not estado:
             raise serializers.ValidationError({"estado": "Estado não encontrado."})
 
         return estado
 
-    # ---------------------------------------------
-    # 🔍 RESOLVE CIDADE (pelo nome + estado)
-    # ---------------------------------------------
-    def _resolve_cidade(self, cidade_input, estado_obj):
-        if not cidade_input:
+    def _resolve_cidade(self, nome, estado):
+        if not nome:
             return None
 
-        cidade = Cidade.objects.filter(
-            nome__iexact=cidade_input,
-            estado=estado_obj
-        ).first()
-
+        cidade = Cidade.objects.filter(nome__iexact=nome, estado=estado).first()
         if not cidade:
             raise serializers.ValidationError({"cidade": "Cidade não encontrada para esse estado."})
 
         return cidade
 
-    # ---------------------------------------------
-    # 🟢 CREATE
-    # ---------------------------------------------
     def create(self, validated_data):
         ambientes_data = validated_data.pop("ambientes", [])
         materiais_data = validated_data.pop("materiais", [])
@@ -273,18 +214,15 @@ class ObraSerializer(serializers.ModelSerializer):
         estado_input = validated_data.pop("estado")
         cidade_input = validated_data.pop("cidade")
 
-        # resolve UF/Nome para objeto
         estado_obj = self._resolve_estado(estado_input)
         cidade_obj = self._resolve_cidade(cidade_input, estado_obj)
 
-        # cria obra
         obra = Obra.objects.create(
             estado=estado_obj,
             cidade=cidade_obj,
             **validated_data
         )
 
-        # cria ambientes e itens
         for ambiente_data in ambientes_data:
             itens_data = ambiente_data.pop("itens", [])
             ambiente = Ambiente.objects.create(obra=obra, **ambiente_data)
@@ -293,53 +231,37 @@ class ObraSerializer(serializers.ModelSerializer):
                 item = ItemSerializer().create(item_data)
                 ambiente.itens.add(item)
 
-        # cria materiais globais
         for material_data in materiais_data:
             MaterialSerializer().create(material_data)
 
         return obra
-
-    # ---------------------------------------------
-    # 🟡 UPDATE
-    # ---------------------------------------------
     def update(self, instance, validated_data):
-        estado_input = validated_data.pop("estado", None)
-        cidade_input = validated_data.pop("cidade", None)
-        ambientes_data = validated_data.pop("ambientes", None)
 
-        # estado
-        if estado_input:
+        if "estado" in validated_data:
+            estado_input = validated_data.pop("estado")
             instance.estado = self._resolve_estado(estado_input)
 
-        # cidade
-        if cidade_input:
+        if "cidade" in validated_data:
+            cidade_input = validated_data.pop("cidade")
             instance.cidade = self._resolve_cidade(cidade_input, instance.estado)
 
-        # campos normais
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
         instance.save()
 
-        # ambientes
+        ambientes_data = validated_data.get("ambientes", None)
         if ambientes_data is not None:
             instance.ambientes.all().delete()
-
             for ambiente_data in ambientes_data:
                 itens_data = ambiente_data.pop("itens", [])
                 ambiente = Ambiente.objects.create(obra=instance, **ambiente_data)
-
                 for item_data in itens_data:
                     item = ItemSerializer().create(item_data)
                     ambiente.itens.add(item)
 
         return instance
-
-    # ---------------------------------------------
-    # 🖼 REPRESENTAÇÃO FINAL
-    # ---------------------------------------------
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data["ambientes"] = AmbienteSerializer(instance.ambientes.all(), many=True).data
         return data
-
