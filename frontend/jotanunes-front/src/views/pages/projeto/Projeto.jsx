@@ -51,7 +51,7 @@ const Projeto = () => {
   const [unidadesData, setUnidadesData] = useState([])
   const [areacomumData, setAreacomumData] = useState([])
   const [materialData, setMaterialData] = useState([])
-  const [observacoesData, setObservacoesData] = useState({ observacoes: '' })
+  const [observacoesData, setObservacoesData] = useState({ observacao_final: '' })
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
@@ -124,7 +124,7 @@ const Projeto = () => {
           setUnidadesData(todosAmbientes.filter((a) => a.tipo === 'UNIDADE'))
           setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'AREA_COMUM'))
           setMaterialData(dadosObra.materiais || [])
-          setObservacoesData(dadosObra.observacoes || '')
+          setObservacoesData(dadosObra.observacao_final || '')
         } else if (referenciaId) {
           const [obraRes, ambientesRes] = await Promise.all([
             obras.retrieve(referenciaId),
@@ -143,7 +143,7 @@ const Projeto = () => {
           setUnidadesData(todosAmbientes.filter((a) => a.tipo === 'UNIDADE'))
           setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'AREA_COMUM'))
           setMaterialData(dadosRef.materiais || [])
-          setObservacoesData(dadosRef.observacoes || '')
+          setObservacoesData(dadosRef.observacao_final || '')
         } else {
           const templateData = await getTemplate()
           setPrefacioData(
@@ -153,7 +153,7 @@ const Projeto = () => {
           setAreacomumData(templateData.areacomumData || [])
           setMaterialData(templateData.materialData || [])
           const obsTemplate = templateData.observacoesData && templateData.observacoesData[0]
-          setObservacoesData({ observacoes: obsTemplate ? obsTemplate.observacao : '' })
+          setObservacoesData({ observacao_final: obsTemplate ? obsTemplate.observacao : '' })
         }
       } catch (error) {
         console.error('Falha ao carregar dados do projeto:', error)
@@ -217,7 +217,7 @@ const Projeto = () => {
       estado: prefacioData.estado,
       cidade: prefacioData.cidade,
       texto_prefacio: prefacioData.texto,
-      observacoes: observacoesData.observacoes,
+      observacao_final: observacoesData.observacao_final,
       status: 'NAO_FINALIZADO',
       ambientes: ambientes
     }
@@ -265,7 +265,7 @@ const Projeto = () => {
       estado: prefacioData.estado,
       cidade: prefacioData.cidade,
       texto_prefacio: prefacioData.texto,
-      observacoes: observacoesData.observacoes,
+      observacao_final: observacoesData.observacao_final,
       status: 'EM_ANALISE',
       ambientes: ambientes
     }
@@ -380,7 +380,7 @@ const Projeto = () => {
           <CardMateriais materiais={materialData} setMateriais={setMaterialData} />
         )}
         {activeTab === 4 && (
-          <CardObservacoes observacoes={observacoesData} setObservacoes={setObservacoesData} />
+          <CardObservacoes observacao_final={observacoesData} setObservacoes={setObservacoesData} />
         )}
       </section>
     </div>
