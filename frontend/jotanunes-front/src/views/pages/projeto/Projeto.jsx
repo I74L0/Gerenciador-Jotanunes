@@ -138,10 +138,17 @@ const Projeto = () => {
           const todosAmbientes = normalizeAmbientes(rawAmbientes)
           console.log('todosAmbientes (normalizados):', todosAmbientes)
 
-          setUnidadesData(
-            todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO'),
+          console.log(
+            'dados.ambientes privativo',
+            dadosObra.ambientes.filter((a) => a.tipo === 'PRIVATIVO'),
           )
-          setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'COMUM'))
+          console.log(
+            'dados.ambientes COMUM',
+            dadosObra.ambientes.filter((a) => a.tipo === 'COMUM'),
+          )
+          
+          setUnidadesData(dadosObra.ambientes.filter((a) => a.tipo === 'PRIVATIVO'))
+          setAreacomumData(dadosObra.ambientes.filter((a) => a.tipo === 'COMUM'))
           setMaterialData(dadosObra.materiais || [])
           setObservacoesData(dadosObra.observacao_final || '')
         } else if (referenciaId) {
