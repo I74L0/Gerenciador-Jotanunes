@@ -87,15 +87,29 @@ const Projeto = () => {
 
   useEffect(() => {
     const normalizeAmbientes = (rawAmbientes = []) => {
-      return rawAmbientes.map((a, index) => ({
-        ...a,
-        id: a.id || `${index + 1}.`,
-        nome: a.nome || '',
-        tipo: (a.tipo || '').toUpperCase(),
-        itens: Array.isArray(a.itens) ? a.itens : Array.isArray(a.itens) ? a.itens : [],
-        editando: !!a.editando,
-        aberto: typeof a.aberto === 'boolean' ? a.aberto : false,
-      }))
+      return rawAmbientes.map((a, index) => {
+        const itensRaw = Array.isArray(a.itens) ? a.itens : []
+        const itens = itensRaw.map((it) => {
+          if (!it) return { item: '', descricao: '', status: false }
+          const nome = it.nome ?? it.item ?? it.name ?? ''
+          const descricoesArr = Array.isArray(it.descricoes)
+            ? it.descricoes
+            : Array.isArray(it.descricao)
+              ? it.descricao
+              : []
+          const descricao = descricoesArr.join('; ')
+          return { item: nome, descricao, status: false }
+        })
+        return {
+          ...a,
+          id: a.id ?? `${index + 1}`,
+          nome: a.nome ?? a.name ?? '',
+          tipo: (a.tipo ?? '').toUpperCase(),
+          itens,
+          editando: !!a.editando,
+          aberto: typeof a.aberto === 'boolean' ? a.aberto : false,
+        }
+      })
     }
 
     const carregarDadosDoProjeto = async () => {
@@ -146,9 +160,10 @@ const Projeto = () => {
             'dados.ambientes COMUM',
             dadosObra.ambientes.filter((a) => a.tipo === 'COMUM'),
           )
-          
-          setUnidadesData(dadosObra.ambientes.filter((a) => a.tipo === 'PRIVATIVO'))
-          setAreacomumData(dadosObra.ambientes.filter((a) => a.tipo === 'COMUM'))
+
+          // usa os ambientes normalizados
+          setUnidadesData(todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO'))
+          setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'COMUM'))
           setMaterialData(dadosObra.materiais || [])
           setObservacoesData(dadosObra.observacao_final || '')
         } else if (referenciaId) {
@@ -225,13 +240,6 @@ const Projeto = () => {
   const getMappedAmbientes = () => {
 
     console.log("unidadesData:", unidadesData)
-
-    const mappedItens = unidadesData.map((unidade) => ({
-      nome: unidade.nome,
-      itens: `unidade:, ${unidade}`
-    }))
-
-    console.log("mappedItens:", mappedItens)
 
     const MapUnidades = unidadesData.map((unidade) => ({
       nome: unidade.nome,
