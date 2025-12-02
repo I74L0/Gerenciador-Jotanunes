@@ -165,7 +165,7 @@ const Projeto = () => {
           setUnidadesData(todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO'))
           setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'COMUM'))
           setMaterialData(dadosObra.materiais || [])
-          setObservacoesData(dadosObra.observacao_final || '')
+          setObservacoesData({ observacao_final: dadosObra.observacao_final || '' })
         } else if (referenciaId) {
           const [obraRes, ambientesRes] = await Promise.all([
             obras.retrieve(referenciaId),
@@ -190,7 +190,7 @@ const Projeto = () => {
           )
           setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'COMUM'))
           setMaterialData(dadosRef.materiais || [])
-          setObservacoesData(dadosRef.observacao_final || '')
+          setObservacoesData({ observacao_final: dadosRef.observacao_final || '' })
         } else {
           const templateData = await getTemplate()
           const pref = templateData.prefacioData || { nome: '', estado: '', cidade: '', texto: '' }
