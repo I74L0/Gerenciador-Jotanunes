@@ -111,7 +111,7 @@ export default function CardUnidades({ ambientes, setAmbientes, showStatus: pare
       nome: `Novo Ambiente ${ambientes.length + 1}`,
       editando: true,
       aberto: true,
-      items: [],
+      itens: [],
     }
     setAmbientes([...ambientes, novo])
   }
@@ -150,15 +150,15 @@ export default function CardUnidades({ ambientes, setAmbientes, showStatus: pare
 
   const adicionarLinha = (idx) => {
     const novos = [...ambientes]
-    if (!novos[idx].items) novos[idx].items = []
-    novos[idx].items.push({ item: '', descricao: '', status: false })
+    if (!novos[idx].itens) novos[idx].itens = []
+    novos[idx].itens.push({ item: '', descricao: '', status: false })
     setAmbientes(novos)
   }
 
   const atualizarLinha = (idxAmb, idxLinha, campo, valor) => {
     const novos = [...ambientes]
-    if (!novos[idxAmb].items) return
-    novos[idxAmb].items[idxLinha][campo] = valor
+    if (!novos[idxAmb].itens) return
+    novos[idxAmb].itens[idxLinha][campo] = valor
     setAmbientes(novos)
   }
 
@@ -170,8 +170,8 @@ export default function CardUnidades({ ambientes, setAmbientes, showStatus: pare
     if (!confirmItem) return
     const { idxAmb, idxLinha } = confirmItem
     const novos = [...ambientes]
-    if (novos[idxAmb] && novos[idxAmb].items && novos[idxAmb].items.length > idxLinha) {
-      novos[idxAmb].items.splice(idxLinha, 1)
+    if (novos[idxAmb] && novos[idxAmb].itens && novos[idxAmb].itens.length > idxLinha) {
+      novos[idxAmb].itens.splice(idxLinha, 1)
       setAmbientes(novos)
     }
     setConfirmItem(null)
@@ -183,8 +183,8 @@ export default function CardUnidades({ ambientes, setAmbientes, showStatus: pare
 
   const toggleStatus = (idxAmb, idxItem) => {
     const novos = [...ambientes]
-    if (!novos[idxAmb].items) return
-    novos[idxAmb].items[idxItem].status = !novos[idxAmb].items[idxItem].status
+    if (!novos[idxAmb].itens) return
+    novos[idxAmb].itens[idxItem].status = !novos[idxAmb].itens[idxItem].status
     setAmbientes(novos)
   }
 
@@ -280,7 +280,7 @@ export default function CardUnidades({ ambientes, setAmbientes, showStatus: pare
                     </CTableRow>
                   </CTableHead>
                   <CTableBody>
-                    {amb.items.map((linha, i) => (
+                    {(amb.itens || []).map((linha, i) => (
                       <CTableRow key={i}>
                         <CTableDataCell>
                           <textarea

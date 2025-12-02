@@ -92,7 +92,7 @@ const Projeto = () => {
         id: a.id || `${index + 1}.`,
         nome: a.nome || '',
         tipo: (a.tipo || '').toUpperCase(),
-        items: Array.isArray(a.items) ? a.items : Array.isArray(a.itens) ? a.itens : [],
+        itens: Array.isArray(a.itens) ? a.itens : Array.isArray(a.itens) ? a.itens : [],
         editando: !!a.editando,
         aberto: typeof a.aberto === 'boolean' ? a.aberto : false,
       }))
@@ -216,15 +216,33 @@ const Projeto = () => {
   }
 
   const getMappedAmbientes = () => {
+
+    console.log("unidadesData:", unidadesData)
+
+    const mappedItens = unidadesData.map((unidade) => ({
+      nome: unidade.nome,
+      itens: `unidade:, ${unidade}`
+    }))
+
+    console.log("mappedItens:", mappedItens)
+
     const MapUnidades = unidadesData.map((unidade) => ({
       nome: unidade.nome,
-      itens: [],
+      itens: [
+        {
+          nome: 'Piso',
+          descricoes: ['Borda reta polida']
+        },
+      ],
       tipo: 'PRIVATIVO',
     }))
 
     const MapAreaComum = areacomumData.map((area) => ({
       nome: area.nome,
-      itens: [],
+      itens: [{
+        nome: "Parede",
+        descricoes: ["Acabamento fosco", "LED 4000K"]
+      }],
       tipo: 'COMUM',
     }))
 
@@ -321,7 +339,7 @@ const Projeto = () => {
         console.log('Projeto atualizado!', response.data)
         navigate('/index')
       } else {
-        response = await obras.create(dadosParaSalvar) //
+        response = await obras.create(dadosParaSalvar)
         navigate('/index')
       }
     } catch (error) {
