@@ -36,7 +36,6 @@ import CardAreaComum from './CardAreaComum'
 import CardMateriais from './CardMateriais'
 import CardObservacoes from './CardObservacoes'
 import MenuTabs from './MenuTabs'
-import avatar8 from 'src/assets/images/avatars/8.jpg'
 import 'src/views/pages/projeto/Projeto-style.scss'
 import { obras, handleLogout, ambientes, perfil, getTemplate, itens } from '../../../api'
 

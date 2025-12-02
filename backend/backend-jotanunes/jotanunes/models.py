@@ -16,7 +16,7 @@ class Estado(models.Model):
         ordering = ['nome']
 
     def __str__(self):
-        return self.nome
+        return self.uf
 
 class Cidade(models.Model):
     nome = models.CharField(max_length=100, verbose_name="Nome da Cidade")
@@ -32,7 +32,7 @@ class Cidade(models.Model):
         ordering = ['nome']
 
     def __str__(self):
-        return f"{self.nome} ({self.estado.uf})"
+        return f"{self.nome}"
 
 class Obra(models.Model):
     nome = models.CharField(max_length=255)
