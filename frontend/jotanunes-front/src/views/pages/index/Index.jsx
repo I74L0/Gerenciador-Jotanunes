@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   CButton,
@@ -10,8 +10,8 @@ import {
   CImage,
   CContainer,
   CSpinner,
-} from "@coreui/react";
-import './Index-style.css';
+} from '@coreui/react'
+import './Index-style.css'
 import { obras, handleLogout, attemptRefresh } from '../../../api'
 
 const Index = () => {
@@ -24,8 +24,10 @@ const Index = () => {
   // REFERÊNCIA
   const [selectedRefId, setSelectedRefId] = useState(null)
 
-  // FILTRO
+  // FILTROS (Status, Estado, Cidade)
   const [filtroStatus, setFiltroStatus] = useState(null)
+  const [filtroEstado, setFiltroEstado] = useState('')
+  const [filtroCidade, setFiltroCidade] = useState('')
 
   // PERFIL
   const [showProfileMenu, setShowProfileMenu] = useState(false)
@@ -34,7 +36,7 @@ const Index = () => {
 
   const [permissoes, setPermissoes] = useState(null)
 
-  // 🔍 Termo de pesquisa que agora filtra a lista principal
+  // 🔍 Termo de pesquisa (agora apenas para NOME)
   const [searchTerm, setSearchTerm] = useState('')
 
   const normalizeText = (text) =>
@@ -113,19 +115,10 @@ const Index = () => {
       try {
         setIsLoading(true)
         setError(null)
-
-        // Tenta atualizar o token antes de fazer a requisição.
-        // Se o token estiver expirado, `attemptRefresh` tentará obter um novo.
-        // `attemptRefresh` é importado do seu arquivo `auth.js`.
         await attemptRefresh()
-
         const response = await obras.list()
         setObrasLista(response.data)
       } catch (error) {
-        // Se `obras.list()` falhar (por exemplo, com 401 mesmo após o refresh
-        // ter falhado), ele cai no erro. Seu código de API (não visível)
-        // deve lidar com o 401 forçando um `handleLogout` se o `attemptRefresh`
-        // retornar `null`.
         setError('Falha ao carregar as obras. Tente novamente.')
       } finally {
         setIsLoading(false)
@@ -135,27 +128,46 @@ const Index = () => {
     carregarObras()
   }, [])
 
-  // 🔍 Agora a pesquisa filtra diretamente a lista principal
+  // --- LÓGICA PARA POPULAR OS DROPDOWNS ---
+  // Extrai lista única de estados
+  const uniqueStates = [...new Set(obrasLista.map((o) => o.estado).filter(Boolean))].sort()
+
+  // Extrai lista única de cidades (se um estado estiver selecionado, mostra apenas cidades daquele estado)
+  const uniqueCities = [
+    ...new Set(
+      obrasLista
+        .filter((o) => !filtroEstado || o.estado === filtroEstado)
+        .map((o) => o.cidade)
+        .filter(Boolean),
+    ),
+  ].sort()
+
+  // --- LÓGICA DE FILTRAGEM ATUALIZADA ---
   const filtrarObras = () => {
     const termo = normalizeText(searchTerm)
+    const estadoSelecionado = normalizeText(filtroEstado)
+    const cidadeSelecionada = normalizeText(filtroCidade)
 
     return obrasLista.filter((obra) => {
       const nome = normalizeText(obra.nome || '')
       const cidade = normalizeText(obra.cidade || '')
       const estado = normalizeText(obra.estado || '')
 
-      const matchTermo =
-        termo === "" ||
-        nome.includes(termo) ||
-        cidade.includes(termo) ||
-        estado.includes(termo);
+      // 1. Pesquisa por NOME
+      const matchTermo = termo === '' || nome.includes(termo)
 
-      const matchStatus =
-      !filtroStatus || getStatusClass(obra.status) === filtroStatus;
+      // 2. Filtro por ESTADO
+      const matchEstado = !filtroEstado || estado === estadoSelecionado
 
-      return matchTermo && matchStatus;
-    });
-  };
+      // 3. Filtro por CIDADE
+      const matchCidade = !filtroCidade || cidade === cidadeSelecionada
+
+      // 4. Filtro por STATUS (mantendo a lógica existente)
+      const matchStatus = !filtroStatus || getStatusClass(obra.status) === filtroStatus
+
+      return matchTermo && matchEstado && matchCidade && matchStatus
+    })
+  }
 
   const renderMainContent = () => {
     if (isLoading) {
@@ -174,13 +186,13 @@ const Index = () => {
         </div>
       )
     }
-    
+
     const obrasFiltradas = filtrarObras()
-    
+
     if (obrasFiltradas.length === 0) {
       return (
         <div className="d-flex justify-content-center align-items-center h-100">
-          <p>Nenhuma obra encontrada.</p>
+          <p>Nenhuma obra encontrada com os filtros atuais.</p>
         </div>
       )
     }
@@ -188,14 +200,10 @@ const Index = () => {
     return (
       <div className="containerObras">
         {obrasFiltradas
-          .filter((obra) => {
-            if (!filtroStatus) return true
-            return getStatusClass(obra.status) === filtroStatus
-          })
           .sort(
             (a, b) =>
               getStatusPriority(getStatusClass(a.status)) -
-              getStatusPriority(getStatusClass(b.status))
+              getStatusPriority(getStatusClass(b.status)),
           )
           .map((obra) => (
             <div key={obra.id} className="obraItem">
@@ -216,14 +224,14 @@ const Index = () => {
               </p>
 
               {podeCriarProjeto && (
-              <div className="selecionar-referencia_container">
-                <input
-                  className="selecionar-referencia"
-                  type="checkbox"
-                  checked={selectedRefId === obra.id}
-                  onChange={() => setSelectedRefId(selectedRefId === obra.id ? null : obra.id)}
-                />
-              </div>
+                <div className="selecionar-referencia_container">
+                  <input
+                    className="selecionar-referencia"
+                    type="checkbox"
+                    checked={selectedRefId === obra.id}
+                    onChange={() => setSelectedRefId(selectedRefId === obra.id ? null : obra.id)}
+                  />
+                </div>
               )}
               <div className="statusProjeto">
                 <div
@@ -263,13 +271,13 @@ const Index = () => {
               <button onClick={handleVerPerfil} className="profile-btn">
                 Ver Perfil
               </button>
-              {podeAdministrar &&(
+              {podeAdministrar && (
                 <button
-                onClick={() => (window.location.href = "http://127.0.0.1:8000/admin/")} 
-                className="profile-btn"
+                  onClick={() => (window.location.href = 'http://127.0.0.1:8000/admin/')}
+                  className="profile-btn"
                 >
-                Administrador
-              </button>
+                  Administrador
+                </button>
               )}
               <button onClick={handleLogout} className="profile-btn">
                 Sair
@@ -296,11 +304,11 @@ const Index = () => {
           </div>
         )}
 
-        {/* 🔍 Campo de pesquisa agora filtra direto a lista */}
+        {/* 🔍 BARRA DE PESQUISA: AGORA SÓ POR NOME */}
         <div className="barraPesquisa">
           <input
             className="form-control"
-            placeholder="Pesquisar obra, cidade ou estado"
+            placeholder="Pesquisar por nome da obra"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -335,13 +343,37 @@ const Index = () => {
       <section className="conteudoPrincipal">
         <div className="header3_conteiner">
           <span className="spanTitulo">Editor de Especificações Técnicas</span>
+
+          {/* DIV FILTROS: AGORA FUNCIONAIS */}
           <div className="filtros">
-            <CFormSelect style={{ width: '200px' }}>
-              <option>Estado</option>
+            <CFormSelect
+              style={{ width: '200px' }}
+              value={filtroEstado}
+              onChange={(e) => {
+                setFiltroEstado(e.target.value)
+                setFiltroCidade('') // Reseta cidade se mudar o estado
+              }}
+            >
+              <option value="">Todos os Estados</option>
+              {uniqueStates.map((uf, index) => (
+                <option key={index} value={uf}>
+                  {uf}
+                </option>
+              ))}
             </CFormSelect>
 
-            <CFormSelect style={{ width: '200px' }}>
-              <option>Cidade</option>
+            <CFormSelect
+              style={{ width: '200px' }}
+              value={filtroCidade}
+              onChange={(e) => setFiltroCidade(e.target.value)}
+              disabled={!uniqueCities.length && !filtroCidade} // Desabilita se não houver cidades
+            >
+              <option value="">Todas as Cidades</option>
+              {uniqueCities.map((city, index) => (
+                <option key={index} value={city}>
+                  {city}
+                </option>
+              ))}
             </CFormSelect>
           </div>
         </div>
@@ -370,6 +402,6 @@ const Index = () => {
       </div>
     </div>
   )
-};
+}
 
-export default Index;
+export default Index
