@@ -319,3 +319,4 @@ class ObraSerializer(serializers.ModelSerializer):
         data["materiais"] = MaterialSerializer(instance.materiais.all(), many=True).data
 
         return data
+
