@@ -206,7 +206,6 @@ const Projeto = () => {
           const rawAmbientes =
             (ambientesRes && (ambientesRes.data || ambientesRes.results || [])) || []
           const todosAmbientes = normalizeAmbientes(rawAmbientes)
-          console.log('todosAmbientes (normalizados) - referencia:', todosAmbientes)
 
           setUnidadesData(todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO'))
           setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'COMUM'))
@@ -238,6 +237,7 @@ const Projeto = () => {
           setObservacoesData({ observacao_final: dadosRef.observacao_final || '' })
         } else {
           const templateData = await getTemplate()
+          console.log("template:", templateData)
           const pref = templateData.prefacioData || { nome: '', estado: '', cidade: '', texto: '' }
           setPrefacioData(pref)
 
@@ -248,9 +248,6 @@ const Projeto = () => {
 
           const unidadesNorm = normalizeAmbientes(unidadesRaw)
           const areacomumNorm = normalizeAmbientes(areacomumRaw)
-
-          console.log('template unidades normalizadas:', unidadesNorm)
-          console.log('template area comum normalizada:', areacomumNorm)
 
           setUnidadesData(unidadesNorm)
           setAreacomumData(areacomumNorm)

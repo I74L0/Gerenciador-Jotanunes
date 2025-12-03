@@ -105,21 +105,23 @@ class DescricaoSerializer(serializers.ModelSerializer):
         model = Descricao
         fields = ["detalhe"]
 
+
 class ItemSerializer(serializers.ModelSerializer):
-    descricao = serializers.CharField(required=False, allow_blank=True)
+    descricoes = serializers.SlugRelatedField(
+        slug_field="detalhe",
+        queryset=Descricao.objects.all(),
+        many=True,
+        required=False
+    )
 
     class Meta:
         model = Item
-        fields = ["nome", "descricao"]
+        fields = ["nome", "descricoes"]
 
     def create(self, validated_data):
-        descricao_texto = validated_data.pop("descricao", None)
-
+        descricoes_data = validated_data.pop("descricoes", [])
         item = Item.objects.create(nome=validated_data["nome"])
-
-        if descricao_texto:
-            desc_obj, _ = Descricao.objects.get_or_create(detalhe=descricao_texto)
-            item.descricoes.add(desc_obj)
+        item.descricoes.set(descricoes_data)
 
         return item
 
