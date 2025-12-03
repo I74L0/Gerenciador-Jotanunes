@@ -150,21 +150,44 @@ const Projeto = () => {
           const rawAmbientes =
             (ambientesRes && (ambientesRes.data || ambientesRes.results || [])) || []
           const todosAmbientes = normalizeAmbientes(rawAmbientes)
-          console.log('todosAmbientes (normalizados):', todosAmbientes)
 
           console.log(
-            'dados.ambientes privativo',
-            dadosObra.ambientes.filter((a) => a.tipo === 'PRIVATIVO'),
+            'todosAmbientes privativo',
+            todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO'),
           )
           console.log(
             'dados.ambientes COMUM',
-            dadosObra.ambientes.filter((a) => a.tipo === 'COMUM'),
+            todosAmbientes.filter((a) => a.tipo === 'COMUM'),
           )
 
           // usa os ambientes normalizados
           setUnidadesData(todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO'))
           setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'COMUM'))
-          setMaterialData(dadosObra.materiais || [])
+
+          const normalizeMateriais = (rawMateriais = []) => {
+            return rawMateriais.map((m) => {
+              // 1. Pega o nome do item. Se for { nome: "..." }, pega o nome. Senão, assume que é string.
+              const nomeItem =
+                typeof m.item === 'object' && m.item !== null ? m.item.nome : m.item || ''
+
+              // 2. Pega as marcas. Se for array de objetos { nome: "..." }, extrai o nome. Senão, mantém como está.
+              const marcasArr = Array.isArray(m.marcas)
+                ? m.marcas
+                    .map((marca) =>
+                      typeof marca === 'object' && marca !== null ? marca.nome : marca,
+                    )
+                    .filter(Boolean)
+                : []
+
+              return {
+                item: nomeItem, // AGORA É STRING
+                marcas: marcasArr, // AGORA É ARRAY DE STRINGS
+              }
+            })
+          }
+          const materiaisNormalizados = normalizeMateriais(dadosObra.materiais || [])
+          console.log('Materiais normalizados:', materiaisNormalizados)
+          setMaterialData(materiaisNormalizados)
           setObservacoesData({ observacao_final: dadosObra.observacao_final || '' })
         } else if (referenciaId) {
           const [obraRes, ambientesRes] = await Promise.all([
@@ -185,11 +208,33 @@ const Projeto = () => {
           const todosAmbientes = normalizeAmbientes(rawAmbientes)
           console.log('todosAmbientes (normalizados) - referencia:', todosAmbientes)
 
-          setUnidadesData(
-            todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO'),
-          )
+          setUnidadesData(todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO'))
           setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'COMUM'))
-          setMaterialData(dadosRef.materiais || [])
+          
+          const normalizeMateriais = (rawMateriais = []) => {
+            return rawMateriais.map((m) => {
+              // 1. Pega o nome do item. Se for { nome: "..." }, pega o nome. Senão, assume que é string.
+              const nomeItem =
+                typeof m.item === 'object' && m.item !== null ? m.item.nome : m.item || ''
+
+              // 2. Pega as marcas. Se for array de objetos { nome: "..." }, extrai o nome. Senão, mantém como está.
+              const marcasArr = Array.isArray(m.marcas)
+                ? m.marcas
+                    .map((marca) =>
+                      typeof marca === 'object' && marca !== null ? marca.nome : marca,
+                    )
+                    .filter(Boolean)
+                : []
+
+              return {
+                item: nomeItem, // AGORA É STRING
+                marcas: marcasArr, // AGORA É ARRAY DE STRINGS
+              }
+            })
+          }
+          const materiaisNormalizados = normalizeMateriais(dadosObra.materiais || [])
+          console.log('Materiais normalizados:', materiaisNormalizados)
+          setMaterialData(materiaisNormalizados)
           setObservacoesData({ observacao_final: dadosRef.observacao_final || '' })
         } else {
           const templateData = await getTemplate()
