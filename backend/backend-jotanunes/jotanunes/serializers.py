@@ -105,6 +105,7 @@ class DescricaoSerializer(serializers.ModelSerializer):
         model = Descricao
         fields = ["detalhe"]
 
+
 class ItemSerializer(serializers.ModelSerializer):
     descricao = serializers.CharField(required=False, allow_blank=True)
 
@@ -114,14 +115,19 @@ class ItemSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         descricao_texto = validated_data.pop("descricao", None)
+        nome = validated_data.get("nome")
 
-        item = Item.objects.create(nome=validated_data["nome"])
+        item, _ = Item.objects.get_or_create(nome=nome)
 
         if descricao_texto:
             desc_obj, _ = Descricao.objects.get_or_create(detalhe=descricao_texto)
+
+            item.descricoes.clear()
             item.descricoes.add(desc_obj)
 
         return item
+
+
 
 class MaterialSerializer(serializers.ModelSerializer):
     item = ItemSerializer()
@@ -135,11 +141,8 @@ class MaterialSerializer(serializers.ModelSerializer):
         item_data = validated_data.pop("item")
         marcas_data = validated_data.pop("marcas")
 
-        item, _ = Item.objects.get_or_create(
-            nome=item_data["nome"],
-        )
-
-        material = Material.objects.create(item=item, **validated_data)
+        item = ItemSerializer().create(item_data)
+        material = Material.objects.create(item=item)
 
         for marca_data in marcas_data:
             marca, _ = Marca.objects.get_or_create(nome=marca_data["nome"])
