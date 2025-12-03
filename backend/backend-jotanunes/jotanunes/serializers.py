@@ -106,28 +106,30 @@ class DescricaoSerializer(serializers.ModelSerializer):
         fields = ["detalhe"]
 
 class ItemSerializer(serializers.ModelSerializer):
+    descricao = serializers.CharField(required=False, allow_blank=True)
+
     class Meta:
         model = Item
-        fields = ["nome"]
+        fields = ["nome", "descricao"]
 
     def create(self, validated_data):
+        descricao_texto = validated_data.pop("descricao", None)
+
         item = Item.objects.create(nome=validated_data["nome"])
+
+        if descricao_texto:
+            desc_obj, _ = Descricao.objects.get_or_create(detalhe=descricao_texto)
+            item.descricoes.add(desc_obj)
+
         return item
 
-
 class MaterialSerializer(serializers.ModelSerializer):
-    # 1. Alteramos para SerializerMethodField para CONTROLAR a saída (GET/Response).
-    # O campo agora é 'read-only' e usa o método 'get_item' para definir o valor.
-    item = serializers.SerializerMethodField()
-
-    marcas = serializers.SlugRelatedField(
-        slug_field="nome", queryset=Marca.objects.all(), many=True
-    )
+    item = ItemSerializer()
+    marcas = MarcaSerializer(many=True)
 
     class Meta:
         model = Material
         fields = ["item", "marcas"]
-<<<<<<< HEAD
 
     def create(self, validated_data):
         item_data = validated_data.pop("item")
@@ -143,37 +145,6 @@ class MaterialSerializer(serializers.ModelSerializer):
             marca, _ = Marca.objects.get_or_create(nome=marca_data["nome"])
             material.marcas.add(marca)
 
-=======
-
-    # NOVO MÉTODO: Define como o campo 'item' aparece na saída (GET/Response)
-    def get_item(self, obj):
-        # Retorna apenas a string do nome do Item relacionado.
-        return obj.item.nome if obj.item else None
-
-    # NOVO MÉTODO: Controla o que acontece com os dados de entrada (POST/PUT)
-    def to_internal_value(self, data):
-        # 1. Chamamos a validação padrão.
-        # Como 'item' é SerializerMethodField, ele é ignorado aqui.
-        internal_value = super().to_internal_value(data)
-
-        # 2. Resgatamos o nome do item do JSON de entrada (o valor enviado pelo usuário)
-        item_nome = data.get("item")
-
-        # 3. Re-adicionamos o nome do item à validated_data.
-        # Isso é necessário para que o método `create` customizado possa pegá-lo (item_nome = validated_data.pop("item")).
-        if item_nome:
-            internal_value["item"] = item_nome
-
-        return internal_value
-
-    def create(self, validated_data):
-        # Esta lógica de criação já estava correta, pois ela espera o 'item' como string.
-        item_nome = validated_data.pop("item")
-        marcas_instances = validated_data.pop("marcas")
-        item_instance, _ = Item.objects.get_or_create(nome=item_nome)
-        material = Material.objects.create(item=item_instance, **validated_data)
-        material.marcas.set(marcas_instances)
->>>>>>> cc17ef09dc103ec039ef9b0cdf6ce2c6132b64b2
         return material
 
 
