@@ -287,7 +287,8 @@ const Projeto = () => {
       texto_prefacio: prefacioData.texto,
       observacao_final: observacoesData.observacao_final,
       status: 'NAO_FINALIZADO',
-      ambientes: ambientes
+      ambientes: ambientes,
+      materiais: materialData
     }
 
     console.log('Salvando dados do projeto antes de sair...', dadosParaSalvar)
@@ -335,7 +336,8 @@ const Projeto = () => {
       texto_prefacio: prefacioData.texto,
       observacao_final: observacoesData.observacao_final,
       status: 'EM_ANALISE',
-      ambientes: ambientes
+      ambientes: ambientes,
+      materiais: materialData
     }
 
     console.log('Salvando dados do projeto...', dadosParaSalvar)
