@@ -128,21 +128,23 @@ class MaterialSerializer(serializers.ModelSerializer):
         return material
 
 class ItemSerializer(serializers.ModelSerializer):
-    descricoes = serializers.ListField(child=serializers.CharField(), write_only=True)
+    descricao = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = Item
-        fields = ["nome", "descricoes"]
+        fields = ["nome", "descricao"]
 
     def create(self, validated_data):
-        descricoes = validated_data.pop("descricoes", [])
-        item = Item.objects.create(**validated_data)
+        descricao_texto = validated_data.pop("descricao", None)
 
-        for desc in descricoes:
-            desc_obj, _ = Descricao.objects.get_or_create(detalhe=desc)
+        item = Item.objects.create(nome=validated_data["nome"])
+
+        if descricao_texto:
+            desc_obj, _ = Descricao.objects.get_or_create(detalhe=descricao_texto)
             item.descricoes.add(desc_obj)
 
         return item
+
 
 
 class AmbienteSerializer(serializers.ModelSerializer):
@@ -232,9 +234,12 @@ class ObraSerializer(serializers.ModelSerializer):
                 ambiente.itens.add(item)
 
         for material_data in materiais_data:
-            MaterialSerializer().create(material_data)
+            material = MaterialSerializer().create(material_data)
+            obra.materiais.add(material)
 
         return obra
+
+
     def update(self, instance, validated_data):
         ambientes_data = validated_data.pop("ambientes", None)
         materiais_data = validated_data.pop("materiais", None)
@@ -264,7 +269,9 @@ class ObraSerializer(serializers.ModelSerializer):
         if materiais_data is not None:
             instance.materiais.clear()
             for material_data in materiais_data:
-                MaterialSerializer().create(material_data)
+                material = MaterialSerializer().create(material_data)
+                instance.materiais.add(material)
+
 
         return instance
 
