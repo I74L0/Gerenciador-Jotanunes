@@ -150,15 +150,14 @@ const Projeto = () => {
           const rawAmbientes =
             (ambientesRes && (ambientesRes.data || ambientesRes.results || [])) || []
           const todosAmbientes = normalizeAmbientes(rawAmbientes)
-          console.log('todosAmbientes (normalizados):', todosAmbientes)
 
           console.log(
-            'dados.ambientes privativo',
-            dadosObra.ambientes.filter((a) => a.tipo === 'PRIVATIVO'),
+            'todosAmbientes privativo',
+            todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO'),
           )
           console.log(
             'dados.ambientes COMUM',
-            dadosObra.ambientes.filter((a) => a.tipo === 'COMUM'),
+            todosAmbientes.filter((a) => a.tipo === 'COMUM'),
           )
 
           // usa os ambientes normalizados
@@ -181,7 +180,6 @@ const Projeto = () => {
                 : []
 
               return {
-                id: m.id ?? `${Date.now()}-${nomeItem}`, // Mantém o id para o React
                 item: nomeItem, // AGORA É STRING
                 marcas: marcasArr, // AGORA É ARRAY DE STRINGS
               }
@@ -210,10 +208,9 @@ const Projeto = () => {
           const todosAmbientes = normalizeAmbientes(rawAmbientes)
           console.log('todosAmbientes (normalizados) - referencia:', todosAmbientes)
 
-          setUnidadesData(
-            todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO'),
-          )
+          setUnidadesData(todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO'))
           setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'COMUM'))
+          
           const normalizeMateriais = (rawMateriais = []) => {
             return rawMateriais.map((m) => {
               // 1. Pega o nome do item. Se for { nome: "..." }, pega o nome. Senão, assume que é string.
@@ -230,7 +227,6 @@ const Projeto = () => {
                 : []
 
               return {
-                id: m.id ?? `${Date.now()}-${nomeItem}`, // Mantém o id para o React
                 item: nomeItem, // AGORA É STRING
                 marcas: marcasArr, // AGORA É ARRAY DE STRINGS
               }
