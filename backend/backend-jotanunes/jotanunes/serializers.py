@@ -105,28 +105,6 @@ class DescricaoSerializer(serializers.ModelSerializer):
         model = Descricao
         fields = ["detalhe"]
 
-
-class MaterialSerializer(serializers.ModelSerializer):
-    marcas = serializers.ListField(child=serializers.CharField())
-    item = serializers.CharField()
-
-    class Meta:
-        model = Material
-        fields = ["item", "descricao", "marcas"]
-
-    def create(self, validated_data):
-        marcas = validated_data.pop("marcas", [])
-        item_nome = validated_data.pop("item")
-
-        item, _ = Item.objects.get_or_create(nome=item_nome)
-        material = Material.objects.create(item=item, **validated_data)
-
-        for marca_nome in marcas:
-            marca, _ = Marca.objects.get_or_create(nome=marca_nome)
-            material.marcas.add(marca)
-
-        return material
-
 class ItemSerializer(serializers.ModelSerializer):
     descricao = serializers.CharField(required=False, allow_blank=True)
 
@@ -145,6 +123,30 @@ class ItemSerializer(serializers.ModelSerializer):
 
         return item
 
+class MaterialSerializer(serializers.ModelSerializer):
+    item = ItemSerializer()
+    marcas = MarcaSerializer(many=True)
+
+    class Meta:
+        model = Material
+        fields = ["item", "descricao", "marcas"]
+
+    def create(self, validated_data):
+        item_data = validated_data.pop("item")
+        marcas_data = validated_data.pop("marcas")
+
+        item, _ = Item.objects.get_or_create(
+            nome=item_data["nome"],
+            defaults={"descricao": item_data.get("descricao", "")}
+        )
+
+        material = Material.objects.create(item=item, **validated_data)
+
+        for marca_data in marcas_data:
+            marca, _ = Marca.objects.get_or_create(nome=marca_data["nome"])
+            material.marcas.add(marca)
+
+        return material
 
 
 class AmbienteSerializer(serializers.ModelSerializer):
@@ -185,6 +187,7 @@ class ObraSerializer(serializers.ModelSerializer):
             "ambientes",
             "materiais",
         ]
+
     def _resolve_estado(self, value):
         if not value:
             return None
@@ -239,7 +242,6 @@ class ObraSerializer(serializers.ModelSerializer):
 
         return obra
 
-
     def update(self, instance, validated_data):
         ambientes_data = validated_data.pop("ambientes", None)
         materiais_data = validated_data.pop("materiais", None)
@@ -272,10 +274,10 @@ class ObraSerializer(serializers.ModelSerializer):
                 material = MaterialSerializer().create(material_data)
                 instance.materiais.add(material)
 
-
         return instance
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data["ambientes"] = AmbienteSerializer(instance.ambientes.all(), many=True).data
+        data["materiais"] = MaterialSerializer(instance.materiais.all(), many=True).data
         return data
