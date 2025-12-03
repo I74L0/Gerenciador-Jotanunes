@@ -129,7 +129,7 @@ class MaterialSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Material
-        fields = ["item", "descricao", "marcas"]
+        fields = ["item", "marcas"]
 
     def create(self, validated_data):
         item_data = validated_data.pop("item")
@@ -137,7 +137,6 @@ class MaterialSerializer(serializers.ModelSerializer):
 
         item, _ = Item.objects.get_or_create(
             nome=item_data["nome"],
-            defaults={"descricao": item_data.get("descricao", "")}
         )
 
         material = Material.objects.create(item=item, **validated_data)
@@ -173,6 +172,12 @@ class ObraSerializer(serializers.ModelSerializer):
     ambientes = AmbienteSerializer(many=True, required=False)
     materiais = MaterialSerializer(many=True, required=False)
 
+    observacao_gestor = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True
+    )
+
     class Meta:
         model = Obra
         fields = [
@@ -186,38 +191,43 @@ class ObraSerializer(serializers.ModelSerializer):
             "status",
             "ambientes",
             "materiais",
+            "observacao_gestor",
         ]
+
+    def user_is_gestor(self, user):
+        return user and user.groups.filter(name="Gestores").exists()
+
+    def user_is_criador(self, user):
+        return user and user.groups.filter(name="Criadores").exists()
+
+    def user_is_admin(self, user):
+        return user and user.is_superuser
 
     def _resolve_estado(self, value):
         if not value:
             return None
-
         estado = (
             Estado.objects.filter(uf__iexact=value).first()
             or Estado.objects.filter(nome__iexact=value).first()
         )
-
         if not estado:
             raise serializers.ValidationError({"estado": "Estado não encontrado."})
-
         return estado
 
     def _resolve_cidade(self, nome, estado):
         if not nome:
             return None
-
         cidade = Cidade.objects.filter(nome__iexact=nome, estado=estado).first()
         if not cidade:
             raise serializers.ValidationError({"cidade": "Cidade não encontrada para esse estado."})
-
         return cidade
 
     def create(self, validated_data):
         ambientes_data = validated_data.pop("ambientes", [])
         materiais_data = validated_data.pop("materiais", [])
-
-        estado_input = validated_data.pop("estado")
-        cidade_input = validated_data.pop("cidade")
+        observacao_gestor = validated_data.pop("observacao_gestor", None)
+        estado_input = validated_data.pop("estado", None)
+        cidade_input = validated_data.pop("cidade", None)
 
         estado_obj = self._resolve_estado(estado_input)
         cidade_obj = self._resolve_cidade(cidade_input, estado_obj)
@@ -225,13 +235,13 @@ class ObraSerializer(serializers.ModelSerializer):
         obra = Obra.objects.create(
             estado=estado_obj,
             cidade=cidade_obj,
+            observacao_gestor=observacao_gestor,
             **validated_data
         )
 
         for ambiente_data in ambientes_data:
             itens_data = ambiente_data.pop("itens", [])
             ambiente = Ambiente.objects.create(obra=obra, **ambiente_data)
-
             for item_data in itens_data:
                 item = ItemSerializer().create(item_data)
                 ambiente.itens.add(item)
@@ -243,8 +253,19 @@ class ObraSerializer(serializers.ModelSerializer):
         return obra
 
     def update(self, instance, validated_data):
+        request = self.context.get("request")
+        user = request.user if request else None
+
         ambientes_data = validated_data.pop("ambientes", None)
         materiais_data = validated_data.pop("materiais", None)
+
+        pode_editar_campo_gestor = (
+            self.user_is_gestor(user)
+            or self.user_is_admin(user)
+        )
+
+        if not pode_editar_campo_gestor:
+            validated_data.pop("observacao_gestor", None)
 
         if "estado" in validated_data:
             estado_input = validated_data.pop("estado")
@@ -277,7 +298,21 @@ class ObraSerializer(serializers.ModelSerializer):
         return instance
 
     def to_representation(self, instance):
+        request = self.context.get("request")
+        user = request.user if request else None
+
         data = super().to_representation(instance)
+
+        pode_ver = (
+            self.user_is_gestor(user)
+            or self.user_is_criador(user)
+            or self.user_is_admin(user)
+        )
+
+        if not pode_ver:
+            data.pop("observacao_gestor", None)
+
         data["ambientes"] = AmbienteSerializer(instance.ambientes.all(), many=True).data
         data["materiais"] = MaterialSerializer(instance.materiais.all(), many=True).data
+
         return data

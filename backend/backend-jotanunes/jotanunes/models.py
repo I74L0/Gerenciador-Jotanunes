@@ -1,4 +1,8 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 
 STATUS_CHOICES = [
     ('RECUSADO', 'Recusado'),
@@ -78,7 +82,8 @@ class Obra(models.Model):
 
     estado = models.ForeignKey(Estado, on_delete=models.SET_NULL, null=True, blank=True)
     cidade = models.ForeignKey(Cidade, on_delete=models.SET_NULL, null=True, blank=True)
-
+    observacao_gestor = models.TextField(null=True, blank=True, help_text="Observação privada do gestor.")
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     texto_prefacio = models.TextField(null=True, blank=True)
     endereco_completo = models.TextField("Endereço Completo", blank=True)
     materiais = models.ManyToManyField(Material, related_name="obras", blank=True)
