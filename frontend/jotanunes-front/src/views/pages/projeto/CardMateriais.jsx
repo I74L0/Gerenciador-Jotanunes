@@ -12,8 +12,11 @@ import {
   CModalFooter,
 } from '@coreui/react'
 import { useState } from 'react'
+import { FaCheck } from 'react-icons/fa'
+import { BsXLg } from 'react-icons/bs'
 
-export default function CardMateriais({ materiais, showStatus, podeEditar, setMateriais }) {
+
+export default function CardMateriais({ materiais, showStatus, podeGestionar, podeEditar, setMateriais }) {
   const [confirmItem, setConfirmItem] = useState(null)
 
   // defensive fallback: garante um array
@@ -51,6 +54,13 @@ export default function CardMateriais({ materiais, showStatus, podeEditar, setMa
     setConfirmItem(null)
   }
 
+  const toggleStatus = (index, valor) => {
+    const novos = [...materiaisArray];
+    novos[index] = { ...novos[index], status: valor };
+    setMateriais(novos);
+  };
+
+
   const cancelRemoveItem = () => {
     setConfirmItem(null)
   }
@@ -83,7 +93,7 @@ export default function CardMateriais({ materiais, showStatus, podeEditar, setMa
           <CTableRow>
             <CTableHeaderCell>Item</CTableHeaderCell>
             <CTableHeaderCell>Marcas Sugeridas (separadas por vírgula)</CTableHeaderCell>
-            {showStatus && <CTableHeaderCell>Status</CTableHeaderCell>}
+            {podeGestionar && <CTableHeaderCell>Status</CTableHeaderCell>}
             {podeEditar && <CTableHeaderCell>Ações</CTableHeaderCell>}
           </CTableRow>
         </CTableHead>
@@ -119,6 +129,35 @@ export default function CardMateriais({ materiais, showStatus, podeEditar, setMa
                 />
               </CTableDataCell>
               <CTableDataCell>
+                {podeGestionar && (
+                  <CTableDataCell style={{ textAlign: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+
+                      {/* Ícone CHECK (ativa status = true) */}
+                      <FaCheck
+                        color={material.status ? "green" : "gray"}
+                        style={{ cursor: "pointer" }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleStatus(i, true);
+                        }}
+                      />
+
+                      {/* Ícone X (ativa status = false) */}
+                      <BsXLg
+                        color={!material.status ? "red" : "gray"}
+                        strokeWidth={1}
+                        style={{ cursor: "pointer" }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleStatus(i, false);
+                        }}
+                      />
+
+                    </div>
+                  </CTableDataCell>
+                )}
+
                 {podeEditar && (
                 <CButton color="danger" size="sm" onClick={() => removerMaterial(i)}>
                   Remover
@@ -128,11 +167,13 @@ export default function CardMateriais({ materiais, showStatus, podeEditar, setMa
             </CTableRow>
           ))}
           <CTableRow>
+            {podeEditar && (
             <CTableDataCell colSpan={3}>
               <CButton color="success" size="sm" onClick={adicionarMaterial}>
                 + Adicionar Material
               </CButton>
             </CTableDataCell>
+            )}
           </CTableRow>
         </CTableBody>
       </CTable>

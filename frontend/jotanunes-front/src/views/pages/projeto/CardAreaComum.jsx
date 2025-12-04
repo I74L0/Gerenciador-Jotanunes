@@ -21,7 +21,7 @@ import { FaCheck } from 'react-icons/fa'
 import { BsXLg } from 'react-icons/bs'
 import DescricaoPopup from '../../../components/DescricaoPopup'
 
-export default function CardAreaComum({ ambientes, setAmbientes, podeEditar, showStatus = false }) {
+export default function CardAreaComum({ ambientes, setAmbientes, podeEditar, podeGestionar, showStatus = false }) {
   const [popupTarget, setPopupTarget] = useState(null)
   const [confirmEnvIdx, setConfirmEnvIdx] = useState(null)
   const [confirmItem, setConfirmItem] = useState(null)
@@ -214,7 +214,7 @@ export default function CardAreaComum({ ambientes, setAmbientes, podeEditar, sho
                     <CTableRow>
                       <CTableHeaderCell>Item</CTableHeaderCell>
                       <CTableHeaderCell>Descrição</CTableHeaderCell>
-                      {showStatus && <CTableHeaderCell>Status</CTableHeaderCell>}
+                      {podeGestionar && <CTableHeaderCell>Status</CTableHeaderCell>}
                       {podeEditar && <CTableHeaderCell>Ações</CTableHeaderCell>}
                     </CTableRow>
                   </CTableHead>
@@ -278,7 +278,7 @@ export default function CardAreaComum({ ambientes, setAmbientes, podeEditar, sho
                               />
                             )}
                         </CTableDataCell>
-                        {showStatus && (
+                        {podeGestionar && (
                         <CTableDataCell style={{ textAlign: 'center' }}>
                           <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
                             
