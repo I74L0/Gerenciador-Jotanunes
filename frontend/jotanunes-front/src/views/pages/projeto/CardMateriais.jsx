@@ -12,8 +12,11 @@ import {
   CModalFooter,
 } from '@coreui/react'
 import { useState } from 'react'
+import { FaCheck } from 'react-icons/fa'
+import { BsXLg } from 'react-icons/bs'
 
-export default function CardMateriais({ materiais, podeEditar, setMateriais }) {
+
+export default function CardMateriais({ materiais, showStatus, podeGestionar, podeEditar, setMateriais }) {
   const [confirmItem, setConfirmItem] = useState(null)
 
   // defensive fallback: garante um array
@@ -51,6 +54,13 @@ export default function CardMateriais({ materiais, podeEditar, setMateriais }) {
     setConfirmItem(null)
   }
 
+  const toggleStatus = (index, valor) => {
+    const novos = [...materiaisArray];
+    novos[index] = { ...novos[index], status: valor };
+    setMateriais(novos);
+  };
+
+
   const cancelRemoveItem = () => {
     setConfirmItem(null)
   }
@@ -83,7 +93,8 @@ export default function CardMateriais({ materiais, podeEditar, setMateriais }) {
           <CTableRow>
             <CTableHeaderCell>Item</CTableHeaderCell>
             <CTableHeaderCell>Marcas Sugeridas (separadas por vírgula)</CTableHeaderCell>
-            <CTableHeaderCell>Ações</CTableHeaderCell>
+            {podeGestionar && <CTableHeaderCell>Status</CTableHeaderCell>}
+            {podeEditar && <CTableHeaderCell>Ações</CTableHeaderCell>}
           </CTableRow>
         </CTableHead>
         <CTableBody>
@@ -94,8 +105,12 @@ export default function CardMateriais({ materiais, podeEditar, setMateriais }) {
                   type="text"
                   className="form-control"
                   value={material?.item ?? ''}
+                  readOnly={!podeEditar}
                   placeholder="Material"
-                  onChange={(e) => atualizarNomeMaterial(i, e.target.value)}
+                  onChange={(e) => {
+                    if (!podeEditar) return
+                    atualizarNomeMaterial(i, e.target.value)
+                  }}
                 />
               </CTableDataCell>
               <CTableDataCell width="60%">
@@ -108,22 +123,57 @@ export default function CardMateriais({ materiais, podeEditar, setMateriais }) {
                       ? material.marcas.join(', ')
                       : String(material?.marcas ?? '')
                   }
-                  onChange={(e) => atualizarMarcas(i, e.target.value)}
+                  readOnly={!podeEditar}
+                  onChange={(e) => 
+                    podeEditar && atualizarMarcas(i, e.target.value)}
                 />
               </CTableDataCell>
               <CTableDataCell>
+                {podeGestionar && (
+                  <CTableDataCell style={{ textAlign: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+
+                      {/* Ícone CHECK (ativa status = true) */}
+                      <FaCheck
+                        color={material.status ? "green" : "gray"}
+                        style={{ cursor: "pointer" }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleStatus(i, true);
+                        }}
+                      />
+
+                      {/* Ícone X (ativa status = false) */}
+                      <BsXLg
+                        color={!material.status ? "red" : "gray"}
+                        strokeWidth={1}
+                        style={{ cursor: "pointer" }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleStatus(i, false);
+                        }}
+                      />
+
+                    </div>
+                  </CTableDataCell>
+                )}
+
+                {podeEditar && (
                 <CButton color="danger" size="sm" onClick={() => removerMaterial(i)}>
                   Remover
                 </CButton>
+                )}
               </CTableDataCell>
             </CTableRow>
           ))}
           <CTableRow>
+            {podeEditar && (
             <CTableDataCell colSpan={3}>
               <CButton color="success" size="sm" onClick={adicionarMaterial}>
                 + Adicionar Material
               </CButton>
             </CTableDataCell>
+            )}
           </CTableRow>
         </CTableBody>
       </CTable>

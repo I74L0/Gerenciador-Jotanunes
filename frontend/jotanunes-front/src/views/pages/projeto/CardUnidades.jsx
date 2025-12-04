@@ -76,7 +76,7 @@ function detectUserRole() {
   return null
 }
 
-export default function CardUnidades({ ambientes, setAmbientes, podeEditar, showStatus: parentShowStatus }) {
+export default function CardUnidades({ ambientes, setAmbientes, podeEditar, podeGestionar, showStatus: parentShowStatus }) {
   const [popupTarget, setPopupTarget] = useState(null)
   const [confirmEnvIdx, setConfirmEnvIdx] = useState(null)
   const [confirmItem, setConfirmItem] = useState(null)
@@ -280,7 +280,7 @@ export default function CardUnidades({ ambientes, setAmbientes, podeEditar, show
                     <CTableRow>
                       <CTableHeaderCell>Item</CTableHeaderCell>
                       <CTableHeaderCell>Descrição</CTableHeaderCell>
-                      {showStatus && <CTableHeaderCell>Status</CTableHeaderCell>}
+                      {podeGestionar && <CTableHeaderCell>Status</CTableHeaderCell>}
                       {podeEditar && <CTableHeaderCell>Ações</CTableHeaderCell>}
                     </CTableRow>
                   </CTableHead>
@@ -352,19 +352,32 @@ export default function CardUnidades({ ambientes, setAmbientes, podeEditar, show
                             )}
                         </CTableDataCell>
 
-                        {showStatus && (
-                          <CTableDataCell
-                            style={{ textAlign: 'center', cursor: 'pointer' }}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              toggleStatus(idx, i)
-                            }}
-                          >
-                            {linha.status ? (
-                              <FaCheck color="green" />
-                            ) : (
-                              <BsXLg color="red" strokeWidth={1} />
-                            )}
+                        {podeGestionar && (
+                          <CTableDataCell style={{ textAlign: 'center' }}>
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                              
+                              {/* Ícone CHECK (ativa status = true) */}
+                              <FaCheck
+                                color={linha.status ? "green" : "gray"}
+                                style={{ cursor: "pointer" }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleStatus(idx, i, true);
+                                }}
+                              />
+
+                              {/* Ícone X (ativa status = false) */}
+                              <BsXLg
+                                color={!linha.status ? "red" : "gray"}
+                                strokeWidth={1}
+                                style={{ cursor: "pointer" }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleStatus(idx, i, false);
+                                }}
+                              />
+
+                            </div>
                           </CTableDataCell>
                         )}
 

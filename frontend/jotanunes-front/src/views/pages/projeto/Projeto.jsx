@@ -102,6 +102,7 @@ const Projeto = () => {
   
   const podeAdministrar = permissoes?.is_superuser
   const podeEditar = permissoes?.is_superuser || permissoes?.is_criador
+  const podeGestionar = permissoes?.is_gestor
 
   useEffect(() => {
     const normalizeAmbientes = (rawAmbientes = []) => {
@@ -551,7 +552,7 @@ const Projeto = () => {
             prefacio={prefacioData}
             setPrefacio={setPrefacioData}
             statusProjeto={showStatus}
-            podeCriar={podeEditar}
+            podeEditar={podeEditar}
           />
         )}
         {activeTab === 1 && (
@@ -559,7 +560,8 @@ const Projeto = () => {
             ambientes={unidadesData}
             setAmbientes={setUnidadesData}
             showStatus={showStatus}
-            podeCriar={podeEditar}
+            podeEditar={podeEditar}
+            podeGestionar={podeGestionar}
           />
         )}
         {activeTab === 2 && (
@@ -567,7 +569,8 @@ const Projeto = () => {
             ambientes={areacomumData} 
             setAmbientes={setAreacomumData}
             showStatus={showStatus}
-            podeCriar={podeEditar}
+            podeEditar={podeEditar}
+            podeGestionar={podeGestionar}            
           />
         )}
         {activeTab === 3 && (
@@ -575,7 +578,8 @@ const Projeto = () => {
             materiais={materialData} 
             setMateriais={setMaterialData} 
             showStatus={showStatus}
-            podeCriar={podeEditar}
+            podeEditar={podeEditar}
+            podeGestionar={podeGestionar}
             />
         )}
         {activeTab === 4 && (
