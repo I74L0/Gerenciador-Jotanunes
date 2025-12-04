@@ -107,7 +107,12 @@ class DescricaoSerializer(serializers.ModelSerializer):
 
 
 class ItemSerializer(serializers.ModelSerializer):
-    descricao = serializers.CharField(required=False, allow_blank=True)
+    # campo usado apenas para criar/atualizar a relação (entrada do seu JSON)
+    descricao = serializers.CharField(required=False, allow_blank=True, write_only=True)
+    # na saída, mostramos a lista de textos (campo 'detalhe' do model Descricao)
+    descricoes = serializers.SlugRelatedField(
+        many=True, slug_field="detalhe", read_only=True
+    )
 
     class Meta:
         model = Item
@@ -116,6 +121,7 @@ class ItemSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         descricao_texto = validated_data.pop("descricao", None)
         nome = validated_data.get("nome")
+        # busca item existente (como você fazia) ou cria novo
         item = Item.objects.filter(nome__iexact=nome).first()
         if not item:
             item = Item.objects.create(nome=nome)
@@ -124,7 +130,6 @@ class ItemSerializer(serializers.ModelSerializer):
             item.descricoes.clear()
             item.descricoes.add(desc_obj)
         return item
-
 
 class MaterialSerializer(serializers.ModelSerializer):
     item = serializers.CharField()
