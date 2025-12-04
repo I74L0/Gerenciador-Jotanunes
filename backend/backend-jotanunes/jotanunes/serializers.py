@@ -111,7 +111,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ["nome", "descricao"]
+        fields = "__all__"
 
     def create(self, validated_data):
         descricao_texto = validated_data.pop("descricao", None)
@@ -132,7 +132,7 @@ class MaterialSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Material
-        fields = ["item", "marcas"]
+        fields = "__all__"
 
     def create(self, validated_data):
         item_name = validated_data.pop("item")
