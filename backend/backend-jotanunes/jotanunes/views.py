@@ -357,3 +357,25 @@ def me(request):
         "is_criador": user.groups.filter(name="Criadores").exists(),
         "is_adm": user.groups.filter(name="Adm").exists(),
     })
+
+@api_view(["PATCH"])
+def atualizar_status_item(request, pk):
+    try:
+        item = Item.objects.get(pk=pk)
+    except Item.DoesNotExist:
+        return Response({"error": "Item não encontrado"}, status=404)
+
+    novo_status = request.data.get("status")
+
+    if novo_status is None:
+        return Response({"error": "Campo 'status' é obrigatório"}, status=400)
+
+    item.status = novo_status
+    item.save(update_fields=["status"])
+
+    return Response(ItemSerializer(item).data, status=200)
+
+class ItemUpdateStatusAPIView(generics.UpdateAPIView):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+    http_method_names = ["patch", "put"]

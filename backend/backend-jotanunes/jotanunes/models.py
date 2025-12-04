@@ -46,6 +46,7 @@ class Descricao(models.Model):
 
 class Item(models.Model):
     nome = models.CharField(max_length=255)
+    status = models.BooleanField(default=False)
     descricoes = models.ManyToManyField(Descricao, related_name='itens', blank=True)
 
     def __str__(self):
@@ -70,7 +71,7 @@ class Material(models.Model):
         null=True,
         blank=True
     )
-
+    status = models.BooleanField(default=False)
     descricao = models.CharField(max_length=255, blank=True, null=True)
     marcas = models.ManyToManyField(Marca, related_name='materiais', blank=True)
 
