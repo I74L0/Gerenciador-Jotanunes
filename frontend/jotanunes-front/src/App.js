@@ -91,10 +91,10 @@ const App = () => {
           <Route exact path="/login" name="Login Page" element={<Login />} />
 
           {/* Redireciona a rota raiz (/) para /login por padrão */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/index" replace />} />
 
           {/* Redireciona qualquer rota não encontrada (*) para a página login. */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<Navigate to="/index" replace />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
