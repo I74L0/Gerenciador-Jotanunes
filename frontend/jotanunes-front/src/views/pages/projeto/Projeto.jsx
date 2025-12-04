@@ -311,31 +311,38 @@ const Projeto = () => {
   }
 
   const getMappedAmbientes = () => {
+    console.log('unidadesData:', unidadesData)
 
-    console.log("unidadesData:", unidadesData)
+    const mapItens = (itensRaw = []) =>
+      (Array.isArray(itensRaw) ? itensRaw : []).map((it) => {
+        if (!it) return { nome: '', descricoes: [] }
+        const nome = it.nome ?? it.item ?? it.name ?? ''
+        const descricoesArr = Array.isArray(it.descricoes)
+          ? it.descricoes
+          : typeof it.descricao === 'string' && it.descricao.trim()
+            ? it.descricao
+                .split(';')
+                .map((s) => s.trim())
+                .filter(Boolean)
+            : []
+        return { nome, descricoes: descricoesArr }
+      })
 
     const MapUnidades = unidadesData.map((unidade) => ({
       nome: unidade.nome,
-      itens: [
-        {
-          nome: 'Piso',
-          descricoes: ['Borda reta polida']
-        },
-      ],
+      itens: mapItens(unidade.itens),
       tipo: 'PRIVATIVO',
     }))
 
     const MapAreaComum = areacomumData.map((area) => ({
       nome: area.nome,
-      itens: [{
-        nome: "Parede",
-        descricoes: ["Acabamento fosco", "LED 4000K"]
-      }],
+      itens: mapItens(area.itens),
       tipo: 'COMUM',
     }))
 
     return [...MapUnidades, ...MapAreaComum]
-  }  
+  }
+  
 
   const protectiveSave = async () => {
     if (!prefacioData.nome) {
@@ -535,7 +542,7 @@ const Projeto = () => {
           </li>
           <MenuTabs activeIndex={activeTab} onChange={setActiveTab} />
           <li className="header__menu__item" onClick={handleSave} disabled={isSaving}>
-            {podeEditar ? 'Enviar para Análise' : 'Finalizar'}
+            {podeEditar ? 'Enviar' : 'Finalizar'}
           </li>
         </ul>
       </header>
