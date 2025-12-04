@@ -109,17 +109,31 @@ const Projeto = () => {
     const normalizeAmbientes = (rawAmbientes = []) => {
       return rawAmbientes.map((a, index) => {
         const itensRaw = Array.isArray(a.itens) ? a.itens : []
+
         const itens = itensRaw.map((it) => {
           if (!it) return { item: '', descricao: '', status: false }
+
+          // 1. Resolve o Nome (prioriza 'nome', fallback para 'item')
           const nome = it.nome ?? it.item ?? it.name ?? ''
-          const descricoesArr = Array.isArray(it.descricoes)
-            ? it.descricoes
-            : Array.isArray(it.descricao)
-              ? it.descricao
-              : []
-          const descricao = descricoesArr.join('; ')
+
+          // 2. Resolve a Descrição (CORREÇÃO AQUI)
+          // Pega o valor bruto de descricao ou descricoes
+          const rawDesc = it.descricao ?? it.descricoes
+
+          let descricao = ''
+          if (Array.isArray(rawDesc)) {
+            // Se for array (antigo), junta com ponto e vírgula
+            descricao = rawDesc.join('; ')
+          } else if (typeof rawDesc === 'string') {
+            // Se for string (novo), usa direto
+            descricao = rawDesc
+          }
+
+          // Mantive status como false conforme seu código, mas se quiser
+          // que os itens venham marcados por padrão, mude para true.
           return { item: nome, descricao, status: false }
         })
+
         return {
           ...a,
           id: a.id ?? `${index + 1}`,
@@ -264,27 +278,37 @@ const Projeto = () => {
             })
           }
           const materiaisNormalizados = normalizeMateriais(dadosObra.materiais || [])
-          console.log('Materiais normalizados:', materiaisNormalizados)
           setMaterialData(materiaisNormalizados)
           setObservacoesData({ observacao_final: dadosRef.observacao_final || '' })
         } else {
           const templateData = await getTemplate()
-          console.log("template:", templateData)
-          const pref = templateData.prefacioData || { nome: '', estado: '', cidade: '', texto: '' }
+          console.log('template:', templateData)
+
+          const pref = {
+            nome: templateData.nome || '',
+            estado: templateData.estado || '',
+            cidade: templateData.cidade || '',
+            texto: templateData.texto_prefacio || '',
+          }
           setPrefacioData(pref)
 
-          const unidadesRaw = templateData.unidadesData || []
-          const areacomumRaw = templateData.areacomumData || []
-          const materialRaw = templateData.materialData || []
-          const obsTemplate = templateData.observacoesData && templateData.observacoesData[0]
+          const todosAmbientes = templateData.ambientes || []
+
+          const unidadesRaw = todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO')
+          const areacomumRaw = todosAmbientes.filter((a) => a.tipo === 'COMUM')
 
           const unidadesNorm = normalizeAmbientes(unidadesRaw)
           const areacomumNorm = normalizeAmbientes(areacomumRaw)
 
           setUnidadesData(unidadesNorm)
           setAreacomumData(areacomumNorm)
-          setMaterialData(materialRaw || [])
-          setObservacoesData({ observacao_final: obsTemplate ? obsTemplate.observacao : '' })
+
+          const materialRaw = templateData.materiais || []
+          setMaterialData(materialRaw)
+
+          setObservacoesData({
+            observacao_final: templateData.observacao_final || '',
+          })
         }
       } catch (error) {
         console.error('Falha ao carregar dados do projeto:', error)
@@ -312,38 +336,55 @@ const Projeto = () => {
   }
 
   const getMappedAmbientes = () => {
+    // Adicionando console.log para fins de depuração (debug)
     console.log('unidadesData:', unidadesData)
+    console.log('areacomumData:', areacomumData)
 
     const mapItens = (itensRaw = []) =>
       (Array.isArray(itensRaw) ? itensRaw : []).map((it) => {
-        if (!it) return { nome: '', descricoes: [] }
+        if (!it) return { nome: '', descricao: '' } // Retorno no novo formato
+
         const nome = it.nome ?? it.item ?? it.name ?? ''
-        const descricoesArr = Array.isArray(it.descricoes)
-          ? it.descricoes
-          : typeof it.descricao === 'string' && it.descricao.trim()
-            ? it.descricao
-                .split(';')
-                .map((s) => s.trim())
-                .filter(Boolean)
-            : []
-        return { nome, descricoes: descricoesArr }
+
+        // 1. Resolve a Descrição (usando a lógica robusta da correção anterior)
+        const rawDesc = it.descricao ?? it.descricoes
+        let descricao = ''
+
+        if (Array.isArray(rawDesc)) {
+          // Se for array (formato antigo/misto), junta em uma string única (separando por '; ')
+          descricao = rawDesc.join('; ')
+        } else if (typeof rawDesc === 'string') {
+          // Se for string (novo formato), usa direto
+          descricao = rawDesc
+        } else {
+          // Se o formato antigo de string que precisa ser splitado ainda existir no source (como no seu código original)
+          // A sua lógica original fazia o split:
+          if (typeof it.descricao === 'string' && it.descricao.trim()) {
+            descricao = it.descricao // Se você mantiver a correção de dados na normalização, pode usar direto
+          }
+        }
+
+        // Retorna o item no formato solicitado: { "nome": "string", "descricao": "string" }
+        return { nome, descricao }
       })
 
-    const MapUnidades = unidadesData.map((unidade) => ({
+    // Mapeamento das Unidades (tipo: PRIVATIVO)
+    const MapUnidades = (unidadesData || []).map((unidade) => ({
       nome: unidade.nome,
-      itens: mapItens(unidade.itens),
       tipo: 'PRIVATIVO',
+      itens: mapItens(unidade.itens),
     }))
 
-    const MapAreaComum = areacomumData.map((area) => ({
+    // Mapeamento da Área Comum
+    const MapAreaComum = (areacomumData || []).map((area) => ({
       nome: area.nome,
-      itens: mapItens(area.itens),
       tipo: 'COMUM',
+      itens: mapItens(area.itens),
     }))
 
+    // Retorna todos os ambientes juntos no formato final
     return [...MapUnidades, ...MapAreaComum]
-  }
-  
+  }  
 
   const protectiveSave = async () => {
     if (!prefacioData.nome) {

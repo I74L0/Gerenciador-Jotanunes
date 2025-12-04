@@ -1,226 +1,388 @@
 {
-  "prefacioData": {
-    "nome": "",
-    "estado": "",
-    "cidade": "",
-    "texto": ""
-  },
-  "unidadesData": [
+  "nome": "Residencial Exemplo",
+  "estado": "SP",
+  "cidade": "São Paulo",
+  "texto_prefacio": "Memorial descritivo padrão para unidades residenciais.",
+  "observacao_final": "Todos os acabamentos devem seguir a norma ABNT vigente.",
+  "status": "NAO_FINALIZADO",
+  "ambientes": [
     {
-      "id": "1.",
       "nome": "Sala de Estar/ Jantar",
-      "editando": false,
-      "aberto": false,
+      "tipo": "PRIVATIVO",
       "itens": [
-        { "item": "Piso", "descricao": "Porcelanato ou laminado", "status": true },
-        { "item": "Parede", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.", "status": true },
-        { "item": "Teto", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.", "status": true },
-        { "item": "Rodapé", "descricao": "Porcelanato ou Laminado, h= 5cm", "status": true },
-        { "item": "Inst. Elétrica", "descricao": "Pontos de luz no teto, tomadas de corrente e interruptores", "status": true },
-        { "item": "Inst. Comunic.", "descricao": "Pontos secos de comunicação e de antena de TV.", "status": true }
+        {
+          "nome": "Piso",
+          "descricao": "Porcelanato ou laminado"
+        },
+        {
+          "nome": "Parede",
+          "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA."
+        },
+        {
+          "nome": "Teto",
+          "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA."
+        },
+        {
+          "nome": "Rodapé",
+          "descricao": "Porcelanato ou Laminado, h= 5cm"
+        },
+        {
+          "nome": "Inst. Elétrica",
+          "descricao": "Pontos de luz no teto, tomadas de corrente e interruptores"
+        },
+        {
+          "nome": "Inst. Comunic.",
+          "descricao": "Pontos secos de comunicação e de antena de TV."
+        }
       ]
     },
     {
-      "id": "2.",
       "nome": "Circulação",
-      "editando": false,
-      "aberto": false,
+      "tipo": "PRIVATIVO",
       "itens": [
-        { "item": "Piso", "descricao": "Porcelanato ou laminado", "status": true },
-        { "item": "Parede", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.", "status": true },
-        { "item": "Teto", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.", "status": true },
-        { "item": "Rodapé", "descricao": "Porcelanato ou Laminado, h= 5cm", "status": true },
-        { "item": "Inst. Elétrica", "descricao": "Pontos de luz no teto, tomadas de corrente e interruptores", "status": true }
+        {
+          "nome": "Piso",
+          "descricao": "Porcelanato ou laminado"
+        },
+        {
+          "nome": "Parede",
+          "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA."
+        },
+        {
+          "nome": "Teto",
+          "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA."
+        },
+        {
+          "nome": "Rodapé",
+          "descricao": "Porcelanato ou Laminado, h= 5cm"
+        },
+        {
+          "nome": "Inst. Elétrica",
+          "descricao": "Pontos de luz no teto, tomadas de corrente e interruptores"
+        }
       ]
     },
     {
-      "id": "3.",
       "nome": "Quarto e Suíte",
-      "editando": false,
-      "aberto": false,
+      "tipo": "PRIVATIVO",
       "itens": [
-        { "item": "Porta", "descricao": "Porta semi–ôca comum pintada c/ esmalte sintético.", "status": true },
-        { "item": "Ferragem", "descricao": "Acabamento cromado.", "status": true },
-        { "item": "Inst. Elétrica", "descricao": "Pontos de luz no teto, tomadas de corrente e interruptores.", "status": true },
-        { "item": "Inst. Comunic.", "descricao": "Pontos secos de comunicação e de antena de TV.", "status": true },
-        { "item": "Ar Condicionado", "descricao": "Infraestrutura para high wall com condensadora axial.", "status": true }
+        {
+          "nome": "Porta",
+          "descricao": "Porta semi–ôca comum pintada c/ esmalte sintético."
+        },
+        {
+          "nome": "Ferragem",
+          "descricao": "Acabamento cromado."
+        },
+        {
+          "nome": "Inst. Elétrica",
+          "descricao": "Pontos de luz no teto, tomadas de corrente e interruptores."
+        },
+        {
+          "nome": "Inst. Comunic.",
+          "descricao": "Pontos secos de comunicação e de antena de TV."
+        },
+        {
+          "nome": "Ar Condicionado",
+          "descricao": "Infraestrutura para high wall com condensadora axial."
+        }
       ]
     },
     {
-      "id": "4.",
       "nome": "Sanitário/ Lavabo",
-      "editando": false,
-      "aberto": false,
+      "tipo": "PRIVATIVO",
       "itens": [
-        { "item": "Ferragem", "descricao": "Acabamento cromado.", "status": true },
-        { "item": "Esquadria", "descricao": "Alumínio pintado de branco.", "status": true },
-        { "item": "Vidro", "descricao": "Pontilhado Incolor.", "status": true },
-        { "item": "Metal Sanitário", "descricao": "Torneira para lavatório, registro de gaveta e registro de pressão com acabamento cromado .", "status": true },
-        { "item": "Louças", "descricao": "Vaso Sanitário com Caixa Acoplada em louça cor branca.", "status": true },
-        { "item": "Inst. Elétrica", "descricao": "Pontos de luz no teto, tomada de corrente e interruptor da Prime, Alumbra, Cemar ou Fame na cor branco.", "status": true },
-        { "item": "Inst. Hidráulica", "descricao": "Sifão em PVC, esgoto em PVC, rede de água fria e ducha higiênica em PEX.", "status": true }
+        {
+          "nome": "Ferragem",
+          "descricao": "Acabamento cromado."
+        },
+        {
+          "nome": "Esquadria",
+          "descricao": "Alumínio pintado de branco."
+        },
+        {
+          "nome": "Vidro",
+          "descricao": "Pontilhado Incolor."
+        },
+        {
+          "nome": "Metal Sanitário",
+          "descricao": "Torneira para lavatório, registro de gaveta e registro de pressão com acabamento cromado ."
+        },
+        {
+          "nome": "Louças",
+          "descricao": "Vaso Sanitário com Caixa Acoplada em louça cor branca."
+        },
+        {
+          "nome": "Inst. Elétrica",
+          "descricao": "Pontos de luz no teto, tomada de corrente e interruptor da Prime, Alumbra, Cemar ou Fame na cor branco."
+        },
+        {
+          "nome": "Inst. Hidráulica",
+          "descricao": "Sifão em PVC, esgoto em PVC, rede de água fria e ducha higiênica em PEX."
+        }
       ]
     },
     {
-      "id": "5.",
       "nome": "Cozinha/ Área de Serviço",
-      "editando": false,
-      "aberto": false,
+      "tipo": "PRIVATIVO",
       "itens": [
-        { "item": "Piso", "descricao": "Cerâmica.", "status": true },
-        { "item": "Parede", "descricao": "Cerâmica até o teto.", "status": true },
-        { "item": "Teto", "descricao": "Pintura látex PVA sobre gesso ou argamassa de regularização PVA.", "status": true },
-        { "item": "Inst. Elétricas", "descricao": "Ponto de luz no teto, tomadas de corrente e interruptores.", "status": true },
-        { "item": "Inst. Hidráulica", "descricao": "Rede de água fria em PEX e esgoto em PVC", "status": true },
-        { "item": "Inst. Comunicação", "descricao": "Tubulação seca.", "status": true }
+        {
+          "nome": "Piso",
+          "descricao": "Cerâmica."
+        },
+        {
+          "nome": "Parede",
+          "descricao": "Cerâmica até o teto."
+        },
+        {
+          "nome": "Teto",
+          "descricao": "Pintura látex PVA sobre gesso ou argamassa de regularização PVA."
+        },
+        {
+          "nome": "Inst. Elétricas",
+          "descricao": "Ponto de luz no teto, tomadas de corrente e interruptores."
+        },
+        {
+          "nome": "Inst. Hidráulica",
+          "descricao": "Rede de água fria em PEX e esgoto em PVC"
+        },
+        {
+          "nome": "Inst. Comunicação",
+          "descricao": "Tubulação seca."
+        }
       ]
     },
     {
-      "id": "6.",
       "nome": "Área Técnica",
-      "editando": false,
-      "aberto": false,
+      "tipo": "PRIVATIVO",
       "itens": [
-        { "item": "Piso", "descricao": "Em concreto desempolado.", "status": true }
+        {
+          "nome": "Piso",
+          "descricao": "Em concreto desempolado."
+        }
       ]
-    }
-  ],
-  "areacomumData": [
+    },
     {
-      "id": "1.",
       "nome": "Guarita",
-      "editando": false,
-      "aberto": false,
+      "tipo": "COMUM",
       "itens": [
-        { "item": "Piso", "descricao": "Porcelanato", "status": true },
-        { "item": "Rodapé", "descricao": "Porcelanato, h-5cm", "status": false },
-        { "item": "Parede", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA", "status": true }
+        {
+          "nome": "Piso",
+          "descricao": "Porcelanato"
+        },
+        {
+          "nome": "Rodapé",
+          "descricao": "Porcelanato, h-5cm"
+        },
+        {
+          "nome": "Parede",
+          "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA"
+        }
       ]
     },
     {
-      "id": "2.",
       "nome": "Salão de Festas Gourmet",
-      "editando": false,
-      "aberto": false,
+      "tipo": "COMUM",
       "itens": [
-        { "item": "Piso", "descricao": "Porcelanato", "status": true },
-        { "item": "Rodapé", "descricao": "Porcelanato, h-5cm", "status": false },
-        { "item": "Parede", "descricao": "Pintura PVA látex branco", "status": true },
-        { "item": "Cozinha", "descricao": "Bancada em granito", "status": true }
+        {
+          "nome": "Piso",
+          "descricao": "Porcelanato"
+        },
+        {
+          "nome": "Rodapé",
+          "descricao": "Porcelanato, h-5cm"
+        },
+        {
+          "nome": "Parede",
+          "descricao": "Pintura PVA látex branco"
+        },
+        {
+          "nome": "Cozinha",
+          "descricao": "Bancada em granito"
+        }
       ]
     },
     {
-      "id": "3.",
       "nome": "Quiosques",
-      "editando": false,
-      "aberto": false,
+      "tipo": "COMUM",
       "itens": [
-        { "item": "Churrasqueira", "descricao": "Aço inox", "status": true },
-        { "item": "Pia", "descricao": "Granito com cuba dupla", "status": true },
-        { "item": "Lixeira", "descricao": "Coletora de recicláveis", "status": false }
+        {
+          "nome": "Churrasqueira",
+          "descricao": "Aço inox"
+        },
+        {
+          "nome": "Pia",
+          "descricao": "Granito com cuba dupla"
+        },
+        {
+          "nome": "Lixeira",
+          "descricao": "Coletora de recicláveis"
+        }
       ]
     },
     {
-      "id": "4.",
       "nome": "Copa Funcionários",
-      "editando": false,
-      "aberto": false,
+      "tipo": "COMUM",
       "itens": [
-        { "item": "Pia", "descricao": "Aço inox com torneira", "status": true },
-        { "item": "Armário", "descricao": "MDF com acabamento", "status": false },
-        { "item": "Geladeira", "descricao": "Capacidade 300L", "status": true }
+        {
+          "nome": "Pia",
+          "descricao": "Aço inox com torneira"
+        },
+        {
+          "nome": "Armário",
+          "descricao": "MDF com acabamento"
+        },
+        {
+          "nome": "Geladeira",
+          "descricao": "Capacidade 300L"
+        }
       ]
     },
     {
-      "id": "5.",
       "nome": "Salão de Festas",
-      "editando": false,
-      "aberto": false,
+      "tipo": "COMUM",
       "itens": [
-        { "item": "Piso", "descricao": "Vinílico", "status": true },
-        { "item": "Iluminação", "descricao": "LED embutido", "status": true },
-        { "item": "Portas", "descricao": "Estandart em madeira", "status": false }
+        {
+          "nome": "Piso",
+          "descricao": "Vinílico"
+        },
+        {
+          "nome": "Iluminação",
+          "descricao": "LED embutido"
+        },
+        {
+          "nome": "Portas",
+          "descricao": "Estandart em madeira"
+        }
       ]
     },
     {
-      "id": "6.",
       "nome": "Brinquedoteca",
-      "editando": false,
-      "aberto": false,
+      "tipo": "COMUM",
       "itens": [
-        { "item": "Piso", "descricao": "Emborrachado", "status": true },
-        { "item": "Brinquedos", "descricao": "Aprovados INMETRO", "status": true },
-        { "item": "Segurança", "descricao": "Proteções nas tomadas", "status": true }
+        {
+          "nome": "Piso",
+          "descricao": "Emborrachado"
+        },
+        {
+          "nome": "Brinquedos",
+          "descricao": "Aprovados INMETRO"
+        },
+        {
+          "nome": "Segurança",
+          "descricao": "Proteções nas tomadas"
+        }
       ]
     },
     {
-      "id": "7.",
       "nome": "Playground",
-      "editando": false,
-      "aberto": false,
+      "tipo": "COMUM",
       "itens": [
-        { "item": "Piso", "descricao": "Emborrachado externo", "status": true },
-        { "item": "Estrutura", "descricao": "Metálica com pintura", "status": false },
-        { "item": "Cercas", "descricao": "Proteção perimetral", "status": true }
+        {
+          "nome": "Piso",
+          "descricao": "Emborrachado externo"
+        },
+        {
+          "nome": "Estrutura",
+          "descricao": "Metálica com pintura"
+        },
+        {
+          "nome": "Cercas",
+          "descricao": "Proteção perimetral"
+        }
       ]
     },
     {
-      "id": "8.",
       "nome": "Piscina Adulto",
-      "editando": false,
-      "aberto": false,
+      "tipo": "COMUM",
       "itens": [
-        { "item": "Tratamento", "descricao": "Cloração automática", "status": true },
-        { "item": "Bombeamento", "descricao": "Bomba 2HP", "status": true },
-        { "item": "Degraus", "descricao": "Antiaderente", "status": false }
+        {
+          "nome": "Tratamento",
+          "descricao": "Cloração automática"
+        },
+        {
+          "nome": "Bombeamento",
+          "descricao": "Bomba 2HP"
+        },
+        {
+          "nome": "Degraus",
+          "descricao": "Antiaderente"
+        }
       ]
     },
     {
-      "id": "9.",
       "nome": "Piscina Infantil",
-      "editando": false,
-      "aberto": false,
+      "tipo": "COMUM",
       "itens": [
-        { "item": "Profundidade", "descricao": "0.6 m", "status": true },
-        { "item": "Brinquedos", "descricao": "Acessórios lúdicos", "status": false },
-        { "item": "Tratamento", "descricao": "Filtragem diária", "status": true }
+        {
+          "nome": "Profundidade",
+          "descricao": "0.6 m"
+        },
+        {
+          "nome": "Brinquedos",
+          "descricao": "Acessórios lúdicos"
+        },
+        {
+          "nome": "Tratamento",
+          "descricao": "Filtragem diária"
+        }
       ]
     },
     {
-      "id": "10.",
       "nome": "Solarium",
-      "editando": false,
-      "aberto": false,
+      "tipo": "COMUM",
       "itens": [
-        { "item": "Deck", "descricao": "Madeira tratada", "status": true },
-        { "item": "Espreguiçadeiras", "descricao": "Em sintético", "status": false },
-        { "item": "Guarda-sol", "descricao": "Estrutura metálica", "status": true }
+        {
+          "nome": "Deck",
+          "descricao": "Madeira tratada"
+        },
+        {
+          "nome": "Espreguiçadeiras",
+          "descricao": "Em sintético"
+        },
+        {
+          "nome": "Guarda-sol",
+          "descricao": "Estrutura metálica"
+        }
       ]
     }
   ],
-  "materialData": [
+  "materiais": [
     {
-      "id": "1",
       "item": "Cerâmica",
-      "marcas": ["Incesa", "Portobello", "Arielle", "Tecnogres", "Pamesa", "Camelo Fior", "Biancogrês", "Pointer"]
+      "marcas": [
+        "Incesa",
+        "Portobello",
+        "Arielle",
+        "Tecnogres",
+        "Pamesa",
+        "Camelo Fior",
+        "Biancogrês",
+        "Pointer"
+      ]
     },
     {
-      "id": "2",
       "item": "Porcelanato",
-      "marcas": ["Portobello", "Arielle", "Tecnogres", "Pamesa", "Biancogrês", "Elizabeth", "Ceusa", "Pointer", "Villagres"]
+      "marcas": [
+        "Portobello",
+        "Arielle",
+        "Tecnogres",
+        "Pamesa",
+        "Biancogrês",
+        "Elizabeth",
+        "Ceusa",
+        "Pointer",
+        "Villagres"
+      ]
     },
     {
-      "id": "3",
       "item": "Laminado",
       "marcas": ["Eucatex", "Durafloor ou Espaçofloor"]
     },
     {
-      "id": "4",
       "item": "Esquadria",
       "marcas": ["Esaf", "Alumasa", "Atlantica", "Ramassol ou Unicasa"]
     }
   ],
-  "observacoesData": [
-    { "observacao": "" }
-  ]
+  "observacao_gestor": "Aguardando validação dos materiais da área da piscina."
 }
