@@ -30,7 +30,6 @@ body, html {
 
 .usuario_container {
   transform: scale(110%);
-  width: 120px;
   display: flex;
   align-items: center;
   gap: 0.8rem;
