@@ -13,7 +13,7 @@ import {
 } from '@coreui/react'
 import { useState } from 'react'
 
-export default function CardMateriais({ materiais, podeEditar, setMateriais }) {
+export default function CardMateriais({ materiais, showStatus, podeEditar, setMateriais }) {
   const [confirmItem, setConfirmItem] = useState(null)
 
   // defensive fallback: garante um array
@@ -83,7 +83,8 @@ export default function CardMateriais({ materiais, podeEditar, setMateriais }) {
           <CTableRow>
             <CTableHeaderCell>Item</CTableHeaderCell>
             <CTableHeaderCell>Marcas Sugeridas (separadas por vírgula)</CTableHeaderCell>
-            <CTableHeaderCell>Ações</CTableHeaderCell>
+            {showStatus && <CTableHeaderCell>Status</CTableHeaderCell>}
+            {podeEditar && <CTableHeaderCell>Ações</CTableHeaderCell>}
           </CTableRow>
         </CTableHead>
         <CTableBody>
@@ -94,8 +95,12 @@ export default function CardMateriais({ materiais, podeEditar, setMateriais }) {
                   type="text"
                   className="form-control"
                   value={material?.item ?? ''}
+                  readOnly={!podeEditar}
                   placeholder="Material"
-                  onChange={(e) => atualizarNomeMaterial(i, e.target.value)}
+                  onChange={(e) => {
+                    if (!podeEditar) return
+                    atualizarNomeMaterial(i, e.target.value)
+                  }}
                 />
               </CTableDataCell>
               <CTableDataCell width="60%">
@@ -108,13 +113,17 @@ export default function CardMateriais({ materiais, podeEditar, setMateriais }) {
                       ? material.marcas.join(', ')
                       : String(material?.marcas ?? '')
                   }
-                  onChange={(e) => atualizarMarcas(i, e.target.value)}
+                  readOnly={!podeEditar}
+                  onChange={(e) => 
+                    podeEditar && atualizarMarcas(i, e.target.value)}
                 />
               </CTableDataCell>
               <CTableDataCell>
+                {podeEditar && (
                 <CButton color="danger" size="sm" onClick={() => removerMaterial(i)}>
                   Remover
                 </CButton>
+                )}
               </CTableDataCell>
             </CTableRow>
           ))}

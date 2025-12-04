@@ -353,19 +353,32 @@ export default function CardUnidades({ ambientes, setAmbientes, podeEditar, show
                         </CTableDataCell>
 
                         {showStatus && (
-                          <CTableDataCell
-                            style={{ textAlign: 'center', cursor: 'pointer' }}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              toggleStatus(idx, i)
-                            }}
-                          >
-                            {linha.status ? (
-                              <FaCheck color="green" />
-                            ) : (
-                              <BsXLg color="red" strokeWidth={1} />
-                            )}
-                          </CTableDataCell>
+                        <CTableDataCell style={{ textAlign: 'center' }}>
+                          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                            
+                            {/* Ícone CHECK (ativa status = true) */}
+                            <FaCheck
+                              color={linha.status ? "green" : "gray"}
+                              style={{ cursor: "pointer" }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleStatus(idx, i, true);
+                              }}
+                            />
+
+                            {/* Ícone X (ativa status = false) */}
+                            <BsXLg
+                              color={!linha.status ? "red" : "gray"}
+                              strokeWidth={1}
+                              style={{ cursor: "pointer" }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleStatus(idx, i, false);
+                              }}
+                            />
+
+                          </div>
+                        </CTableDataCell>
                         )}
 
                         {podeEditar && (
