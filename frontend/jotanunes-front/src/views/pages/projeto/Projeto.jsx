@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
@@ -407,8 +408,24 @@ const Projeto = () => {
 
     setIsSaving(true)
     setSaveError(null)
+
+    const compactarAmbientes = (ambs) => (ambs || []).map((a) => ({
+      nome: a.nome,
+      tipo: a.tipo,
+      itens: (a.itens || [])
+        .map((it) => {
+          if (!it) return null
+          const nome = it.nome ?? it.item ?? it.name ?? ''
+          const descricoes = Array.isArray(it.descricoes) ? it.descricoes.filter(Boolean) : []
+          if (!nome && !descricoes.length) return null
+          const out = { nome }
+          if (descricoes.length) out.descricoes = descricoes
+          return out
+        })
+        .filter(Boolean),
+    }))
     
-    const ambientes = getMappedAmbientes()
+    const ambientesCompactos = compactarAmbientes(getMappedAmbientes())
 
     const dadosParaSalvar = {
       nome: prefacioData.nome,
@@ -417,43 +434,31 @@ const Projeto = () => {
       texto_prefacio: prefacioData.texto,
       observacao_final: observacoesData.observacao_final,
       status: 'EM_ANALISE',
-      ambientes: ambientes,
+      ambientes: ambientesCompactos,
       materiais: materialData
     }
 
     console.log('Salvando dados do projeto...', dadosParaSalvar)
 
     try {
-      let response
-      let statusTest
       if (id) {
-        // Retorna pra /index após atualizar projeto, se for usuário comum
-        // E gera um pdf se for gestor
-        // Atráves da url /api/obras/{id}/gerar-pdf/
-        statusTest = (await obras.retrieve(id)).data
-        if (statusTest.status == 'EM_ANALISE') {
-          console.log('Projetos Em Analise não podem ser editados!')
-          navigate('/index')
-          return
-        }
-        response = await obras.partialUpdate(id, dadosParaSalvar)
-        console.log('Projeto atualizado!', response.data)
-        console.log('Permissões do usuário:', permissoes)
-        if (!podeEditar) {
-          const pdfRes = await obras.downloadPdf(
-            response.data.id,
-            `projeto-${response.data.id}.pdf`,
-          )
-          if (pdfRes && pdfRes.data instanceof Blob) {
-            console.log('PDF gerado e baixado com sucesso.')
-          } else {
-            console.error('Falha ao gerar o PDF:', pdfRes)
-          }
-        }
+        // usa axios direto com timeout maior
+        const token = localStorage.getItem('accessToken')
+        const url = `http://127.0.0.1:8000/api/obras/${id}/`
+        const resp = await axios.patch(url, dadosParaSalvar, {
+          headers: { Authorization: 'Bearer ' + token },
+          timeout: 60000,
+        })
+        console.log('Projeto atualizado!', resp.data)
         navigate('/index')
       } else {
-        response = await obras.create(dadosParaSalvar)
-        console.log('Novo projeto criado!', response.data)
+        const token = localStorage.getItem('accessToken')
+        const url = `http://127.0.0.1:8000/api/obras/`
+        const resp = await axios.post(url, dadosParaSalvar, {
+          headers: { Authorization: 'Bearer ' + token },
+          timeout: 60000,
+        })
+        console.log('Novo projeto criado!', resp.data)
         navigate('/index')
       }
     } catch (error) {

@@ -16,12 +16,6 @@
         { "item": "Parede", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.", "status": true },
         { "item": "Teto", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.", "status": true },
         { "item": "Rodapé", "descricao": "Porcelanato ou Laminado, h= 5cm", "status": true },
-        { "item": "Soleira", "descricao": "Mármore ou granito.", "status": true },
-        { "item": "Peitoril", "descricao": "Metálico", "status": true },
-        { "item": "Esquadria", "descricao": "Alumínio pintado de branco", "status": true },
-        { "item": "Vidro", "descricao": "Liso incolor.", "status": true },
-        { "item": "Porta", "descricao": "Porta semi–ôca comum pintada c/ esmalte sintético.", "status": true },
-        { "item": "Ferragem", "descricao": "Acabamento cromado.", "status": true },
         { "item": "Inst. Elétrica", "descricao": "Pontos de luz no teto, tomadas de corrente e interruptores", "status": true },
         { "item": "Inst. Comunic.", "descricao": "Pontos secos de comunicação e de antena de TV.", "status": true }
       ]
@@ -45,14 +39,6 @@
       "editando": false,
       "aberto": false,
       "itens": [
-        { "item": "Piso", "descricao": "Porcelanato ou laminado.", "status": true },
-        { "item": "Parede", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.", "status": true },
-        { "item": "Teto", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA.", "status": true },
-        { "item": "Rodapé", "descricao": "Porcelanato ou Laminado, h= 5cm.", "status": true },
-        { "item": "Soleira", "descricao": "Mármore ou granito.", "status": true },
-        { "item": "Peitoril", "descricao": "Metálico.", "status": true },
-        { "item": "Esquadria", "descricao": "Alumínio pintado de branco.", "status": true },
-        { "item": "Vidro", "descricao": "Liso incolor.", "status": true },
         { "item": "Porta", "descricao": "Porta semi–ôca comum pintada c/ esmalte sintético.", "status": true },
         { "item": "Ferragem", "descricao": "Acabamento cromado.", "status": true },
         { "item": "Inst. Elétrica", "descricao": "Pontos de luz no teto, tomadas de corrente e interruptores.", "status": true },
@@ -66,14 +52,6 @@
       "editando": false,
       "aberto": false,
       "itens": [
-        { "item": "Piso", "descricao": "Cerâmica.", "status": true },
-        { "item": "Parede", "descricao": "Cerâmica até o teto.", "status": true },
-        { "item": "Teto", "descricao": "Forro de gesso.", "status": true },
-        { "item": "Filete", "descricao": "Mármore ou granito L=3,5cm.", "status": true },
-        { "item": "Cordão de Box", "descricao": "Mármore ou granito.", "status": true },
-        { "item": "Bancada", "descricao": "Em mármore ou granito com cuba em louça cor branca", "status": true },
-        { "item": "Porta", "descricao": "Porta semi-oca comum pintura c/ esmalte sintético.", "status": true },
-        { "item": "Peitoril", "descricao": "Metálico.", "status": true },
         { "item": "Ferragem", "descricao": "Acabamento cromado.", "status": true },
         { "item": "Esquadria", "descricao": "Alumínio pintado de branco.", "status": true },
         { "item": "Vidro", "descricao": "Pontilhado Incolor.", "status": true },
@@ -92,13 +70,6 @@
         { "item": "Piso", "descricao": "Cerâmica.", "status": true },
         { "item": "Parede", "descricao": "Cerâmica até o teto.", "status": true },
         { "item": "Teto", "descricao": "Pintura látex PVA sobre gesso ou argamassa de regularização PVA.", "status": true },
-        { "item": "Filete", "descricao": "Mármore ou granito L=3,5cm.", "status": true },
-        { "item": "Bancada", "descricao": "Em mármore ou granito.", "status": true },
-        { "item": "Cuba", "descricao": "Inox.", "status": true },
-        { "item": "Peitoril", "descricao": "Metálico.", "status": true },
-        { "item": "Tanque", "descricao": "Louça cor branca.", "status": true },
-        { "item": "Esquadrias", "descricao": "Alumínio pintado de branco.", "status": true },
-        { "item": "Metais", "descricao": "Torneiras e registro de gaveta com acabamento cromado.", "status": true },
         { "item": "Inst. Elétricas", "descricao": "Ponto de luz no teto, tomadas de corrente e interruptores.", "status": true },
         { "item": "Inst. Hidráulica", "descricao": "Rede de água fria em PEX e esgoto em PVC", "status": true },
         { "item": "Inst. Comunicação", "descricao": "Tubulação seca.", "status": true }
@@ -110,35 +81,7 @@
       "editando": false,
       "aberto": false,
       "itens": [
-        { "item": "Piso", "descricao": "Em concreto desempolado.", "status": true },
-        { "item": "Parede", "descricao": "Textura acrílica.", "status": true },
-        { "item": "Teto", "descricao": "Pintura ou textura acrílica.", "status": true },
-        { "item": "Gradil", "descricao": "Em perfil metálico pintado de branco.", "status": true }
-      ]
-    },
-    {
-      "id": "7.",
-      "nome": "Varanda",
-      "editando": false,
-      "aberto": false,
-      "itens": [
-        { "item": "Piso", "descricao": "Porcelanato.", "status": true },
-        { "item": "Parede", "descricao": "Textura Acrílica ou Pastilha Cerâmica, conforme definido em projeto arquitetônico.", "status": true },
-        { "item": "Teto", "descricao": "Pintura PVA látex branco sobre gesso ou massa de regularização PVA ou Forro de gesso.", "status": true },
-        { "item": "Rodapé", "descricao": "Porcelanato ou Laminado, h=5cm.", "status": true },
-        { "item": "Porta", "descricao": "Alumínio pintado de branco com vidro liso.", "status": true },
-        { "item": "Inst. Elétrica", "descricao": "Ponto de luz no teto.", "status": true },
-        { "item": "Guarda Corpo", "descricao": "Em perfil metálico pintado de branco.", "status": true }
-      ]
-    },
-    {
-      "id": "8.",
-      "nome": "Garden",
-      "editando": false,
-      "aberto": false,
-      "itens": [
-        { "item": "Piso", "descricao": "Grama", "status": true },
-        { "item": "Gradil", "descricao": "Em perfil metálico pintado de branco.", "status": true }
+        { "item": "Piso", "descricao": "Em concreto desempolado.", "status": true }
       ]
     }
   ],
@@ -253,83 +196,6 @@
         { "item": "Espreguiçadeiras", "descricao": "Em sintético", "status": false },
         { "item": "Guarda-sol", "descricao": "Estrutura metálica", "status": true }
       ]
-    },
-    {
-      "id": "11.",
-      "nome": "Deck Molhado",
-      "editando": false,
-      "aberto": false,
-      "itens": [
-        { "item": "Revestimento", "descricao": "Antiderrapante", "status": true },
-        { "item": "Dreno", "descricao": "Sistema linear", "status": true },
-        { "item": "Corrimão", "descricao": "Inox", "status": false }
-      ]
-    },
-    {
-      "id": "12.",
-      "nome": "Sauna",
-      "editando": false,
-      "aberto": false,
-      "itens": [
-        { "item": "Forno", "descricao": "Elétrico 6kW", "status": true },
-        { "item": "Revestimento", "descricao": "Madeira nobre", "status": true },
-        { "item": "Ventilação", "descricao": "Exaustor", "status": false }
-      ]
-    },
-    {
-      "id": "13.",
-      "nome": "Academia",
-      "editando": false,
-      "aberto": false,
-      "itens": [
-        { "item": "Equipamentos", "descricao": "Esteira, bike, pesos", "status": true },
-        { "item": "Piso", "descricao": "Borracha técnica", "status": true },
-        { "item": "Ar-condicionado", "descricao": "Split 18.000 BTU", "status": false }
-      ]
-    },
-    {
-      "id": "14.",
-      "nome": "Quadra Poliesportiva",
-      "editando": false,
-      "aberto": false,
-      "itens": [
-        { "item": "Piso", "descricao": "Poliuretano", "status": true },
-        { "item": "Iluminação", "descricao": "Holofotes 500W", "status": false },
-        { "item": "Rede", "descricao": "Voleibol/Futebol", "status": true }
-      ]
-    },
-    {
-      "id": "15.",
-      "nome": "Espaço Pet",
-      "editando": false,
-      "aberto": false,
-      "itens": [
-        { "item": "Piso", "descricao": "Ladrilho técnico", "status": true },
-        { "item": "Bebedouro", "descricao": "Automático", "status": false },
-        { "item": "Cerca", "descricao": "Proteção perimetral", "status": true }
-      ]
-    },
-    {
-      "id": "16.",
-      "nome": "Bicicletário",
-      "editando": false,
-      "aberto": false,
-      "itens": [
-        { "item": "Suporte", "descricao": "Capacidade 20 bikes", "status": true },
-        { "item": "Cobertura", "descricao": "Policarbonato", "status": true },
-        { "item": "Iluminação", "descricao": "Sensor de presença", "status": false }
-      ]
-    },
-    {
-      "id": "17.",
-      "nome": "Vestiários",
-      "editando": false,
-      "aberto": false,
-      "itens": [
-        { "item": "Chuveiro", "descricao": "Box e ducha", "status": true },
-        { "item": "Bancos", "descricao": "Madeira tratada", "status": true },
-        { "item": "Armários", "descricao": "Aço com fechadura", "status": false }
-      ]
     }
   ],
   "materialData": [
@@ -352,21 +218,6 @@
       "id": "4",
       "item": "Esquadria",
       "marcas": ["Esaf", "Alumasa", "Atlantica", "Ramassol ou Unicasa"]
-    },
-    {
-      "id": "5",
-      "item": "Ferragem",
-      "marcas": ["Silvana", "Stam", "Arouca", "Soprano", "Aliança", "Imab"]
-    },
-    {
-      "id": "6",
-      "item": "Instalação Elétrica",
-      "marcas": ["Alumbra", "Steck", "Ilumi", "Schneider", "Margirius ou Fame"]
-    },
-    {
-      "id": "7",
-      "item": "Metal Sanitário",
-      "marcas": ["Forusi", "Deca", "Celite", "Fabrimar ou Docol"]
     }
   ],
   "observacoesData": [
