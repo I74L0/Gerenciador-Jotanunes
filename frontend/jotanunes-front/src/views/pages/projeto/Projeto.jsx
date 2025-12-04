@@ -96,6 +96,8 @@ const Projeto = () => {
   const [permissoes, setPermissoes] = useState(null)
   
   const podeAdministrar = permissoes?.is_superuser
+  const podeEditar = permissoes?.is_superuser || permissoes?.is_criador
+  
 
 
   useEffect(() => {
@@ -175,11 +177,14 @@ const Projeto = () => {
           const dadosObra = obraRes.data
           console.log('Dados da obra carregados:', dadosObra)
 
+          setShowStatus(dadosObra.status)
+
           setPrefacioData({
             nome: dadosObra.nome || '',
             estado: dadosObra.estado || '',
             cidade: dadosObra.cidade || '',
             texto: dadosObra.texto_prefacio || '',
+            observacao_gestor: dadosObra.observacao_gestor || ''
           })
 
           const rawAmbientes =
@@ -236,6 +241,7 @@ const Projeto = () => {
             estado: dadosRef.estado || '',
             cidade: dadosRef.cidade || '',
             texto: dadosRef.texto_prefacio || '',
+            observacao_gestor: dadosObra.observacao_gestor || ''            
           })
 
           const rawAmbientes =
@@ -363,6 +369,7 @@ const Projeto = () => {
       cidade: prefacioData.cidade,
       texto_prefacio: prefacioData.texto,
       observacao_final: observacoesData.observacao_final,
+      observacao_gestor: prefacioData.observacao_gestor,
       status: 'NAO_FINALIZADO',
       ambientes: ambientes,
       materiais: materialData
@@ -534,19 +541,37 @@ const Projeto = () => {
       )}
 
       <section className="content background">
-        {activeTab === 0 && <CardPrefacio prefacio={prefacioData} setPrefacio={setPrefacioData} />}
+        {activeTab === 0 && (
+          <CardPrefacio
+            prefacio={prefacioData}
+            setPrefacio={setPrefacioData}
+            statusProjeto={showStatus}
+            podeCriar={podeEditar}
+          />
+        )}
         {activeTab === 1 && (
           <CardUnidades
             ambientes={unidadesData}
             setAmbientes={setUnidadesData}
             showStatus={showStatus}
+            podeCriar={podeEditar}
           />
         )}
         {activeTab === 2 && (
-          <CardAreaComum ambientes={areacomumData} setAmbientes={setAreacomumData} />
+          <CardAreaComum 
+            ambientes={areacomumData} 
+            setAmbientes={setAreacomumData}
+            showStatus={showStatus}
+            podeCriar={podeEditar}
+          />
         )}
         {activeTab === 3 && (
-          <CardMateriais materiais={materialData} setMateriais={setMaterialData} />
+          <CardMateriais
+            materiais={materialData} 
+            setMateriais={setMaterialData} 
+            showStatus={showStatus}
+            podeCriar={podeEditar}
+            />
         )}
         {activeTab === 4 && (
           <CardObservacoes observacao_final={observacoesData} setObservacoes={setObservacoesData} />
