@@ -24,6 +24,8 @@ from .serializers import (
     UsuarioSerializer, UsuarioLoginSerializer, UsuarioUpdateSerializer
 )
 
+from xhtml2pdf import pisa
+from io import BytesIO
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
@@ -83,7 +85,7 @@ class ObraViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'], url_path='gerar-pdf')
     def gerar_pdf(self, request, pk=None):
-        from weasyprint import HTML
+
 
         obra = self.get_object()
 
@@ -135,21 +137,20 @@ class ObraViewSet(viewsets.ModelViewSet):
             "logo_footer_url": logo_footer_url,
         })
 
-        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-        tmp_path = tmp.name
-        tmp.close()
 
-        HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf(tmp_path)
 
-        with open(tmp_path, "rb") as f:
-            pdf_data = f.read()
+        resultado = BytesIO() 
+        pisa_status = pisa.CreatePDF(html_string, dest=resultado)
 
-        os.remove(tmp_path)
+        if pisa_status.err:
+            return HttpResponse("Erro ao gerar PDF.", status=500)
+
+        pdf_data = resultado.getvalue()
 
         response = HttpResponse(pdf_data, content_type="application/pdf")
-        response["Content-Disposition"] = f'attachment; filename="especificacao_{obra.id}.pdf"'
+        response["Content-Disposition"] = f'attachment; filename=\"especificacao_{obra.id}.pdf\"'
         return response
-
+    
     @action(detail=True, methods=['post'], url_path='finalizar')
     def finalizar_obra(self, request, pk=None):
         try:
