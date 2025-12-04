@@ -13,6 +13,7 @@ import {
 
 import './Perfil.css'
 import AlterarSenhaModal from './AlterarSenha'
+import { getUser } from '../../../api'
 
 const Perfil = () => {
   const [usuario, setUsuario] = useState({
@@ -46,10 +47,7 @@ const Perfil = () => {
     }
 
     // Buscar perfil
-    fetch('http://localhost:8000/api/perfil/', {
-      headers: { Authorization: 'Bearer ' + token }
-    })
-      .then(res => res.json())
+    getUser(token)
       .then(data => {
         setUsuario({
           username: data.username,

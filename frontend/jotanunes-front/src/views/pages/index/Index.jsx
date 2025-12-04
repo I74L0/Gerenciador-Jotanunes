@@ -12,7 +12,7 @@ import {
   CSpinner,
 } from '@coreui/react'
 import './Index-style.css'
-import { obras, handleLogout, attemptRefresh } from '../../../api'
+import { obras, handleLogout, attemptRefresh, getUser } from '../../../api'
 
 const Index = () => {
   const navigate = useNavigate()
@@ -35,8 +35,7 @@ const Index = () => {
   const handleVerPerfil = () => navigate('/perfil')
 
   const [permissoes, setPermissoes] = useState(null)
-
-  // 🔍 Termo de pesquisa (agora apenas para NOME)
+  const [usuario, setUsuario] = useState({ username: '' })
   const [searchTerm, setSearchTerm] = useState('')
 
   const normalizeText = (text) =>
@@ -58,6 +57,15 @@ const Index = () => {
     })
       .then((res) => res.json())
       .then((data) => setPermissoes(data))
+      .catch((err) => console.error(err))
+  }, [])
+
+  // Função para pegar o nome do usuário
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken')
+
+    getUser(token)
+      .then((data) => setUsuario({ username: data.username }))
       .catch((err) => console.error(err))
   }, [])
 
@@ -254,7 +262,7 @@ const Index = () => {
         </div>
 
         <div className="usuario_container position-relative">
-          <span>Usuário</span>
+          <span>{usuario.username}</span>
 
           {/* ÍCONE */}
           <div

@@ -81,3 +81,29 @@ export const setAuthToken = (token) => {
     setAuthTokenHelper(apiClient, null)
   }
 }
+
+// fetch('http://localhost:8000/api/perfil/', {
+//   headers: { Authorization: 'Bearer ' + token },
+// })
+//   .then((res) => res.json())
+//   .then((data) => {
+//     setUsuario({
+//       username: data.username,
+//       email: data.email,
+//       first_name: data.first_name,
+//       last_name: data.last_name,
+//     })
+//   })
+
+export const getUser = async (token) => {
+  try {
+    const res = await apiClient
+      .get('/perfil/', {
+        headers: { Authorization: 'Bearer ' + token },
+      });
+    return res.data;
+  } catch (err) {
+    console.error('Erro ao buscar perfil do usuário:', err);
+    throw err;
+  }
+}

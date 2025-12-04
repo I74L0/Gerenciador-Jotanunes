@@ -38,7 +38,7 @@ import CardMateriais from './CardMateriais'
 import CardObservacoes from './CardObservacoes'
 import MenuTabs from './MenuTabs'
 import 'src/views/pages/projeto/Projeto-style.scss'
-import { obras, handleLogout, ambientes, perfil, getTemplate, itens } from '../../../api'
+import { obras, handleLogout, ambientes, perfil, getTemplate, getUser } from '../../../api'
 
 const Projeto = () => {
   const navigate = useNavigate()
@@ -55,11 +55,16 @@ const Projeto = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
-  const [userRole, setUserRole] = useState(null)
   const [showStatus, setShowStatus] = useState(null)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
-  const userIconRef = useRef(null)
   const [menuCoords, setMenuCoords] = useState({ top: 0, left: 0 })
+  const [usuario, setUsuario] = useState({
+      username: '',
+      email: '',
+      first_name: '',
+      last_name: '',
+    })
+  const userIconRef = useRef(null)
   
   useEffect(() => {
     if (!showProfileMenu) return
@@ -97,30 +102,6 @@ const Projeto = () => {
   
   const podeAdministrar = permissoes?.is_superuser
   const podeEditar = permissoes?.is_superuser || permissoes?.is_criador
-  
-
-
-  useEffect(() => {
-    let mounted = true
-    const fetchRole = async () => {
-      try {
-        const res = await perfil.get()
-        const role =
-          res && res.data && (res.data.role || (res.data.user && res.data.user.role))
-            ? String(res.data.role || res.data.user.role).toLowerCase()
-            : null
-        if (mounted && role) {
-          setUserRole(role)
-          return
-        }
-      } catch (err) {}
-    }
-
-    fetchRole()
-    return () => {
-      mounted = false
-    }
-  }, [])
 
   useEffect(() => {
     const normalizeAmbientes = (rawAmbientes = []) => {
@@ -161,6 +142,14 @@ const Projeto = () => {
         })
 
         if (!permissaoRes.ok) throw new Error('Erro ao buscar permissões')
+
+        const dadosUsuario = await getUser(token)
+        setUsuario({
+          username: dadosUsuario.username,
+          email: dadosUsuario.email,
+          first_name: dadosUsuario.first_name,
+          last_name: dadosUsuario.last_name,
+        })
 
         const dadosPermissoes = await permissaoRes.json()
         setPermissoes({
@@ -430,6 +419,9 @@ const Projeto = () => {
       let response
       let statusTest
       if (id) {
+        // Retorna pra /index após atualizar projeto, se for usuário comum
+        // E gera um pdf se for gestor
+        // Atráves da url /api/obras/{id}/gerar-pdf/
         statusTest = (await obras.retrieve(id)).data
         if (statusTest.status == 'EM_ANALISE') {
           console.log('Projetos Em Analise não podem ser editados!')
@@ -438,9 +430,22 @@ const Projeto = () => {
         }
         response = await obras.partialUpdate(id, dadosParaSalvar)
         console.log('Projeto atualizado!', response.data)
+        console.log('Permissões do usuário:', permissoes)
+        if (!podeEditar) {
+          const pdfRes = await obras.downloadPdf(
+            response.data.id,
+            `projeto-${response.data.id}.pdf`,
+          )
+          if (pdfRes && pdfRes.data instanceof Blob) {
+            console.log('PDF gerado e baixado com sucesso.')
+          } else {
+            console.error('Falha ao gerar o PDF:', pdfRes)
+          }
+        }
         navigate('/index')
       } else {
         response = await obras.create(dadosParaSalvar)
+        console.log('Novo projeto criado!', response.data)
         navigate('/index')
       }
     } catch (error) {
@@ -468,7 +473,7 @@ const Projeto = () => {
             <CImage src="/images/Logo Vermelha.png" alt="JotaNunes Logo" height={48} />
           </div>
           <div className="usuario_container position-relative">
-            <span>Usuário</span>
+            <span>{usuario.username}</span>
 
             {/* ÍCONE */}
             <div
@@ -529,7 +534,7 @@ const Projeto = () => {
           </li>
           <MenuTabs activeIndex={activeTab} onChange={setActiveTab} />
           <li className="header__menu__item" onClick={handleSave} disabled={isSaving}>
-            {'Enviar'}
+            {podeEditar ? 'Enviar para Análise' : 'Finalizar'}
           </li>
         </ul>
       </header>
