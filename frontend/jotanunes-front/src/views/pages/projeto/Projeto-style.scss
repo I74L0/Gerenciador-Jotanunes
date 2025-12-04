@@ -14,6 +14,7 @@ html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  overflow-y: hidden;
 }
 
 html *, html *::before, html *::after {
@@ -43,19 +44,14 @@ summary::marker {
 .user-icon {
   width: 35px;
   height: 35px;
-  background: #122c33;
+  font-size: 22px;
+  background: #0c0c0c;
+  color: white;
+  padding: 6px 10px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-}
-
-.user-icon {
-  font-size: 22px;
-  background: #0c0c0c;
-  padding: 6px 10px;
-  border-radius: 50%;
   cursor: pointer;
 }
 
@@ -69,7 +65,6 @@ summary::marker {
   padding: 12px;
   width: 160px;
   box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-  z-index: 9999;
 }
 
 .profile-btn {
@@ -308,51 +303,51 @@ summary::marker {
 }
 
 .tabs {
-  display: table;
-  table-layout: fixed;
+  display: flex;
   width: 100%;
-  margin: 0;
+  height: 100%;
   padding: 0;
-  -webkit-transform: translateY(5px);
-  transform: translateY(5px);
-  margin-bottom: 4px;
+  margin: 0;
 
   >li {
     transition-duration: .25s;
-    display: table-cell;
     list-style: none;
     text-align: center;
-    padding: 20px 20px 25px 20px;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
     position: relative;
-    overflow: hidden;
     cursor: pointer;
     color: black;
+    padding-top: 3vh;
+    padding-left: 5px;
+    padding-right: 5px;
 
     &:before {
       z-index: -1;
       position: absolute;
       content: "";
       width: 100%;
-      height: 120%;
+      height: 200%;
       top: 0;
       left: 0;
       background-color: $primary;
       opacity: .8;
-      -webkit-transform: translateY(100%);
       transform: translateY(100%);
       transition-duration: .25s;
-      border-radius: 5px 5px 0 0;
+      border-radius: 10px 10px 0 0;
     }
 
     &:hover {
       &:before {
-        -webkit-transform: translateY(70%);
-        transform: translateY(70%);
+        -webkit-transform: translateY(40%);
+        transform: translateY(40%);
       }
     }
 
     &.active {
       color: white;
+      font-size: 1.2rem;
 
       &:before {
         transition-duration: .5s;
@@ -396,7 +391,7 @@ summary::marker {
 
 .header {
   position: relative;
-  z-index: 9999;
+  z-index: 1;
   width: 100%;
   background-color: white;
   display: flex;
@@ -409,6 +404,7 @@ summary::marker {
 }
 
 .header__header {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -434,21 +430,19 @@ summary::marker {
   width: 98%;
   margin: 0;
   margin-left: 1%;
-  z-index: 10;
 }
 
 .header__menu {
   position: absolute;
-  top: 13.4vh;
-  margin: 0;
-  padding: 0;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  top: 10vh;
+  height: 10vh;
+  width: 100%;
+  margin-top: 16px;
+  padding: 0 2rem;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  width: 100%;
-  gap: 5rem;
+  gap: 4rem;
 }
 
 .header__menu__item {
@@ -460,15 +454,12 @@ summary::marker {
   background-color: white;
   color: rgb(33, 33, 33);
   transition: 0.5s;
+  margin-bottom: 12px;
 }
 
 .header__menu__item:hover {
   color: white;
   background-color: $primary;
-}
-
-.header__menu__tabs {
-  width: 85vw;
 }
 
 .content {
@@ -477,7 +468,7 @@ summary::marker {
   position: absolute;
   top: 22vh;
   height: 78vh;
-  width: 100%;
+  width: 100vw;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -508,15 +499,33 @@ summary::marker {
     top: 17vh;
   }
   .header__header{
-    padding: 0 1rem;
-    margin: 0;
+    padding: 0 5px;
+    height: 9vh;
   }
   .header__header__logo {
     transform: scale(80%);
   }
   .header__menu{
-    font-size: 0.6rem;
-    top: 10vh;
+    font-size: 0.8rem;
+    top: 9vh;
+    height: 8vh;
+    gap: 1rem;
+    margin-top: 5px
+  }
+  .tabs {
+    >li {
+      padding-top: 16px;
+      &.active {
+        font-size: 1rem;
+      }
+    }
+  }
+  .header__menu__item{
+    padding: 0.4rem 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+  .header hr {
+    top: 9vh;
   }
   .header{
     height: 17vh;
@@ -576,6 +585,8 @@ summary::marker {
 
   .header__header__logo {
     transform: scale(70%);
+    position: relative;
+    left: -20px;
   }
 
   .header__header__user {
@@ -588,12 +599,11 @@ summary::marker {
   .header__menu__item{
     transform: scale(70%);
   }
-
   .content {
     top: 17vh;
     height: 83%;
     max-height: 83%;
-    width: 104vw;
+    width: 100%;
     padding: 0;
   }
 
@@ -627,5 +637,26 @@ summary::marker {
     transform: scale(90%);
     width: 110px;
     gap: 0.6rem;
+  }
+
+  /* Permitir que wrapper quebre em telas pequenas para evitar overflow horizontal */
+  .wrapper {
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  /* Aba ativa menor em telas pequenas */
+  .tabs {
+    padding-top: 2px;
+    >li {
+      padding-top: 1rem;
+      &.active {
+        font-size: 0.6rem;
+      }
+      &::before {
+        transform: translateY(110%);
+      }
+    }
   }
 }

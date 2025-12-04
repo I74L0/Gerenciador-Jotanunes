@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import {
   CImage,
@@ -57,6 +58,40 @@ const Projeto = () => {
   const [userRole, setUserRole] = useState(null)
   const [showStatus, setShowStatus] = useState(null)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const userIconRef = useRef(null)
+  const [menuCoords, setMenuCoords] = useState({ top: 0, left: 0 })
+  
+  useEffect(() => {
+    if (!showProfileMenu) return
+  
+    const update = () => {
+      const rect = userIconRef.current?.getBoundingClientRect()
+      if (rect) {
+        const menuWidth = 160
+        const left = Math.max(8, rect.right - menuWidth + window.scrollX)
+        const top = rect.bottom + window.scrollY + 6
+        setMenuCoords({ top, left })
+      }
+    }
+  
+    update()
+    window.addEventListener('resize', update)
+    window.addEventListener('scroll', update, true)
+  
+    const onDocClick = (e) => {
+      if (userIconRef.current && !userIconRef.current.contains(e.target)) {
+        setShowProfileMenu(false)
+      }
+    }
+  
+    document.addEventListener('mousedown', onDocClick)
+  
+    return () => {
+      window.removeEventListener('resize', update)
+      window.removeEventListener('scroll', update, true)
+      document.removeEventListener('mousedown', onDocClick)
+    }
+  }, [showProfileMenu])
   const handleVerPerfil = () => navigate('/perfil')
   const [permissoes, setPermissoes] = useState(null)
   
@@ -431,32 +466,54 @@ const Projeto = () => {
             {/* ÍCONE */}
             <div
               className="user-icon"
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              ref={userIconRef}
+              onClick={() => {
+                const opening = !showProfileMenu
+                setShowProfileMenu(opening)
+                if (opening) {
+                  // calcula posição do menu ao abrir
+                  const rect = userIconRef.current?.getBoundingClientRect()
+                  if (rect) {
+                    // largura do menu definida no CSS (~160px)
+                    const menuWidth = 160
+                    const left = Math.max(8, rect.right - menuWidth + window.scrollX)
+                    const top = rect.bottom + window.scrollY + 6
+                    setMenuCoords({ top, left })
+                  }
+                }
+              }}
               style={{ cursor: 'pointer' }}
             >
               👤
             </div>
-
-            {/* MENU DE PERFIL */}
-            {showProfileMenu && (
-              <div className="profile-menu">
-                <button onClick={handleVerPerfil} className="profile-btn">
-                  Ver Perfil
-                </button>
-                {podeAdministrar &&(
-                  <button
-                  onClick={() => (window.location.href = "http://127.0.0.1:8000/admin/")} 
+          </div>
+          {/* Perfil: renderizado via portal para escapar de stacking contexts */}
+          {showProfileMenu && userIconRef.current && createPortal(
+            <div
+              className="profile-menu"
+              style={{
+                position: 'absolute',
+                top: `${menuCoords.top}px`,
+                left: `${menuCoords.left}px`,
+                zIndex: 200000,
+              }}
+            >
+              <button onClick={handleVerPerfil} className="profile-btn">
+                Ver Perfil
+              </button>
+              {podeAdministrar && (
+                <button
+                  onClick={() => (window.location.href = 'http://127.0.0.1:8000/admin/')}
                   className="profile-btn"
-                  >
+                >
                   Administrador
                 </button>
-                )}
-                <button onClick={handleLogout} className="profile-btn">
-                  Sair
-                </button>
-              </div>
-            )}
-          </div>
+              )}
+              <button onClick={handleLogout} className="profile-btn">
+                Sair
+              </button>
+            </div>
+          , document.body)}
         </div>
         <hr />
         <ul className="header__menu">
