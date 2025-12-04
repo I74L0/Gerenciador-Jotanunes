@@ -1,7 +1,7 @@
 import React from 'react'
 import { CCard, CCardBody } from '@coreui/react'
 
-export default function CardPrefacio({ prefacio, setPrefacio }) {
+export default function CardPrefacio({ prefacio, setPrefacio, statusProjeto }) {
 
   return (
     <div className="body__card-prefacio">
@@ -49,6 +49,23 @@ export default function CardPrefacio({ prefacio, setPrefacio }) {
           onChange={(e) => setPrefacio({ ...prefacio, texto: e.target.value })}
         />
       </div>
+
+        {(statusProjeto === "EM_ANALISE" || statusProjeto === "RECUSADO") && (
+        <div className="observacoes-gestor">
+          <h6>Observações do gestor</h6>
+
+          <textarea
+            className="prefacio-textarea"
+            placeholder="Digite as observações..."
+            value={prefacio.observacao_gestor || ""}
+            disabled={statusProjeto === "RECUSADO"}  
+            onChange={(e) =>
+              setPrefacio({ ...prefacio, observacao_gestor: e.target.value })
+            }
+          />
+        </div>
+      )}
+    
     </div>
   )
 }

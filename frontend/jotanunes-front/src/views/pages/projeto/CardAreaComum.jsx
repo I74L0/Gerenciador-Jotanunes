@@ -21,7 +21,7 @@ import { FaCheck } from 'react-icons/fa'
 import { BsXLg } from 'react-icons/bs'
 import DescricaoPopup from '../../../components/DescricaoPopup'
 
-export default function CardAreaComum({ ambientes, setAmbientes, showStatus = false }) {
+export default function CardAreaComum({ ambientes, setAmbientes, podeEditar, showStatus = false }) {
   const [popupTarget, setPopupTarget] = useState(null)
   const [confirmEnvIdx, setConfirmEnvIdx] = useState(null)
   const [confirmItem, setConfirmItem] = useState(null)
@@ -138,16 +138,18 @@ export default function CardAreaComum({ ambientes, setAmbientes, showStatus = fa
 
   return (
     <div className="section__section">
-      <CButton className="adicionar-ambiente">
-        <div
-          className="d-flex align-items-center add-ambiente"
-          onClick={adicionarAmbiente}
-          style={{ cursor: 'pointer', width: 'auto' }}
-        >
-          <IoIosAddCircle className="circle-icon" />
-          <span className="ms-2">Adicionar Ambiente</span>
-        </div>
-      </CButton>
+      {podeEditar && (
+        <CButton className="adicionar-ambiente">
+          <div
+            className="d-flex align-items-center add-ambiente"
+            onClick={adicionarAmbiente}
+            style={{ cursor: 'pointer', width: 'auto' }}
+          >
+            <IoIosAddCircle className="circle-icon" />
+            <span className="ms-2">Adicionar Ambiente</span>
+          </div>
+        </CButton>
+      )}
 
       <hr className='m-3'/>
 
@@ -177,6 +179,7 @@ export default function CardAreaComum({ ambientes, setAmbientes, showStatus = fa
                   <span
                     className="nome-ambiente"
                     onDoubleClick={(e) => {
+                      if (!podeEditar) return
                       e.stopPropagation()
                       const novos = [...ambientes]
                       novos[idx].editando = true
@@ -188,18 +191,20 @@ export default function CardAreaComum({ ambientes, setAmbientes, showStatus = fa
                 )}
               </div>
 
-              <div className="acao-remover">
-                <CButton
-                  color="danger"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    removerAmbiente(idx)
-                  }}
-                >
-                  {btnRemoverAmbienteTxt}
-                </CButton>
-              </div>
+              {podeEditar && (
+                <div className="acao-remover">
+                  <CButton
+                    color="danger"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      removerAmbiente(idx)
+                    }}
+                  >
+                    {btnRemoverAmbienteTxt}
+                  </CButton>
+                </div>
+              )}
             </CRow>
 
             <CCollapse className="div-collapse" visible={amb.aberto}>
@@ -210,7 +215,7 @@ export default function CardAreaComum({ ambientes, setAmbientes, showStatus = fa
                       <CTableHeaderCell>Item</CTableHeaderCell>
                       <CTableHeaderCell>Descrição</CTableHeaderCell>
                       {showStatus && <CTableHeaderCell>Status</CTableHeaderCell>}
-                      <CTableHeaderCell>Ações</CTableHeaderCell>
+                      {podeEditar && <CTableHeaderCell>Ações</CTableHeaderCell>}
                     </CTableRow>
                   </CTableHead>
                   <CTableBody>
@@ -221,7 +226,11 @@ export default function CardAreaComum({ ambientes, setAmbientes, showStatus = fa
                             className="auto-expand"
                             rows="1"
                             value={linha.item}
-                            onChange={(e) => atualizarLinha(idx, i, 'item', e.target.value)}
+                            readOnly={!podeEditar}
+                            onChange={(e) => {
+                              if (!podeEditar) return
+                              atualizarLinha(idx, i, 'item', e.target.value)
+                            }}
                           />
                         </CTableDataCell>
                         <CTableDataCell style={{ position: 'relative' }}>
@@ -230,14 +239,18 @@ export default function CardAreaComum({ ambientes, setAmbientes, showStatus = fa
                             rows="1"
                             ref={(el) => (linha.descricaoRef = el)}
                             value={linha.descricao}
+                            readOnly={!podeEditar}
                             onClick={(e) => {
+                              if (podeEditar) {
                               e.stopPropagation();
                               setPopupTarget({ ambIdx: idx, itemIdx: i, ref: e.target });
+                              }
                             }}
                             onChange={(e) =>
-                              atualizarLinha(idx, i, 'descricao', e.target.value)
+                              podeEditar && atualizarLinha(idx, i, 'descricao', e.target.value)
                             }
                             onInput={(e) => {
+                              if (!podeEditar) return
                               e.target.style.height = 'auto';
                               e.target.style.height = e.target.scrollHeight + 'px';
                             }}
@@ -277,24 +290,28 @@ export default function CardAreaComum({ ambientes, setAmbientes, showStatus = fa
                             )}
                           </CTableDataCell>
                         )}
-                        <CTableDataCell>
-                          <CButton
-                            color="danger"
-                            size="sm"
-                            onClick={() => removerLinha(idx, i)}
-                          >
-                            Remover
+                        {podeEditar && (
+                          <CTableDataCell>
+                            <CButton
+                              color="danger"
+                              size="sm"
+                              onClick={() => removerLinha(idx, i)}
+                            >
+                              Remover
+                            </CButton>
+                          </CTableDataCell>
+                        )}
+                      </CTableRow>
+                    ))}
+                    {podeEditar && (
+                      <CTableRow>
+                        <CTableDataCell colSpan={4}>
+                          <CButton color="success" size="sm" onClick={() => adicionarLinha(idx)}>
+                            + Adicionar Linha
                           </CButton>
                         </CTableDataCell>
                       </CTableRow>
-                    ))}
-                    <CTableRow>
-                      <CTableDataCell colSpan={4}>
-                        <CButton color="success" size="sm" onClick={() => adicionarLinha(idx)}>
-                          + Adicionar Linha
-                        </CButton>
-                      </CTableDataCell>
-                    </CTableRow>
+                    )}
                   </CTableBody>
                 </CTable>
               </CCard>

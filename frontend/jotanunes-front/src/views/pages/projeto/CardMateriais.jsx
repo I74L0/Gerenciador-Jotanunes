@@ -13,7 +13,7 @@ import {
 } from '@coreui/react'
 import { useState } from 'react'
 
-export default function CardMateriais({ materiais, setMateriais }) {
+export default function CardMateriais({ materiais, podeEditar, setMateriais }) {
   const [confirmItem, setConfirmItem] = useState(null)
 
   // defensive fallback: garante um array
