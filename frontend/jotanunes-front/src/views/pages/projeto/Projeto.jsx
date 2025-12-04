@@ -60,16 +60,16 @@ const Projeto = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [menuCoords, setMenuCoords] = useState({ top: 0, left: 0 })
   const [usuario, setUsuario] = useState({
-      username: '',
-      email: '',
-      first_name: '',
-      last_name: '',
-    })
+    username: '',
+    email: '',
+    first_name: '',
+    last_name: '',
+  })
   const userIconRef = useRef(null)
-  
+
   useEffect(() => {
     if (!showProfileMenu) return
-  
+
     const update = () => {
       const rect = userIconRef.current?.getBoundingClientRect()
       if (rect) {
@@ -79,19 +79,19 @@ const Projeto = () => {
         setMenuCoords({ top, left })
       }
     }
-  
+
     update()
     window.addEventListener('resize', update)
     window.addEventListener('scroll', update, true)
-  
+
     const onDocClick = (e) => {
       if (userIconRef.current && !userIconRef.current.contains(e.target)) {
         setShowProfileMenu(false)
       }
     }
-  
+
     document.addEventListener('mousedown', onDocClick)
-  
+
     return () => {
       window.removeEventListener('resize', update)
       window.removeEventListener('scroll', update, true)
@@ -100,7 +100,7 @@ const Projeto = () => {
   }, [showProfileMenu])
   const handleVerPerfil = () => navigate('/perfil')
   const [permissoes, setPermissoes] = useState(null)
-  
+
   const podeAdministrar = permissoes?.is_superuser
   const podeEditar = permissoes?.is_superuser || permissoes?.is_criador
   const podeGestionar = permissoes?.is_gestor
@@ -189,7 +189,7 @@ const Projeto = () => {
             estado: dadosObra.estado || '',
             cidade: dadosObra.cidade || '',
             texto: dadosObra.texto_prefacio || '',
-            observacao_gestor: dadosObra.observacao_gestor || ''
+            observacao_gestor: dadosObra.observacao_gestor || '',
           })
 
           const rawAmbientes =
@@ -246,7 +246,7 @@ const Projeto = () => {
             estado: dadosRef.estado || '',
             cidade: dadosRef.cidade || '',
             texto: dadosRef.texto_prefacio || '',
-            observacao_gestor: dadosObra.observacao_gestor || ''            
+            observacao_gestor: dadosObra.observacao_gestor || '',
           })
 
           const rawAmbientes =
@@ -255,7 +255,7 @@ const Projeto = () => {
 
           setUnidadesData(todosAmbientes.filter((a) => a.tipo === 'PRIVATIVO'))
           setAreacomumData(todosAmbientes.filter((a) => a.tipo === 'COMUM'))
-          
+
           const normalizeMateriais = (rawMateriais = []) => {
             return rawMateriais.map((m) => {
               // 1. Pega o nome do item. Se for { nome: "..." }, pega o nome. Senão, assume que é string.
@@ -319,7 +319,7 @@ const Projeto = () => {
     }
 
     carregarDadosDoProjeto()
-  }, [id, referenciaId])  
+  }, [id, referenciaId])
 
   const validarEstadoCidade = () => {
     if (
@@ -384,7 +384,7 @@ const Projeto = () => {
 
     // Retorna todos os ambientes juntos no formato final
     return [...MapUnidades, ...MapAreaComum]
-  }  
+  }
 
   const protectiveSave = async () => {
     if (!prefacioData.nome) {
@@ -411,11 +411,11 @@ const Projeto = () => {
       observacao_gestor: prefacioData.observacao_gestor,
       status: 'NAO_FINALIZADO',
       ambientes: ambientes,
-      materiais: materialData
+      materiais: materialData,
     }
 
     console.log('Salvando dados do projeto antes de sair...', dadosParaSalvar)
-    
+
     try {
       let response
       let statusTest
@@ -442,6 +442,7 @@ const Projeto = () => {
     }
   }
 
+  // se o projeto estiver em análise, salva o objeto com status 'FINALIZADO', se não salva como 'EM_ANALISE'
   const handleSave = async () => {
     if (!validarEstadoCidade()) {
       return
@@ -450,23 +451,7 @@ const Projeto = () => {
     setIsSaving(true)
     setSaveError(null)
 
-    const compactarAmbientes = (ambs) => (ambs || []).map((a) => ({
-      nome: a.nome,
-      tipo: a.tipo,
-      itens: (a.itens || [])
-        .map((it) => {
-          if (!it) return null
-          const nome = it.nome ?? it.item ?? it.name ?? ''
-          const descricoes = Array.isArray(it.descricoes) ? it.descricoes.filter(Boolean) : []
-          if (!nome && !descricoes.length) return null
-          const out = { nome }
-          if (descricoes.length) out.descricoes = descricoes
-          return out
-        })
-        .filter(Boolean),
-    }))
-    
-    const ambientesCompactos = compactarAmbientes(getMappedAmbientes())
+    const ambientes = getMappedAmbientes()
 
     const dadosParaSalvar = {
       nome: prefacioData.nome,
@@ -474,33 +459,24 @@ const Projeto = () => {
       cidade: prefacioData.cidade,
       texto_prefacio: prefacioData.texto,
       observacao_final: observacoesData.observacao_final,
-      status: 'EM_ANALISE',
-      ambientes: ambientesCompactos,
-      materiais: materialData
+      observacao_gestor: prefacioData.observacao_gestor,
+      status: showStatus === 'EM_ANALISE' ? 'FINALIZADO' : 'EM_ANALISE',
+      ambientes: ambientes,
+      materiais: materialData,
     }
 
     console.log('Salvando dados do projeto...', dadosParaSalvar)
 
     try {
+      let response
       if (id) {
-        // usa axios direto com timeout maior
-        const token = localStorage.getItem('accessToken')
-        const url = `http://127.0.0.1:8000/api/obras/${id}/`
-        const resp = await axios.patch(url, dadosParaSalvar, {
-          headers: { Authorization: 'Bearer ' + token },
-          timeout: 60000,
-        })
-        console.log('Projeto atualizado!', resp.data)
-        navigate('/index')
+        response = await obras.partialUpdate(id, dadosParaSalvar)
+        console.log('Projeto atualizado!', response.data)
+        navigate(`/index`)
       } else {
-        const token = localStorage.getItem('accessToken')
-        const url = `http://127.0.0.1:8000/api/obras/`
-        const resp = await axios.post(url, dadosParaSalvar, {
-          headers: { Authorization: 'Bearer ' + token },
-          timeout: 60000,
-        })
-        console.log('Novo projeto criado!', resp.data)
-        navigate('/index')
+        response = await obras.create(dadosParaSalvar)
+        console.log('Novo projeto criado!', response.data)
+        navigate(`/index`)
       }
     } catch (error) {
       console.error('Erro ao salvar:', error)
@@ -554,32 +530,35 @@ const Projeto = () => {
             </div>
           </div>
           {/* Perfil: renderizado via portal para escapar de stacking contexts */}
-          {showProfileMenu && userIconRef.current && createPortal(
-            <div
-              className="profile-menu"
-              style={{
-                position: 'absolute',
-                top: `${menuCoords.top}px`,
-                left: `${menuCoords.left}px`,
-                zIndex: 200000,
-              }}
-            >
-              <button onClick={handleVerPerfil} className="profile-btn">
-                Ver Perfil
-              </button>
-              {podeAdministrar && (
-                <button
-                  onClick={() => (window.location.href = 'http://127.0.0.1:8000/admin/')}
-                  className="profile-btn"
-                >
-                  Administrador
+          {showProfileMenu &&
+            userIconRef.current &&
+            createPortal(
+              <div
+                className="profile-menu"
+                style={{
+                  position: 'absolute',
+                  top: `${menuCoords.top}px`,
+                  left: `${menuCoords.left}px`,
+                  zIndex: 200000,
+                }}
+              >
+                <button onClick={handleVerPerfil} className="profile-btn">
+                  Ver Perfil
                 </button>
-              )}
-              <button onClick={handleLogout} className="profile-btn">
-                Sair
-              </button>
-            </div>
-          , document.body)}
+                {podeAdministrar && (
+                  <button
+                    onClick={() => (window.location.href = 'http://127.0.0.1:8000/admin/')}
+                    className="profile-btn"
+                  >
+                    Administrador
+                  </button>
+                )}
+                <button onClick={handleLogout} className="profile-btn">
+                  Sair
+                </button>
+              </div>,
+              document.body,
+            )}
         </div>
         <hr />
         <ul className="header__menu">
@@ -618,22 +597,22 @@ const Projeto = () => {
           />
         )}
         {activeTab === 2 && (
-          <CardAreaComum 
-            ambientes={areacomumData} 
+          <CardAreaComum
+            ambientes={areacomumData}
             setAmbientes={setAreacomumData}
             showStatus={showStatus}
             podeEditar={podeEditar}
-            podeGestionar={podeGestionar}            
+            podeGestionar={podeGestionar}
           />
         )}
         {activeTab === 3 && (
           <CardMateriais
-            materiais={materialData} 
-            setMateriais={setMaterialData} 
+            materiais={materialData}
+            setMateriais={setMaterialData}
             showStatus={showStatus}
             podeEditar={podeEditar}
             podeGestionar={podeGestionar}
-            />
+          />
         )}
         {activeTab === 4 && (
           <CardObservacoes observacao_final={observacoesData} setObservacoes={setObservacoesData} />
