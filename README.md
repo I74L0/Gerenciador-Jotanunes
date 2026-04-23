@@ -1,80 +1,191 @@
-# fullstack-jotanunes (RODANDO SEM O DOCKER E MYSQL, APENAS PARA TESTE)
-Branch :italo
+# 🏗️ Gerenciador de Ativos Jotanunes Construtora
 
-No início precisamos ativar o venv
+> Uma solução moderna para gerenciamento de ativos e projetos de construção
 
-(TUDO A BAIXO PRECISA SER DIGITADO NO TERMINAL)
+## 📋 Sumário
 
+- [📂 Estrutura do Projeto](#-estrutura-do-projeto)
+- [🛠️ Stack Tecnológico](#️-stack-tecnológico)
+- [⚙️ Instalação e Configuração](#️-instalação-e-configuração)
+- [🚀 Quick Start](#-quick-start)
+- [🌐 URLs e Endpoints](#-urls-e-endpoints)
+
+---
+
+## 📂 Estrutura do Projeto
+
+```
+fullstack-jotanunes/
+├── backend/               # API REST (Django + DRF)
+│   └── backend-jotanunes/
+│       ├── jotanunes/    # App principal
+│       ├── residencia/   # Configurações Django
+│       └── manage.py
+├── frontend/             # Interface Web (React + Vite)
+│   └── jotanunes-front/
+│       ├── src/
+│       ├── public/
+│       └── vite.config.mjs
+├── nginx/                # Configuração de reverse proxy
+└── docker-compose.yml    # Orquestração de containers
+```
+
+## 🛠️ Stack Tecnológico
+
+| Camada | Tecnologia |
+|--------|-----------|
+| **Frontend** | React, Vite, ESLint |
+| **Backend** | Django, Django REST Framework |
+| **Banco de Dados** | SQLite (desenvolvimento) |
+| **Containerização** | Docker, Docker Compose |
+| **Proxy** | Nginx |
+
+---
+
+## ⚙️ Instalação e Configuração
+
+### 1️⃣ Configuração Inicial (Ambiente Virtual)
+
+Crie um ambiente virtual Python:
+
+```bash
 python -m venv venv
+```
 
+Ative o ambiente virtual de acordo com seu sistema operacional:
+
+**Windows (PowerShell):**
+```powershell
 .\venv\Scripts\Activate.ps1
+```
 
-se der erro:
-
+**Windows (CMD):**
+```bash
 venv\Scripts\activate.bat
+```
 
-ou:
-
+**Linux/Mac:**
+```bash
 source venv/Scripts/activate
+```
 
-e caso de linux ou macOS:
+---
 
-source venv/bin/activate
+### 2️⃣ Backend - Django
 
-git clone -b ndocker https://github.com/cauaunit/fullstack-jotanunes.git
+#### 📍 Navegação
 
-ou
+```bash
+cd backend/backend-jotanunes
+```
 
-git clone -b italo https://github.com/cauaunit/fullstack-jotanunes.git
+#### 🔧 Instalação e Setup
 
-(TESTAR A BRANCH MAIS ATUAL, QUE FOI MODIFICADA POR ÚLTIMO)
-
-no mesmo nível do manage.py(arquivo do backend), rodar:
-
-(para chegar no nível do manage.py, digitamos cd fullstack-jotanunes, cd backend, cd backend-jotanunes)
-
+```bash
+# Instalar dependências
 pip install -r requirements.txt
 
+# Executar migrações do banco de dados
 python manage.py migrate
 
+# Criar usuário administrador (superuser)
 python manage.py createsuperuser
 
+# Iniciar servidor
 python manage.py runserver
-
-teremos http://127.0.0.1:8000/
-
-http://127.0.0.1:8000/admin
-
-http://127.0.0.1:8000/api/*                
-
-"*" = urls, por exemplo http://127.0.0.1:8000/api/obras
-
-no frontend iremos rodar npm install
-
-para chegar no frontend, digitamos cd fullstack-jotanunes, cd frontend, cd jotanunes-front
-
-quando chegarmos ao frontend, digitamos npm start
-
-com isso teremos http://localhost:3000
-
-e so acender o front
-
-## Código pro Back
 ```
+
+✅ Backend estará disponível em: **http://127.0.0.1:8000**
+
+---
+
+### 3️⃣ Frontend - React + Vite
+
+#### 📍 Navegação
+
+```bash
+cd frontend/jotanunes-front
+```
+
+#### 🔧 Instalação e Setup
+
+```bash
+# Instalar dependências
+npm install
+
+# Iniciar servidor de desenvolvimento
+npm start
+```
+
+✅ Frontend estará disponível em: **http://localhost:3000**
+
+---
+
+## 🚀 Quick Start
+
+### Execução Rápida do Backend
+
+```bash
 python -m venv venv
 venv\Scripts\activate.bat
 cd backend/backend-jotanunes
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
-
 ```
 
-## Código pro Front
+### Execução Rápida do Frontend
 
-```
+```bash
 cd frontend/jotanunes-front
 npm install
 npm start
+```
+
+---
+
+## 🌐 URLs e Endpoints
+
+### Admin & Aplicação
+
+| URL | Descrição |
+|-----|-----------|
+| **http://127.0.0.1:8000/** | Página inicial do backend |
+| **http://127.0.0.1:8000/admin** | Painel administrativo Django |
+| **http://127.0.0.1:8000/api/** | Base de todos os endpoints |
+
+### Exemplos de Endpoints da API
 
 ```
+http://127.0.0.1:8000/api/obras          # Listar obras
+http://127.0.0.1:8000/api/ambientes      # Listar ambientes
+http://127.0.0.1:8000/api/materiais      # Listar materiais
+```
+
+### Frontend
+
+| URL | Descrição |
+|-----|-----------|
+| **http://localhost:3000** | Aplicação React principal |
+
+---
+
+## 📝 Notas Importantes
+
+- Certifique-se de estar no diretório correto antes de executar os comandos
+- O backend deve estar rodando antes de acessar a aplicação frontend
+- Use o painel admin (http://127.0.0.1:8000/admin) para gerenciar dados
+- As migrações devem ser executadas sempre que há mudanças no banco de dados
+
+---
+
+## 🔗 Referências
+
+- [Django Documentation](https://docs.djangoproject.com/)
+- [Django REST Framework](https://www.django-rest-framework.org/)
+- [React Documentation](https://react.dev/)
+- [Vite Documentation](https://vitejs.dev/)
+
+---
+
+**Desenvolvido com ❤️**
