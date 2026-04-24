@@ -1,35 +1,24 @@
 {
-  "name": "@coreui/coreui-free-react-admin-template",
-  "version": "5.5.0",
-  "description": "CoreUI Free React Admin Template",
-  "homepage": ".",
-  "bugs": {
-    "url": "https://github.com/coreui/coreui-free-react-admin-template/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:coreui/coreui-free-react-admin-template.git"
-  },
-  "license": "MIT",
-  "author": "The CoreUI Team (https://github.com/orgs/coreui/people)",
+  "name": "jotanunes-front",
+  "version": "1.0.0",
+  "description": "Gerenciador de Ativos - Jotanunes Construtora",
+  "private": true,
   "scripts": {
     "build": "vite build",
     "lint": "eslint",
     "serve": "vite preview",
-    "start": "vite"
+    "start": "vite",
+    "dev": "vite"
   },
   "dependencies": {
-    "@coreui/chartjs": "^4.1.0",
     "@coreui/coreui": "^5.4.1",
     "@coreui/icons": "^3.0.1",
     "@coreui/icons-react": "^2.3.0",
     "@coreui/react": "^5.7.1",
-    "@coreui/react-chartjs": "^3.0.0",
     "@coreui/utils": "^2.0.2",
     "@popperjs/core": "^2.11.8",
     "axios": "^1.13.1",
     "bootstrap": "^5.3.8",
-    "chart.js": "^4.5.0",
     "classnames": "^2.5.1",
     "core-js": "^3.45.0",
     "framer-motion": "^12.23.21",
@@ -39,7 +28,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.5.0",
-    "react-popper": "^2.3.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.7.1",
     "redux": "5.0.1",
