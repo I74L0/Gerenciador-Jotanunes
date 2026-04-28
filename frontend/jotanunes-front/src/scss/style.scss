@@ -4,7 +4,7 @@
   $secondary: variables.$secondary,
   $enable-deprecation-messages: false,
 );
-@use "@coreui/chartjs/scss/coreui-chartjs";
+// @use "@coreui/chartjs/scss/coreui-chartjs";
 @use "vendors/simplebar";
 
 // Prevent zoom issues when DevTools is closed
