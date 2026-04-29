@@ -15,9 +15,9 @@
 ## 📂 Estrutura do Projeto
 
 ```
-fullstack-jotanunes/
+Gerenciador-jotanunes/
 ├── backend/               # API REST (Django + DRF)
-│   ├── jotanunes/         # App principal
+│   ├── app/         # App principal
 │   ├── residencia/        # Configurações Django
 │   └── manage.py
 ├── frontend/             # Interface Web (React + Vite)

@@ -40,7 +40,7 @@ Ao escrever ou modificar código, os agentes devem respeitar as seguintes tecnol
 ## 📂 Estrutura e Arquivos Chave
 
 *   **`README.md`**: Instruções detalhadas de inicialização local, scripts e URLs da API. **Leitura obrigatória inicial**.
-*   **`/backend/jotanunes/`**: App principal do Django com a lógica de negócios e endpoints da API (obras, ambientes, materiais).
+*   **`/backend/app/`**: App principal do Django com a lógica de negócios e endpoints da API (obras, ambientes, materiais).
 *   **`/backend/residencia/`**: Pasta de configurações globais do projeto Django (`settings.py`, `urls.py`).
 *   **`/frontend/src/`**: Código-fonte do frontend.
 *   **`/frontend/vite.config.mjs`**: Configurações de build do frontend, incluindo configurações de plugins, aliases e dependências do Vite.
