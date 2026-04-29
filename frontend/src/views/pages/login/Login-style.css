@@ -1,57 +1,136 @@
-.col {
-  height: -webkit-fill-available;
+/* ================================================================
+   LOGIN PAGE – Split-Screen Layout (Moderno / Corporativo)
+   ================================================================ */
+
+/* ── Wrapper principal ─────────────────────────────────────────── */
+.login-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
 
-.btn-login {
-  color: white;
-  border: none;
+/* ── Painel esquerdo: imagem edge-to-edge ──────────────────────── */
+.login-image-panel {
+  flex: 0 0 55%;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-image-panel img {
   width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* Overlay suave para dar profundidade à imagem */
+.login-image-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 10, 30, 0.35) 0%,
+    rgba(10, 10, 30, 0.10) 100%
+  );
+  pointer-events: none;
+}
+
+/* ── Painel direito: formulário ────────────────────────────────── */
+.login-form-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa; /* cinza-claríssimo neutro */
+  padding: 3rem 2rem;
+}
+
+/* ── Logo acima do formulário ──────────────────────────────────── */
+.login-logo {
+  margin-bottom: 2.25rem;
+}
+
+.login-logo img {
+  height: 48px;
+  display: block;
+}
+
+/* ── Card do formulário ────────────────────────────────────────── */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem 2rem;
+}
+
+/* ── Título do card ─────────────────────────────────────────────── */
+.login-card h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1a1d2e;
+  margin-bottom: 0.25rem;
+}
+
+.login-subtitle {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Separador ─────────────────────────────────────────────────── */
+.login-card hr {
+  border-color: #e9ecef;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Botão de login ─────────────────────────────────────────────── */
+.btn-login {
+  width: 100%;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
 .btn-login:hover {
-  background-color: var(cui-btn-hover-bg);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(var(--cui-primary-rgb), 0.35);
 }
 
+.btn-login:active {
+  transform: translateY(0);
+}
+
+/* ── Row do botão sem gutter lateral ──────────────────────────── */
 .row-login {
   --cui-gutter-x: 0 !important;
 }
 
-.background {
-  background-image: linear-gradient(var(--cui-secondary), var(--cui-primary));
-  flex: 1;
-  height: calc(100% - 97px);
-}
-
-.col-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.col-image {
-  margin: 15px;
-  width: 47%;
-  height: 95%;
-  border-radius: 15px;
-  border: 2px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 8px 80px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-}
-
-.col-login {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 50%;
-  height: 100%;
-}
-
+/* ── Responsividade: oculta o painel de imagem em telas menores ── */
 @media screen and (max-width: 1000px) {
-  .col-image {
+  .login-image-panel {
     display: none;
   }
-  
-  .col-login {
-    width: 100%;
+
+  .login-form-panel {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .login-card {
+    padding: 2rem 1.25rem;
+    border-radius: 12px;
   }
 }
