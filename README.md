@@ -102,7 +102,7 @@ python manage.py runserver
 #### 📍 Navegação
 
 ```bash
-cd frontend/jotanunes-front
+cd frontend
 ```
 
 #### 🔧 Instalação e Setup
@@ -136,7 +136,9 @@ python manage.py runserver
 ### Execução Rápida do Frontend
 
 ```bash
-cd frontend/jotanunes-front
+python -m venv venv
+venv\Scripts\activate.bat
+cd frontend
 npm install
 npm start
 ```

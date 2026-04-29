@@ -23,7 +23,7 @@ Ao escrever ou modificar código, os agentes devem respeitar as seguintes tecnol
     *   Siga as convenções do Django para criação de Models, Views (preferencialmente ViewSets do DRF) e Serializers.
     *   Sempre verifique a necessidade de criar migrações ao alterar modelos (`models.py`).
 
-### Frontend (Pasta: `/frontend/jotanunes-front/`)
+### Frontend (Pasta: `/frontend/`)
 *   **Linguagem:** JavaScript / JSX
 *   **Biblioteca:** React
 *   **Build Tool:** Vite
@@ -42,13 +42,13 @@ Ao escrever ou modificar código, os agentes devem respeitar as seguintes tecnol
 *   **`README.md`**: Instruções detalhadas de inicialização local, scripts e URLs da API. **Leitura obrigatória inicial**.
 *   **`/backend/jotanunes/`**: App principal do Django com a lógica de negócios e endpoints da API (obras, ambientes, materiais).
 *   **`/backend/residencia/`**: Pasta de configurações globais do projeto Django (`settings.py`, `urls.py`).
-*   **`/frontend/jotanunes-front/src/`**: Código-fonte do frontend.
-*   **`/frontend/jotanunes-front/vite.config.mjs`**: Configurações de build do frontend, incluindo configurações de plugins, aliases e dependências do Vite.
+*   **`/frontend/src/`**: Código-fonte do frontend.
+*   **`/frontend/vite.config.mjs`**: Configurações de build do frontend, incluindo configurações de plugins, aliases e dependências do Vite.
 
 ## 📝 Regras de Interação para Agentes
 
 1.  **Diretórios de Execução:** Preste muita atenção ao diretório atual ao executar comandos de terminal:
     *   Comandos backend (`python manage.py ...`, `pip install ...`) **devem** ser executados em `/backend/` com o ambiente virtual (venv) ativado.
-    *   Comandos frontend (`npm install`, `npm start`, etc.) **devem** ser executados em `/frontend/jotanunes-front/`.
+    *   Comandos frontend (`npm install`, `npm start`, etc.) **devem** ser executados em `/frontend/`.
 2.  **Verificação de Dependências:** Diante de erros de compilação no frontend (como módulos ou folhas de estilo não encontrados), o agente deve primeiro inspecionar o `package.json` para confirmar a presença das dependências ou verificar a pasta `node_modules`.
 3.  **Ambiente Isolado:** O projeto usa Docker, mas o desenvolvimento local atual é feito via ambientes isolados (Venv e node_modules). Respeite esse fluxo a menos que o usuário solicite explicitamente trabalhar com os containers.

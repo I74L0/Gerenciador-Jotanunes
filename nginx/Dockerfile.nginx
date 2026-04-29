@@ -3,11 +3,11 @@ FROM node:20-alpine AS builder
 ARG VITE_API_URL
 ENV VITE_API_URL=${VITE_API_URL}
 WORKDIR /app
-COPY ./frontend/jotanunes-front/package.json ./frontend/jotanunes-front/package-lock.json ./
+COPY ./frontend/package.json ./frontend/package-lock.json ./
 RUN npm ci
 
 # Copia o resto do código do frontend
-COPY ./frontend/jotanunes-front/ ./
+COPY ./frontend/ ./
 RUN npm run build
 
 FROM nginx:1.25-alpine
