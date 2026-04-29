@@ -11,7 +11,7 @@ services:
       - mysql_data:/var/lib/mysql
     restart: always
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -46,12 +46,12 @@ services:
 
   backend:
     build:
-      context: ./backend/backend-jotanunes
+      context: ./backend
       dockerfile: Dockerfile
     container_name: django_backend_jotanunes
     command: gunicorn residencia.wsgi:application --bind 0.0.0.0:8000
     volumes:
-      - ./backend/backend-jotanunes:/app
+      - ./backend:/app
       - staticfiles_volume:/app/staticfiles
       - mediafiles_volume:/app/mediafiles
     expose:
@@ -69,12 +69,12 @@ services:
 
   celery_worker:
     build:
-      context: ./backend/backend-jotanunes
+      context: ./backend
       dockerfile: Dockerfile
     container_name: celery_worker_jotanunes
     command: celery -A residencia worker -l info
     volumes:
-      - ./backend/backend-jotanunes:/app
+      - ./backend:/app
     env_file:
       - .env
     depends_on:

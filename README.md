@@ -17,15 +17,13 @@
 ```
 fullstack-jotanunes/
 ├── backend/               # API REST (Django + DRF)
-│   └── backend-jotanunes/
-│       ├── jotanunes/    # App principal
-│       ├── residencia/   # Configurações Django
-│       └── manage.py
+│   ├── jotanunes/         # App principal
+│   ├── residencia/        # Configurações Django
+│   └── manage.py
 ├── frontend/             # Interface Web (React + Vite)
-│   └── jotanunes-front/
-│       ├── src/
-│       ├── public/
-│       └── vite.config.mjs
+│   ├── src/
+│   ├── public/
+│   └── vite.config.mjs
 ├── nginx/                # Configuração de reverse proxy
 └── docker-compose.yml    # Orquestração de containers
 ```
@@ -76,7 +74,7 @@ source venv/Scripts/activate
 #### 📍 Navegação
 
 ```bash
-cd backend/backend-jotanunes
+cd backend
 ```
 
 #### 🔧 Instalação e Setup
@@ -128,7 +126,7 @@ npm start
 ```bash
 python -m venv venv
 venv\Scripts\activate.bat
-cd backend/backend-jotanunes
+cd backend
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py createsuperuser

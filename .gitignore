@@ -1,7 +1,7 @@
 # Ignorando arquivos de cache
-backend/backend-jotanunes/jotanunes/migrations/__pycache__/
-backend/backend-jotanunes/jotanunes/__pycache__/
-backend/backend-jotanunes/residencia/__pycache__/
+backend/jotanunes/migrations/__pycache__/
+backend/jotanunes/__pycache__/
+backend/residencia/__pycache__/
 .vscode/
 node_modules/
 venv/
