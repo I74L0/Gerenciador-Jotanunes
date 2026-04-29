@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
+  CBadge,
   CButton,
-  CCardTitle,
-  CCardText,
-  CForm,
+  CFormInput,
   CFormSelect,
-  CHeader,
   CImage,
-  CContainer,
   CSpinner,
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilPlus, cilArrowRight, cilUser } from '@coreui/icons'
 import './Index-style.css'
 import { obras, handleLogout, attemptRefresh, getUser } from '../../../api'
 
@@ -180,16 +179,16 @@ const Index = () => {
   const renderMainContent = () => {
     if (isLoading) {
       return (
-        <div className="d-flex justify-content-center align-items-center h-100">
-          <CSpinner color="primary" />
-          <span className="ms-2">Carregando obras...</span>
+        <div className="idx-state">
+          <CSpinner color="dark" />
+          <span>Carregando obras...</span>
         </div>
       )
     }
 
     if (error) {
       return (
-        <div className="d-flex justify-content-center align-items-center h-100 text-danger">
+        <div className="idx-state idx-state--error">
           {error}
         </div>
       )
@@ -199,14 +198,14 @@ const Index = () => {
 
     if (obrasFiltradas.length === 0) {
       return (
-        <div className="d-flex justify-content-center align-items-center h-100">
+        <div className="idx-state">
           <p>Nenhuma obra encontrada com os filtros atuais.</p>
         </div>
       )
     }
 
     return (
-      <div className="containerObras">
+      <div className="idx-obras-list">
         {obrasFiltradas
           .sort(
             (a, b) =>
@@ -214,25 +213,35 @@ const Index = () => {
               getStatusPriority(getStatusClass(b.status)),
           )
           .map((obra) => (
-            <div key={obra.id} className="obraItem">
-              <button
-                className="abrirProjeto_botao"
-                onClick={() => navigate(`/projeto/${obra.id}`)}
-              >
-                <p className="IconeAquivo">{'>'}</p>
-                <p className="abrirProjeto_botao_texto">Abrir Projeto</p>
-              </button>
+            <div key={obra.id} className="idx-obra-card">
+              {/* Botão Abrir */}
+              <div className="idx-obra-card__open">
+                <CButton
+                  color="dark"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate(`/projeto/${obra.id}`)}
+                >
+                  <CIcon icon={cilArrowRight} size="sm" className="idx-open-icon" />
+                  <span className="ms-1">Abrir</span>
+                </CButton>
+              </div>
 
-              <h2 className="tituloProjeto">{obra.nome || `Obra ID: ${obra.id}`}</h2>
+              {/* Nome e localização */}
+              <div className="idx-obra-card__info">
+                <h6 className="idx-obra-card__name">
+                  {obra.nome || `Obra ID: ${obra.id}`}
+                </h6>
+                <p className="idx-obra-card__location">
+                  {obra.cidade && obra.estado
+                    ? `${obra.cidade} – ${obra.estado}`
+                    : 'Localização não definida'}
+                </p>
+              </div>
 
-              <p className="localizacaoProjeto">
-                {obra.cidade && obra.estado
-                  ? `${obra.cidade} - ${obra.estado}`
-                  : 'Localização não definida'}
-              </p>
-
+              {/* Checkbox referência */}
               {podeCriarProjeto && (
-                <div className="selecionar-referencia_container">
+                <div className="idx-obra-card__ref">
                   <input
                     className="selecionar-referencia"
                     type="checkbox"
@@ -241,11 +250,15 @@ const Index = () => {
                   />
                 </div>
               )}
-              <div className="statusProjeto">
-                <div
-                  className={`circle ${getStatusClass(obra.status)}`}
-                  title={getStatusLabel(obra.status)}
-                />
+
+              {/* Status Badge */}
+              <div className="idx-obra-card__status">
+                <CBadge
+                  className={`idx-badge--${getStatusClass(obra.status)}`}
+                  shape="rounded-pill"
+                >
+                  {getStatusLabel(obra.status)}
+                </CBadge>
               </div>
             </div>
           ))}
@@ -254,40 +267,42 @@ const Index = () => {
   }
 
   return (
-    <div className="fundo">
-      {/* ====== TOPBAR */}
-      <header className="header_conteiner">
-        <div className="logo">
-          <img src="/images/Logo Vermelha.png" alt="Logo" height={45} width={150} />
+    <div className="idx-page">
+
+      {/* ══════════ TOP BAR ══════════ */}
+      <header className="idx-topbar">
+        <div className="idx-topbar__logo">
+          <img src="/images/Logo Vermelha.png" alt="JotaNunes" />
         </div>
 
-        <div className="usuario_container position-relative">
-          <span>{usuario.username}</span>
+        <div className="idx-topbar__user">
+          <span className="idx-topbar__username">{usuario.username}</span>
 
-          {/* ÍCONE */}
           <div
-            className="user-icon"
+            className="idx-topbar__avatar"
             onClick={() => setShowProfileMenu(!showProfileMenu)}
-            style={{ cursor: 'pointer' }}
           >
-            👤
+            <CIcon icon={cilUser} size="sm" />
           </div>
 
-          {/* MENU DE PERFIL */}
+          {/* Menu de perfil */}
           {showProfileMenu && (
-            <div className="profile-menu">
-              <button onClick={handleVerPerfil} className="profile-btn">
+            <div className="idx-profile-menu">
+              <button onClick={handleVerPerfil} className="idx-profile-menu__btn">
                 Ver Perfil
               </button>
               {podeAdministrar && (
                 <button
                   onClick={() => (window.location.href = 'http://127.0.0.1:8000/admin/')}
-                  className="profile-btn"
+                  className="idx-profile-menu__btn"
                 >
                   Administrador
                 </button>
               )}
-              <button onClick={handleLogout} className="profile-btn">
+              <button
+                onClick={handleLogout}
+                className="idx-profile-menu__btn idx-profile-menu__btn--danger"
+              >
                 Sair
               </button>
             </div>
@@ -295,119 +310,114 @@ const Index = () => {
         </div>
       </header>
 
-      {/* SUBBAR */}
-      <header className="header2_conteiner">
+      {/* ══════════ TOOLBAR ══════════ */}
+      <div className="idx-toolbar">
+
+        {/* Criar Projeto */}
         {podeCriarProjeto && (
-          <div className="botao_criarProjeto">
-            <button
-              className="text-danger fw-bold d-flex align-items-center gap-2 border-0"
-              onClick={handleTemplateVazio}
-              style={{ backgroundColor: '#f5f6f8' }}
-            >
-              <CImage src="/images/mais.png" alt="Mais" height={20} />
-              <span className="text-dark">
-                {selectedRefId ? 'Criar Com Referência' : 'Criar Projeto'}
-              </span>
-            </button>
-          </div>
+          <CButton color="danger" size="sm" onClick={handleTemplateVazio}>
+            <CIcon icon={cilPlus} size="sm" />
+            <span className="ms-1 idx-toolbar__create-text">
+              {selectedRefId ? 'Criar Com Referência' : 'Criar Projeto'}
+            </span>
+          </CButton>
         )}
 
-        {/* 🔍 BARRA DE PESQUISA: AGORA SÓ POR NOME */}
-        <div className="barraPesquisa">
-          <input
-            className="form-control"
-            placeholder="Pesquisar por nome da obra"
+        {/* Pesquisa */}
+        <div className="idx-toolbar__search">
+          <CFormInput
+            placeholder="Pesquisar por nome da obra..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        <div className="bolinhasJuntas">
+        {/* Status pills */}
+        <div className="idx-status-filters">
           <div
-            className={`circle red ${filtroStatus === 'red' ? 'active-filter' : ''}`}
+            className={`idx-status-pill red ${filtroStatus === 'red' ? 'active-filter' : ''}`}
             onClick={() => setFiltroStatus(filtroStatus === 'red' ? null : 'red')}
-          ></div>
-
+            title="Recusado"
+          />
           <div
-            className={`circle orange ${filtroStatus === 'orange' ? 'active-filter' : ''}`}
+            className={`idx-status-pill orange ${filtroStatus === 'orange' ? 'active-filter' : ''}`}
             onClick={() => setFiltroStatus(filtroStatus === 'orange' ? null : 'orange')}
-          ></div>
-
+            title="Não Finalizado"
+          />
           <div
-            className={`circle blue ${filtroStatus === 'blue' ? 'active-filter' : ''}`}
+            className={`idx-status-pill blue ${filtroStatus === 'blue' ? 'active-filter' : ''}`}
             onClick={() => setFiltroStatus(filtroStatus === 'blue' ? null : 'blue')}
-          ></div>
-
+            title="Em análise"
+          />
           <div
-            className={`circle green ${filtroStatus === 'green' ? 'active-filter' : ''}`}
+            className={`idx-status-pill green ${filtroStatus === 'green' ? 'active-filter' : ''}`}
             onClick={() => setFiltroStatus(filtroStatus === 'green' ? null : 'green')}
-          ></div>
-
-          <div className="filter">⚲</div>
-        </div>
-      </header>
-
-      {/* CONTEÚDO */}
-      <section className="conteudoPrincipal">
-        <div className="header3_conteiner">
-          <span className="spanTitulo">Editor de Especificações Técnicas</span>
-
-          {/* DIV FILTROS: AGORA FUNCIONAIS */}
-          <div className="filtros">
-            <CFormSelect
-              style={{ width: '200px' }}
-              value={filtroEstado}
-              onChange={(e) => {
-                setFiltroEstado(e.target.value)
-                setFiltroCidade('') // Reseta cidade se mudar o estado
-              }}
-            >
-              <option value="">Todos os Estados</option>
-              {uniqueStates.map((uf, index) => (
-                <option key={index} value={uf}>
-                  {uf}
-                </option>
-              ))}
-            </CFormSelect>
-
-            <CFormSelect
-              style={{ width: '200px' }}
-              value={filtroCidade}
-              onChange={(e) => setFiltroCidade(e.target.value)}
-              disabled={!uniqueCities.length && !filtroCidade} // Desabilita se não houver cidades
-            >
-              <option value="">Todas as Cidades</option>
-              {uniqueCities.map((city, index) => (
-                <option key={index} value={city}>
-                  {city}
-                </option>
-              ))}
-            </CFormSelect>
-          </div>
+            title="Finalizado"
+          />
         </div>
 
-        <div className="main-content-placeholder" style={{ minHeight: 420 }}>
-          {renderMainContent()}
-        </div>
-      </section>
+        {/* Filtros de localização */}
+        <div className="idx-toolbar__filters">
+          <CFormSelect
+            size="sm"
+            value={filtroEstado}
+            onChange={(e) => {
+              setFiltroEstado(e.target.value)
+              setFiltroCidade('') // Reseta cidade se mudar o estado
+            }}
+          >
+            <option value="">Todos os Estados</option>
+            {uniqueStates.map((uf, index) => (
+              <option key={index} value={uf}>
+                {uf}
+              </option>
+            ))}
+          </CFormSelect>
 
-      {/* FOOTER */}
-      <div className="footer">
-        <div className="legendas_container">
-          <div className="legend-item">
-            <div className="legend-circle red"></div>Recusado
-          </div>
-          <div className="legend-item">
-            <div className="legend-circle blue"></div>Em análise
-          </div>
-          <div className="legend-item">
-            <div className="legend-circle orange"></div>Não Finalizado
-          </div>
-          <div className="legend-item">
-            <div className="legend-circle green"></div>Finalizado
-          </div>
+          <CFormSelect
+            size="sm"
+            value={filtroCidade}
+            onChange={(e) => setFiltroCidade(e.target.value)}
+            disabled={!uniqueCities.length && !filtroCidade} // Desabilita se não houver cidades
+          >
+            <option value="">Todas as Cidades</option>
+            {uniqueCities.map((city, index) => (
+              <option key={index} value={city}>
+                {city}
+              </option>
+            ))}
+          </CFormSelect>
         </div>
       </div>
+
+      {/* ══════════ CONTEÚDO PRINCIPAL ══════════ */}
+      <main className="idx-content">
+        <h5 className="idx-content__title">Editor de Especificações Técnicas</h5>
+        {renderMainContent()}
+      </main>
+
+      {/* ══════════ FOOTER / LEGENDA ══════════ */}
+      <footer className="idx-footer">
+        <div className="idx-legend">
+          <div className="idx-legend__item">
+            <div className="idx-legend__dot red" />
+            <span>Recusado</span>
+          </div>
+          <div className="idx-legend__item">
+            <div className="idx-legend__dot blue" />
+            <span>Em análise</span>
+          </div>
+          <div className="idx-legend__item">
+            <div className="idx-legend__dot orange" />
+            <span>Não Finalizado</span>
+          </div>
+          <div className="idx-legend__item">
+            <div className="idx-legend__dot green" />
+            <span>Finalizado</span>
+          </div>
+        </div>
+      </footer>
+
     </div>
   )
 }

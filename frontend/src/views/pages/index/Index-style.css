@@ -1,311 +1,291 @@
-html {
-  overflow-y: scroll;
+/* ================================================================
+   INDEX PAGE – Enterprise Dashboard Layout
+   ================================================================ */
+
+/* ── CSS Custom Properties ─────────────────────────────────────── */
+:root {
+  --idx-brand: #BC1F1B;
+  --idx-brand-dark: #8e1714;
+  --idx-surface: #f4f6f9;
+  --idx-card-bg: #ffffff;
+  --idx-text-primary: #1a1d2e;
+  --idx-text-secondary: #6c757d;
+  --idx-border: #e2e6ea;
+  --idx-radius: 10px;
+  --idx-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --idx-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --idx-transition: 0.2s ease;
 }
 
-body, html {
-  background: linear-gradient(#BC1F1B, rgb(54.2139534884, 8.9395348837, 7.7860465116));
-}
-
-/* container da página */
-.fundo {
-  position: relative;
-  font-family: Arial, sans-serif;
-  background: transparent;
-  height: 100vh;
+/* ── Page wrapper ──────────────────────────────────────────────── */
+.idx-page {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  background: var(--idx-surface);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: var(--idx-text-primary);
 }
 
-/* Topbar */
-.header_conteiner {
+/* ── Top Header ────────────────────────────────────────────────── */
+.idx-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 1.5rem;
+  background: var(--idx-card-bg);
+  border-bottom: 1px solid var(--idx-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.idx-topbar__logo img {
+  height: 40px;
+  display: block;
+}
+
+.idx-topbar__user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   position: relative;
-  z-index: 1;
-  display: flex;
-  height: 8vh;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: #fff;
 }
 
-.usuario_container {
-  transform: scale(110%);
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
+.idx-topbar__username {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--idx-text-secondary);
 }
 
-/* Subbar */
-.header2_conteiner {
-  display: flex;
-  height: 8vh;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: #f8f9fa;
-}
-
-.botao_criarProjeto{
-  width: 13%;
-}
-
-.barraPesquisa {
-  width: 60%;
-}
-
-/* Círculos */
-.circle {
-  width: 18px;
-  height: 18px;
+.idx-topbar__avatar {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.red { background: red; }
-.orange { background: orange; }
-.blue { background: blue; }
-.green { background: green; }
-
-/* Destaque quando círculo está ativo como filtro */
-.circle.active-filter {
-  transform: scale(1.1);
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
-}
-
-.circle:hover {
-  transform: scale(1.1);
-}
-
-.filter {
-  margin-left: 10px;
-  cursor: pointer;
-}
-
-.user-icon {
-  width: 35px;
-  height: 35px;
-  background: #122c33;
-  border-radius: 50%;
+  background: var(--idx-brand);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-}
-
-/* Footer legenda */
-.legend {
-  background: #eee;
-  border-radius: 6px;
-  padding: 6px 12px;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.legend-circle {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.gap-custom {
-  gap: 15rem; /* ou o valor que quiser */
-}
-
-.bolinhasJuntas {
-  display: flex;
-  gap: 8px;
-}
-
-/* Conteúdo principal */
-.conteudoPrincipal{
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  margin: 0px 0px 0px 25vh;
-  padding: 0px;
-  height: 78vh;
-  background: rgb(255, 255, 255);
-  width: 72%;
-}
-
-/* Ícone do usuário */
-.user-icon {
-  font-size: 22px;
-  background: #0c0c0c;
-  padding: 6px 10px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-/* Menu de perfil */
-.profile-menu {
-  position: absolute;
-  top: 45px;
-  right: 0;
-  background: white;
-  border-radius: 10px;
-  padding: 12px;
-  width: 160px;
-  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-  z-index: 9999;
-}
-
-.profile-email {
-  padding-left: 1px;   
-  padding-right: 12px;
-  font-weight: 600;
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.profile-btn {
-  width: 100%;
-  border: none;
-  background: #f5f5f5;
-  padding: 8px;
-  margin-bottom: 6px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.profile-btn:hover {
-  background: #e2e2e2;
-}
-
-
-.header3_conteiner{
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  margin: 0 0 0.6rem 1rem;
-  padding: 0;
-  overflow: visible;
-}
-
-.spanTitulo{
-  font-size: 1.2rem;
-  background-color: #e4e4e4;
-  padding: 0.3rem 9px;
-  border-radius: 0 0 10px 10px;
-  width: 20rem;
-  position: relative;
-  margin-left: -85px;
-  z-index: 10;
-}
-
-.filtros{
-  display: flex;
-  gap: 2.4rem;
-  margin: 0;
-  padding: 0;
-  margin-left: 6rem;
-}
-
-.containerObras{
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: 0.2rem;
-  height: 67vh;
-  max-height: 67vh;
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
-
-.containerObras::-webkit-scrollbar {
-  width: 0;
-}
-
-.obraItem {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  background: linear-gradient(to left, #e9e9e9, #cecece);
-  padding: 0.8rem 0.2rem;
-}
-
-.abrirProjeto_botao{
-  margin: 0;
+  color: #fff;
   font-size: 1rem;
-  background-color: transparent;
-  border: none;
   cursor: pointer;
-  width: 15%;
+  transition: box-shadow var(--idx-transition);
 }
 
-.abrirProjeto_botao_texto{
-  margin: 0;
+.idx-topbar__avatar:hover {
+  box-shadow: 0 0 0 3px rgba(188, 31, 27, 0.2);
 }
 
-.tituloProjeto{
-  padding-top: 8px;
-  width: 48%;
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-.localizacaoProjeto{
-  margin: 0;
-  width: 28%;
-}
-
-.selecionar-referencia_container{
-  width: 5%;
-}
-
-/* Botão de fechar */
-.close-btn {
+/* ── Profile Dropdown ──────────────────────────────────────────── */
+.idx-profile-menu {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--idx-card-bg);
+  border: 1px solid var(--idx-border);
+  border-radius: var(--idx-radius);
+  padding: 0.5rem;
+  min-width: 170px;
+  box-shadow: var(--idx-shadow-md);
+  z-index: 200;
+}
+
+.idx-profile-menu__btn {
+  display: block;
+  width: 100%;
   border: none;
   background: transparent;
-  font-size: 20px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  text-align: left;
   cursor: pointer;
+  transition: background var(--idx-transition);
+  color: var(--idx-text-primary);
 }
 
-/* Conteúdo do modal */
-.modal-content {
+.idx-profile-menu__btn:hover {
+  background: var(--idx-surface);
+}
+
+.idx-profile-menu__btn--danger {
+  color: var(--idx-brand);
+}
+
+/* ── Toolbar (search + filters + create) ───────────────────────── */
+.idx-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--idx-card-bg);
+  border-bottom: 1px solid var(--idx-border);
+  flex-wrap: wrap;
+}
+
+.idx-toolbar__search {
+  flex: 1;
+  min-width: 200px;
+  max-width: 500px;
+}
+
+.idx-toolbar__search .form-control {
+  border-radius: 8px;
+  border-color: var(--idx-border);
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.idx-toolbar__search .form-control:focus {
+  border-color: var(--idx-brand);
+  box-shadow: 0 0 0 3px rgba(188, 31, 27, 0.12);
+}
+
+/* ── Status filter pills ──────────────────────────────────────── */
+.idx-status-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.idx-status-pill {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--idx-transition);
+  position: relative;
+}
+
+.idx-status-pill:hover {
+  transform: scale(1.15);
+}
+
+.idx-status-pill.active-filter {
+  transform: scale(1.15);
+  border-color: var(--idx-text-primary);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+.idx-status-pill.red    { background: #e74c3c; }
+.idx-status-pill.orange { background: #f39c12; }
+.idx-status-pill.blue   { background: #3498db; }
+.idx-status-pill.green  { background: #27ae60; }
+
+/* ── Location dropdowns ───────────────────────────────────────── */
+.idx-toolbar__filters {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.idx-toolbar__filters .form-select {
+  min-width: 160px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  border-color: var(--idx-border);
+}
+
+.idx-toolbar__filters .form-select:focus {
+  border-color: var(--idx-brand);
+  box-shadow: 0 0 0 3px rgba(188, 31, 27, 0.12);
+}
+
+/* ── Main content area ─────────────────────────────────────────── */
+.idx-content {
+  flex: 1;
+  padding: 1.25rem 1.5rem;
+  overflow-y: auto;
+}
+
+.idx-content__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--idx-text-primary);
+  margin-bottom: 1rem;
+}
+
+/* ── Obra cards list ───────────────────────────────────────────── */
+.idx-obras-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
+  gap: 0.5rem;
 }
 
-/* Botões do modal */
-.modal-btn {
-  border: 2px solid #555;
-  border-radius: 8px;
-  font-weight: 500;
+.idx-obra-card {
+  background: var(--idx-card-bg);
+  border: 1px solid var(--idx-border);
+  border-radius: var(--idx-radius);
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all var(--idx-transition);
+  cursor: default;
 }
 
-/* Checkbox totalmente custom: remove aparência nativa e desenha o check */
+.idx-obra-card:hover {
+  border-color: #c5cad0;
+  box-shadow: var(--idx-shadow-sm);
+  transform: translateY(-1px);
+}
+
+.idx-obra-card__open {
+  flex-shrink: 0;
+}
+
+.idx-obra-card__open .btn {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
+}
+
+.idx-obra-card__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.idx-obra-card__name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--idx-text-primary);
+  margin: 0 0 0.15rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.idx-obra-card__location {
+  font-size: 0.8rem;
+  color: var(--idx-text-secondary);
+  margin: 0;
+}
+
+.idx-obra-card__ref {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Custom Checkbox (referência) ──────────────────────────────── */
 input.selecionar-referencia {
-  /* remove aparência nativa */
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-
-  /* caixa base */
   width: 20px;
   height: 20px;
-  border: 2px solid #8e9aa7;
+  border: 2px solid #b0b7c0;
   border-radius: 6px;
   background: #fff;
   display: grid;
   place-content: center;
   cursor: pointer;
-  box-sizing: border-box;
-  transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* ícone do check desenhado com bordas */
 input.selecionar-referencia::after {
   content: "";
   width: 7px;
@@ -314,259 +294,201 @@ input.selecionar-referencia::after {
   border-width: 0 2px 2px 0;
   transform: rotate(45deg) scale(0.9);
   opacity: 0;
-  transition: opacity .15s ease;
+  transition: opacity 0.15s ease;
 }
 
-/* estados de interação */
 input.selecionar-referencia:hover {
-  border-color: #6b7785;
+  border-color: var(--idx-brand);
 }
 
 input.selecionar-referencia:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(13, 110, 253, .25);
+  box-shadow: 0 0 0 3px rgba(188, 31, 27, 0.15);
 }
 
-/* marcado */
 input.selecionar-referencia:checked {
-  background: #0d6efd; /* cor do preenchimento */
-  border-color: #0d6efd;
+  background: var(--idx-brand);
+  border-color: var(--idx-brand);
 }
 
 input.selecionar-referencia:checked::after {
   opacity: 1;
 }
 
-.footer {
-  background: #fff;
+/* ── Status Badge (inside card) ────────────────────────────────── */
+.idx-obra-card__status {
+  flex-shrink: 0;
+}
+
+/* Badge colors by status */
+.idx-badge--red    { background-color: #e74c3c !important; color: #fff !important; }
+.idx-badge--orange { background-color: #f39c12 !important; color: #fff !important; }
+.idx-badge--blue   { background-color: #3498db !important; color: #fff !important; }
+.idx-badge--green  { background-color: #27ae60 !important; color: #fff !important; }
+
+/* ── Footer / Legend ───────────────────────────────────────────── */
+.idx-footer {
   display: flex;
-  justify-content: left;
   align-items: center;
-  height: 6vh;
-  z-index: 20;
+  padding: 0.6rem 1.5rem;
+  background: var(--idx-card-bg);
+  border-top: 1px solid var(--idx-border);
 }
 
-.legendas_container {
-  font-size: 0.85rem;
+.idx-legend {
   display: flex;
-  gap: 1rem;
+  gap: 1.25rem;
+  font-size: 0.8rem;
+  color: var(--idx-text-secondary);
 }
 
-.IconeAquivo{
-  display: none;
+.idx-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
+.idx-legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.idx-legend__dot.red    { background: #e74c3c; }
+.idx-legend__dot.orange { background: #f39c12; }
+.idx-legend__dot.blue   { background: #3498db; }
+.idx-legend__dot.green  { background: #27ae60; }
+
+/* ── Empty / loading / error states ────────────────────────────── */
+.idx-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--idx-text-secondary);
+  gap: 0.75rem;
+}
+
+.idx-state--error {
+  color: var(--idx-brand);
+}
+
+/* ================================================================
+   RESPONSIVIDADE
+   ================================================================ */
+
+/* ── Tablets e telas intermediárias ── */
 @media screen and (max-width: 1000px) {
-  .conteudoPrincipal{
-    margin-left: 0;
-    background: rgb(255, 255, 255);
-    width: 100%;
+  .idx-toolbar {
+    padding: 0.6rem 1rem;
   }
 
-  .header2_conteiner{
-    flex-direction: row;
-    gap: 1rem;
-    margin: 0;
-    padding: 0;
+  .idx-toolbar__filters {
+    flex-wrap: wrap;
   }
 
-  .header3_conteiner{
-    gap: 0.2rem;
-    margin: 0 0 0.5rem 0;
+  .idx-toolbar__filters .form-select {
+    min-width: 130px;
   }
 
-  .spanTitulo{
-    font-size: 1rem;
-    width: 100%;
-    margin-left: 0px;
-    border-radius: 0%;
+  .idx-content {
+    padding: 1rem;
   }
 
-  .filtros{
-    position: relative;
-    transform: scale(90%);
-    gap: 1rem;
-    margin-left: 0.6rem;
-  }
-  
-  .botao_criarProjeto{
-    padding-left: 10px;
-    width: 8%;
+  .idx-obra-card__name {
+    font-size: 0.9rem;
   }
 
-  .text-dark{
+  .idx-obra-card__open .btn span {
     display: none;
   }
 
-  .barraPesquisa {
-    width: 70%;
-  }
-
-  .bolinhasJuntas {
-    width: 25%;
-    gap: 4px;
-    transform: scale(80%);
-  }
-
-  .filter {
-    display: none;
-  }
-
-  .abrirProjeto_botao_texto {
-    display: none;
-  }
-
-  .IconeAquivo {
-    display:inline;
-  }
-
-  .obraItem {
-    gap: 0;
-  }
-
-  .abrirProjeto_botao{
-    transform: scale(130%);
-    width: 10%;
-  }
-
-  .tituloProjeto{
-    width: 35%;
-    font-size: 1rem;
-  }
-  .localizacaoProjeto{
-    width: 35%;
-
-  }
-  .selecionar-referencia_container{
-    width: 10%;
-  }
-}
-
-@media screen and (max-width: 600px) {
-  .conteudoPrincipal{
-    margin-left: 0;
-    background: rgb(255, 255, 255);
-    width: 100%;
-  }
-
-  .header2_conteiner{
-    flex-direction: row;
-    gap: 1rem;
-    margin: 0;
-    padding: 0;
-  }
-
-  .header3_conteiner{
-    gap: 0.5rem;
-    margin: 0 0 0.5rem 0;
-  }
-
-  .spanTitulo{
-    font-size: 1rem;
-    width: 100%;
-    margin-left: 0px;
-    border-radius: 0%;
-  }
-
-  .filtros{
-    position: relative;
-    transform: scale(85%);
-    gap: 1rem;
-    margin-left: 0;
-    padding-left: 0;
-  }
-  
-  .botao_criarProjeto{
-    padding-left: 10px;
-    width: 8%;
-  }
-
-  .text-dark{
-    display: none;
-  }
-
-  .barraPesquisa {
-    width: 70%;
-  }
-
-  .bolinhasJuntas {
-    width: 25%;
-    gap: 4px;
-    transform: scale(80%);
-  }
-
-  .filter {
-    display: none;
-  }
-
-  .abrirProjeto_botao_texto {
-    display: none;
-  }
-
-  .IconeAquivo {
+  .idx-obra-card__open .btn .idx-open-icon {
     display: inline;
   }
+}
 
-  .obraItem {
-    padding: 0.6rem 0;
-    gap: 0;
+/* ── Mobile ── */
+@media screen and (max-width: 600px) {
+  .idx-topbar {
+    padding: 0 0.75rem;
+    height: 52px;
   }
 
-  .abrirProjeto_botao{
-    transform: scale(110%);
-    width: 7%;
+  .idx-topbar__logo img {
+    height: 32px;
   }
 
-  .tituloProjeto{
-    width: 45%;
+  .idx-topbar__username {
+    display: none;
+  }
+
+  .idx-toolbar {
+    padding: 0.5rem 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .idx-toolbar__search {
+    min-width: 0;
+    max-width: none;
+    flex: 1 1 100%;
+    order: -1;
+  }
+
+  .idx-toolbar__create-text {
+    display: none;
+  }
+
+  .idx-toolbar__filters {
+    flex: 1 1 100%;
+  }
+
+  .idx-toolbar__filters .form-select {
+    min-width: 0;
+    flex: 1;
+    font-size: 0.8rem;
+  }
+
+  .idx-status-filters {
+    gap: 0.3rem;
+  }
+
+  .idx-status-pill {
+    width: 18px;
+    height: 18px;
+  }
+
+  .idx-content {
+    padding: 0.75rem;
+  }
+
+  .idx-obra-card {
+    padding: 0.65rem 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .idx-obra-card__name {
+    font-size: 0.85rem;
+  }
+
+  .idx-obra-card__location {
     font-size: 0.75rem;
   }
 
-  .localizacaoProjeto{
+  .idx-obra-card__open .btn {
     font-size: 0.75rem;
-    width: 34%;
+    padding: 0.25rem 0.5rem;
   }
 
-  .footer {
-    justify-content: start;
-    padding: 0px 10px; }
-
-  .legendas_container {
-    margin: 0;
-    padding: 0;
-    font-size: 0.55rem;
-    display: flex;
-    justify-content: flex-start;
-    gap: 1rem;
+  .idx-footer {
+    padding: 0.5rem 0.75rem;
   }
 
-  .legend-item {
-    gap: 4px;
-    justify-content: center;
-  }
-
-  .statusProjeto {
-    transform: scale(80%);
-  }
-
-  .selecionar-referencia_container{
-    transform: scale(80%);
-    width: 7%;
-  }
-
-  .logo {
-    transform: scale(70%);
-  }
-
-  .header_conteiner {
-    justify-content: space-between;
-    padding: 0;
-    margin: 0;
-  }
-
-  .usuario_container {
-    transform: scale(90%);
-    width: 110px;
-    gap: 0.6rem;
+  .idx-legend {
+    gap: 0.75rem;
+    font-size: 0.7rem;
   }
 }
