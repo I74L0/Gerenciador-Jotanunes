@@ -1,6 +1,5 @@
 @use "variables";
-@use "@coreui/coreui/scss/coreui" as * with ( 
-  $primary: variables.$primary,
+@use "@coreui/coreui/scss/coreui" as * with ($primary: variables.$primary,
   $secondary: variables.$secondary,
   $enable-deprecation-messages: false,
 );
@@ -28,7 +27,7 @@ body {
   @include transition(padding .15s);
 }
 
-.header > .container-fluid,
+.header>.container-fluid,
 .sidebar-header {
   min-height: calc(4rem + 1px); // stylelint-disable-line function-disallowed-list
 }
@@ -61,21 +60,10 @@ body {
   }
 }
 
-.header > .container-fluid + .container-fluid {
+.header>.container-fluid+.container-fluid {
   min-height: 3rem;
 }
 
 .footer {
   min-height: calc(3rem + 1px); // stylelint-disable-line function-disallowed-list
 }
-
-// Descomentar para habilitar o modo escuro
-// @include color-mode(dark) {
-//   body {
-//     background-color: var(--cui-dark-bg-subtle);
-//   }
-
-//   .footer {
-//     --cui-footer-bg: var(--cui-body-bg);
-//   }
-// }
