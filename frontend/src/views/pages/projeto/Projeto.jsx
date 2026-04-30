@@ -218,10 +218,10 @@ const Projeto = () => {
               // 2. Pega as marcas. Se for array de objetos { nome: "..." }, extrai o nome. Senão, mantém como está.
               const marcasArr = Array.isArray(m.marcas)
                 ? m.marcas
-                    .map((marca) =>
-                      typeof marca === 'object' && marca !== null ? marca.nome : marca,
-                    )
-                    .filter(Boolean)
+                  .map((marca) =>
+                    typeof marca === 'object' && marca !== null ? marca.nome : marca,
+                  )
+                  .filter(Boolean)
                 : []
 
               return {
@@ -265,10 +265,10 @@ const Projeto = () => {
               // 2. Pega as marcas. Se for array de objetos { nome: "..." }, extrai o nome. Senão, mantém como está.
               const marcasArr = Array.isArray(m.marcas)
                 ? m.marcas
-                    .map((marca) =>
-                      typeof marca === 'object' && marca !== null ? marca.nome : marca,
-                    )
-                    .filter(Boolean)
+                  .map((marca) =>
+                    typeof marca === 'object' && marca !== null ? marca.nome : marca,
+                  )
+                  .filter(Boolean)
                 : []
 
               return {
@@ -498,16 +498,16 @@ const Projeto = () => {
   return (
     <div className="body__body">
       <header className="header">
-        <div className="header__header">
-          <div className="header__header__logo">
+        <div className="idx-topbar">
+          <div className="idx-topbar__logo">
             <CImage src="/images/Logo Vermelha.png" alt="JotaNunes Logo" height={48} />
           </div>
-          <div className="usuario_container position-relative">
-            <span>{usuario.username}</span>
+          <div className="idx-topbar__user">
+            <span className="idx-topbar__username">{usuario.username}</span>
 
             {/* ÍCONE */}
             <div
-              className="user-icon"
+              className="idx-topbar__avatar"
               ref={userIconRef}
               onClick={() => {
                 const opening = !showProfileMenu
@@ -524,9 +524,8 @@ const Projeto = () => {
                   }
                 }
               }}
-              style={{ cursor: 'pointer' }}
             >
-              👤
+              <CIcon icon={cilUser} size="sm" />
             </div>
           </div>
           {/* Perfil: renderizado via portal para escapar de stacking contexts */}
@@ -534,7 +533,7 @@ const Projeto = () => {
             userIconRef.current &&
             createPortal(
               <div
-                className="profile-menu"
+                className="idx-profile-menu"
                 style={{
                   position: 'absolute',
                   top: `${menuCoords.top}px`,
@@ -542,18 +541,18 @@ const Projeto = () => {
                   zIndex: 200000,
                 }}
               >
-                <button onClick={handleVerPerfil} className="profile-btn">
+                <button onClick={handleVerPerfil} className="idx-profile-menu__btn">
                   Ver Perfil
                 </button>
                 {podeAdministrar && (
                   <button
                     onClick={() => (window.location.href = 'http://127.0.0.1:8000/admin/')}
-                    className="profile-btn"
+                    className="idx-profile-menu__btn"
                   >
                     Administrador
                   </button>
                 )}
-                <button onClick={handleLogout} className="profile-btn">
+                <button onClick={handleLogout} className="idx-profile-menu__btn idx-profile-menu__btn--danger">
                   Sair
                 </button>
               </div>,

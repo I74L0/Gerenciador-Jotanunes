@@ -33,53 +33,82 @@ summary::marker {
   list-style: none;
 }
 
-.usuario_container {
-  transform: scale(110%);
-  width: 120px;
+/* ── idx-topbar (shared with Index) ── */
+.header .idx-topbar {
+  position: relative;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.8rem;
+  width: 100%;
+  height: 10vh;
+  padding: 0 1rem;
 }
 
-.user-icon {
-  width: 35px;
-  height: 35px;
-  font-size: 22px;
-  background: #0c0c0c;
-  color: white;
-  padding: 6px 10px;
+.header .idx-topbar__logo img {
+  height: 40px;
+  display: block;
+}
+
+.header .idx-topbar__user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.header .idx-topbar__username {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.header .idx-topbar__avatar {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
+  background: #BC1F1B;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #fff;
+  font-size: 1rem;
   cursor: pointer;
+  transition: box-shadow 0.2s ease;
 }
 
-.profile-menu {
-  position: absolute;
-  z-index: 9999;
-  top: 45px;
-  right: 0;
-  background: white;
+.header .idx-topbar__avatar:hover {
+  box-shadow: 0 0 0 3px rgba(188, 31, 27, 0.2);
+}
+
+.idx-profile-menu {
+  background: #ffffff;
+  border: 1px solid #e2e6ea;
   border-radius: 10px;
-  padding: 12px;
-  width: 160px;
-  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+  padding: 0.5rem;
+  min-width: 170px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
-.profile-btn {
+.idx-profile-menu__btn {
+  display: block;
   width: 100%;
   border: none;
-  background: #f5f5f5;
-  padding: 8px;
-  margin-bottom: 6px;
+  background: transparent;
+  padding: 0.5rem 0.75rem;
   border-radius: 6px;
+  font-size: 0.875rem;
+  text-align: left;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s ease;
+  color: #1a1d2e;
 }
 
-.profile-btn:hover {
-  background: #e2e2e2;
+.idx-profile-menu__btn:hover {
+  background: #f4f6f9;
+}
+
+.idx-profile-menu__btn--danger {
+  color: #BC1F1B;
 }
 
 .body__card-prefacio {
@@ -498,12 +527,12 @@ summary::marker {
     height: 83vh;
     top: 17vh;
   }
-  .header__header{
+  .header .idx-topbar {
     padding: 0 5px;
     height: 9vh;
   }
-  .header__header__logo {
-    transform: scale(80%);
+  .header .idx-topbar__logo img {
+    height: 32px;
   }
   .header__menu{
     font-size: 0.8rem;
@@ -577,16 +606,14 @@ summary::marker {
   .header {
     height: 18vh;
   }
-  .header__header{
+  .header .idx-topbar {
     margin: 0;
-    padding: 0;
+    padding: 0 0.5rem;
     padding-top: 0.5rem;
   }
 
-  .header__header__logo {
-    transform: scale(70%);
-    position: relative;
-    left: -20px;
+  .header .idx-topbar__logo img {
+    height: 28px;
   }
 
   .header__header__user {
@@ -633,9 +660,7 @@ summary::marker {
     padding: 6px 4px;
   }
 
-  .usuario_container {
-    transform: scale(90%);
-    width: 110px;
+  .header .idx-topbar__user {
     gap: 0.6rem;
   }
 
