@@ -496,7 +496,7 @@ const Projeto = () => {
   }
 
   return (
-    <div className="body__body">
+    <div className="prj-page">
       <header className="header">
         <div className="idx-topbar">
           <div className="idx-topbar__logo">
@@ -559,25 +559,29 @@ const Projeto = () => {
               document.body,
             )}
         </div>
-        <hr />
-        <ul className="header__menu">
-          <li className="header__menu__item" onClick={protectiveSave}>
-            Sair
-          </li>
-          <MenuTabs activeIndex={activeTab} onChange={setActiveTab} />
-          <li className="header__menu__item" onClick={handleSave} disabled={isSaving}>
-            {podeEditar ? 'Enviar' : 'Finalizar'}
-          </li>
-        </ul>
+        <div className="prj-toolbar">
+          <div className="prj-toolbar__tabs">
+            <MenuTabs activeIndex={activeTab} onChange={setActiveTab} />
+          </div>
+          
+          <div className="prj-toolbar__actions">
+            <CButton color="dark" variant="ghost" onClick={protectiveSave} className="me-2">
+              Voltar
+            </CButton>
+            <CButton color="danger" onClick={handleSave} disabled={isSaving}>
+              {isSaving ? <CSpinner size="sm" /> : (podeEditar ? 'Salvar Projeto' : 'Finalizar Avaliação')}
+            </CButton>
+          </div>
+        </div>
       </header>
 
       {saveError && (
-        <CContainer className="d-flex w-75 p-2 bg-danger-light text-danger border rounded z-3">
+        <CContainer className="d-flex w-75 p-2 bg-danger-light text-danger border rounded z-3 mt-3">
           Erro: {saveError}
         </CContainer>
       )}
 
-      <section className="content background">
+      <main className="prj-content">
         {activeTab === 0 && (
           <CardPrefacio
             prefacio={prefacioData}
@@ -614,9 +618,13 @@ const Projeto = () => {
           />
         )}
         {activeTab === 4 && (
-          <CardObservacoes observacao_final={observacoesData} setObservacoes={setObservacoesData} />
+          <CardObservacoes 
+            observacao_final={observacoesData} 
+            setObservacoes={setObservacoesData} 
+            podeEditar={podeEditar} 
+          />
         )}
-      </section>
+      </main>
     </div>
   )
 }

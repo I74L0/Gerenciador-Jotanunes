@@ -1,90 +1,43 @@
-import React, { useRef, useState, useEffect } from 'react';
-import prefacioIcon from '../../../assets/images/pen-toolIcon.png';
-import unidadesIcon from '../../../assets/images/inIcon.png';
-import areaComumIcon from '../../../assets/images/outIcon.png';
-import materiaisIcon from '../../../assets/images/brickIcon.png';
-import observacoesIcon from '../../../assets/images/infoIcon.ico';
+import React from 'react';
+import { CNav, CNavItem, CNavLink } from '@coreui/react';
+import CIcon from '@coreui/icons-react';
+import { cilPen, cilHouse, cilVector, cilLayers, cilInfo } from '@coreui/icons';
 
 const MenuTabs = ({ activeIndex = 0, onChange = () => {} }) => {
-  const menuRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(false);
-
-  const tabTitles = [
-    "Prefácio",
-    "Unidades Privativas",
-    "Área Comum",
-    "Materiais",
-    "Observações"
+  const tabs = [
+    { title: "Prefácio", icon: cilPen },
+    { title: "Unidades Privativas", icon: cilHouse },
+    { title: "Área Comum", icon: cilVector },
+    { title: "Materiais", icon: cilLayers },
+    { title: "Observações", icon: cilInfo }
   ];
-
-  const tabIcons = [
-    prefacioIcon,
-    unidadesIcon,
-    areaComumIcon,
-    materiaisIcon,
-    observacoesIcon
-  ];
-
-  const [iconFailed, setIconFailed] = useState(() => new Array(tabIcons.length).fill(false));
-
-  // Detecta mudanças no tamanho da viewport
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 600);
-    };
-
-    // Executar na montagem
-    handleResize();
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  function clickItem(i) {
-    if (i === activeIndex) return;
-    
-    if (menuRef.current) {
-      menuRef.current.style.removeProperty('--timeOut');
-    }
-    
-    onChange(i); 
-  }
 
   return (
-    <ul className="tabs" ref={menuRef}>
-      {tabTitles.map((title, index) => {
-        let mobileContent
-        if (index === activeIndex) {
-          mobileContent = title
-        } else if (iconFailed[index]) {
-          mobileContent = tabAbbreviations[index]
-        } else {
-          mobileContent = (
-            <img
-              src={tabIcons[index]}
-              alt={title}
-              className="tab-icon"
-              style={{ width: 22, height: 22, objectFit: 'contain' }}
-              onError={() => setIconFailed(prev => {
-                const copy = [...prev]
-                copy[index] = true
-                return copy
-              })}
-            />
-          )
-        }
-
-        return (
-          <li
-            key={index}
-            className={index === activeIndex ? 'active' : ''}
-            onClick={() => clickItem(index)}
+    <CNav variant="pills" className="flex-nowrap overflow-auto prj-tabs hide-scrollbar py-2">
+      {tabs.map((tab, index) => (
+        <CNavItem key={index}>
+          <CNavLink 
+            active={activeIndex === index}
+            onClick={() => onChange(index)}
+            style={{ 
+              cursor: 'pointer', 
+              whiteSpace: 'nowrap', 
+              color: activeIndex === index ? '#fff' : '#6c757d',
+              backgroundColor: activeIndex === index ? '#BC1F1B' : 'transparent',
+              borderRadius: '20px',
+              padding: '0.5rem 1rem',
+              fontWeight: 500,
+              transition: 'all 0.2s ease'
+            }}
+            className="d-flex align-items-center gap-2 me-2"
           >
-            {isMobile ? mobileContent : title}
-          </li>
-        )
-      })}
-    </ul>
+            <CIcon icon={tab.icon} size="sm" />
+            <span className="d-none d-sm-inline">{tab.title}</span>
+            <span className="d-inline d-sm-none" title={tab.title}>{tab.title.split(' ')[0]}</span>
+          </CNavLink>
+        </CNavItem>
+      ))}
+    </CNav>
   );
 }
 

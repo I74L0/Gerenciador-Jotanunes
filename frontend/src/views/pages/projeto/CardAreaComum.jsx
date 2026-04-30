@@ -139,19 +139,15 @@ export default function CardAreaComum({ ambientes, setAmbientes, podeEditar, pod
   return (
     <div className="section__section">
       {podeEditar && (
-        <CButton className="adicionar-ambiente">
-          <div
-            className="d-flex align-items-center add-ambiente"
-            onClick={adicionarAmbiente}
-            style={{ cursor: 'pointer', width: 'auto' }}
-          >
-            <IoIosAddCircle className="circle-icon" />
-            <span className="ms-2">Adicionar Ambiente</span>
-          </div>
-        </CButton>
+        <div className="d-flex justify-content-end mb-3">
+          <CButton color="primary" onClick={adicionarAmbiente}>
+            <div className="d-flex align-items-center">
+              <IoIosAddCircle className="fs-5" />
+              <span className="ms-2">Adicionar Ambiente</span>
+            </div>
+          </CButton>
+        </div>
       )}
-
-      <hr className='m-3'/>
 
       <div className="lista-ambientes">
         {ambientes.map((amb, idx) => (
@@ -208,14 +204,14 @@ export default function CardAreaComum({ ambientes, setAmbientes, podeEditar, pod
             </CRow>
 
             <CCollapse className="div-collapse" visible={amb.aberto}>
-              <CCard>
-                <CTable bordered>
-                  <CTableHead>
+              <CCard className="border-top-0" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, marginTop: '-0.5rem', marginBottom: '1rem', border: '1px solid #e9ecef', borderTop: 'none', background: '#fcfcfc' }}>
+                <CTable hover responsive className="mb-0" align="middle">
+                  <CTableHead color="light">
                     <CTableRow>
-                      <CTableHeaderCell>Item</CTableHeaderCell>
-                      <CTableHeaderCell>Descrição</CTableHeaderCell>
-                      {podeGestionar && <CTableHeaderCell>Status</CTableHeaderCell>}
-                      {podeEditar && <CTableHeaderCell>Ações</CTableHeaderCell>}
+                      <CTableHeaderCell className="border-0 w-25">Item</CTableHeaderCell>
+                      <CTableHeaderCell className="border-0 w-50">Descrição</CTableHeaderCell>
+                      {podeGestionar && <CTableHeaderCell className="border-0 text-center">Status</CTableHeaderCell>}
+                      {podeEditar && <CTableHeaderCell className="border-0">Ações</CTableHeaderCell>}
                     </CTableRow>
                   </CTableHead>
                   <CTableBody>

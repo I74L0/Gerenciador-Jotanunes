@@ -10,6 +10,7 @@ import {
   CModalHeader,
   CModalBody,
   CModalFooter,
+  CCard,
 } from '@coreui/react'
 import { useState } from 'react'
 import { FaCheck } from 'react-icons/fa'
@@ -87,48 +88,53 @@ export default function CardMateriais({ materiais, showStatus, podeGestionar, po
   }
 
   return (
-    <section className="section__section">
-      <CTable hover>
-        <CTableHead>
-          <CTableRow>
-            <CTableHeaderCell>Item</CTableHeaderCell>
-            <CTableHeaderCell>Marcas Sugeridas (separadas por vírgula)</CTableHeaderCell>
-            {podeGestionar && <CTableHeaderCell>Status</CTableHeaderCell>}
-            {podeEditar && <CTableHeaderCell>Ações</CTableHeaderCell>}
-          </CTableRow>
-        </CTableHead>
-        <CTableBody>
-          {materiaisArray.map((material, i) => (
-            <CTableRow key={material.id ?? i}>
-              <CTableDataCell width="25%">
-                <input
-                  type="text"
-                  className="form-control"
-                  value={material?.item ?? ''}
-                  readOnly={!podeEditar}
-                  placeholder="Material"
-                  onChange={(e) => {
-                    if (!podeEditar) return
-                    atualizarNomeMaterial(i, e.target.value)
-                  }}
-                />
-              </CTableDataCell>
-              <CTableDataCell width="60%">
-                <textarea
-                  className="form-control"
-                  rows="2"
-                  placeholder="Marcas"
-                  value={
-                    Array.isArray(material?.marcas)
-                      ? material.marcas.join(', ')
-                      : String(material?.marcas ?? '')
-                  }
-                  readOnly={!podeEditar}
-                  onChange={(e) => 
-                    podeEditar && atualizarMarcas(i, e.target.value)}
-                />
-              </CTableDataCell>
-              <CTableDataCell>
+    <div className="section__section">
+      <CCard className="mb-4 shadow-sm border-0" style={{ borderRadius: '10px' }}>
+        <CTable hover responsive className="mb-0" align="middle">
+          <CTableHead color="light">
+            <CTableRow>
+              <CTableHeaderCell className="border-0 w-25">Item</CTableHeaderCell>
+              <CTableHeaderCell className="border-0 w-50">Marcas Sugeridas (separadas por vírgula)</CTableHeaderCell>
+              {podeGestionar && <CTableHeaderCell className="border-0 text-center">Status</CTableHeaderCell>}
+              {podeEditar && <CTableHeaderCell className="border-0">Ações</CTableHeaderCell>}
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            {materiaisArray.map((material, i) => (
+              <CTableRow key={material.id ?? i}>
+                <CTableDataCell>
+                  <input
+                    type="text"
+                    className="auto-expand"
+                    value={material?.item ?? ''}
+                    readOnly={!podeEditar}
+                    placeholder="Material"
+                    onChange={(e) => {
+                      if (!podeEditar) return
+                      atualizarNomeMaterial(i, e.target.value)
+                    }}
+                  />
+                </CTableDataCell>
+                <CTableDataCell>
+                  <textarea
+                    className="auto-expand"
+                    rows="1"
+                    placeholder="Marcas"
+                    value={
+                      Array.isArray(material?.marcas)
+                        ? material.marcas.join(', ')
+                        : String(material?.marcas ?? '')
+                    }
+                    readOnly={!podeEditar}
+                    onInput={(e) => {
+                      if(!podeEditar) return
+                      e.target.style.height = 'auto'
+                      e.target.style.height = e.target.scrollHeight + 'px'
+                    }}
+                    onChange={(e) => 
+                      podeEditar && atualizarMarcas(i, e.target.value)}
+                  />
+                </CTableDataCell>
                 {podeGestionar && (
                   <CTableDataCell style={{ textAlign: 'center' }}>
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
@@ -158,25 +164,27 @@ export default function CardMateriais({ materiais, showStatus, podeGestionar, po
                   </CTableDataCell>
                 )}
 
-                {podeEditar && (
-                <CButton color="danger" size="sm" onClick={() => removerMaterial(i)}>
-                  Remover
-                </CButton>
-                )}
-              </CTableDataCell>
-            </CTableRow>
-          ))}
-          <CTableRow>
+                <CTableDataCell>
+                  {podeEditar && (
+                  <CButton color="danger" size="sm" onClick={() => removerMaterial(i)}>
+                    Remover
+                  </CButton>
+                  )}
+                </CTableDataCell>
+              </CTableRow>
+            ))}
             {podeEditar && (
-            <CTableDataCell colSpan={3}>
-              <CButton color="success" size="sm" onClick={adicionarMaterial}>
-                + Adicionar Material
-              </CButton>
-            </CTableDataCell>
+              <CTableRow>
+                <CTableDataCell colSpan={showStatus ? 4 : 3}>
+                  <CButton color="success" size="sm" onClick={adicionarMaterial}>
+                    + Adicionar Material
+                  </CButton>
+                </CTableDataCell>
+              </CTableRow>
             )}
-          </CTableRow>
-        </CTableBody>
-      </CTable>
+          </CTableBody>
+        </CTable>
+      </CCard>
 
       <CModal
         visible={confirmItem !== null}
@@ -196,6 +204,6 @@ export default function CardMateriais({ materiais, showStatus, podeGestionar, po
           </CButton>
         </CModalFooter>
       </CModal>
-    </section>
+    </div>
   )
 }
