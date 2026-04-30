@@ -171,11 +171,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 LOGOUT_REDIRECT_URL = '/admin/'
-LOGIN_URL = 'tela_login'
-LOGIN_REDIRECT_URL = '/api/'
-
-
-
 
 JAZZMIN_SETTINGS = {
     "site_title": "JotaNunes Admin",
