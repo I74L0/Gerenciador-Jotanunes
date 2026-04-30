@@ -124,6 +124,15 @@
   flex-wrap: wrap;
 }
 
+.idx-toolbar .btn {
+  color: #ffffff !important;
+}
+
+.idx-toolbar .btn svg {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+}
+
 .idx-toolbar__search {
   flex: 1;
   min-width: 200px;
