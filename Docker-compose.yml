@@ -49,7 +49,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: django_backend_jotanunes
-    command: gunicorn residencia.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - ./backend:/app
       - staticfiles_volume:/app/staticfiles
@@ -72,7 +72,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: celery_worker_jotanunes
-    command: celery -A residencia worker -l info
+    command: celery -A config worker -l info
     volumes:
       - ./backend:/app
     env_file:

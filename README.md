@@ -18,7 +18,7 @@
 Gerenciador-jotanunes/
 ├── backend/               # API REST (Django + DRF)
 │   ├── app/         # App principal
-│   ├── residencia/        # Configurações Django
+│   ├── config/        # Configurações Django
 │   └── manage.py
 ├── frontend/             # Interface Web (React + Vite)
 │   ├── src/

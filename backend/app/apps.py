@@ -3,4 +3,5 @@ from django.apps import AppConfig
 
 class JotanunesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'jotanunes'
+    name = 'app'
+    label = 'jotanunes'
