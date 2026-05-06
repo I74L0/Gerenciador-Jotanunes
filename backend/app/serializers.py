@@ -265,6 +265,48 @@ class ObraSerializer(serializers.ModelSerializer):
             if chave not in nomes_tipos_enviados:
                 ambiente.delete()
 
+    def _sync_materiais(self, instance, materiais_data):
+        """
+        Upsert de materiais: usa o nome do item como chave natural.
+        - Material enviado cujo item já existe na obra → atualiza as marcas.
+        - Material enviado cujo item não existia → cria e vincula.
+        - Material vinculado à obra que não foi enviado → desvincula e deleta
+          (Material é sempre exclusivo de uma obra via este fluxo).
+        """
+        # Indexa materiais existentes pelo nome do item (chave natural)
+        existentes = {
+            m.item.nome.lower(): m
+            for m in instance.materiais.select_related('item').prefetch_related('marcas').all()
+            if m.item
+        }
+        nomes_enviados = set()
+
+        for material_data in materiais_data:
+            item_name = material_data.get('item', '')
+            marcas_names = material_data.get('marcas', [])
+            chave = item_name.lower()
+            nomes_enviados.add(chave)
+
+            if chave in existentes:
+                # Atualiza apenas as marcas do material existente
+                material = existentes[chave]
+                material.marcas.clear()
+                for marca_name in marcas_names:
+                    if not marca_name:
+                        continue
+                    marca_obj, _ = Marca.objects.get_or_create(nome=marca_name)
+                    material.marcas.add(marca_obj)
+            else:
+                # Cria novo material e vincula à obra
+                material = MaterialSerializer().create(material_data)
+                instance.materiais.add(material)
+
+        # Remove materiais que não foram enviados
+        for chave, material in existentes.items():
+            if chave not in nomes_enviados:
+                instance.materiais.remove(material)
+                material.delete()
+
     @transaction.atomic
     def create(self, validated_data):
         ambientes_data = validated_data.pop("ambientes", [])
@@ -325,13 +367,8 @@ class ObraSerializer(serializers.ModelSerializer):
         if ambientes_data is not None:
             self._sync_ambientes(instance, ambientes_data)
 
-        # Materiais: comportamento de replace mantido (clear + recria),
-        # pois não há ID de referência vindo do frontend ainda
         if materiais_data is not None:
-            instance.materiais.clear()
-            for material_data in materiais_data:
-                material = MaterialSerializer().create(material_data)
-                instance.materiais.add(material)
+            self._sync_materiais(instance, materiais_data)
 
         return instance
 
