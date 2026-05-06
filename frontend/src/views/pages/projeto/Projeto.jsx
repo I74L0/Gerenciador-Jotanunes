@@ -74,8 +74,8 @@ const Projeto = () => {
       const rect = userIconRef.current?.getBoundingClientRect()
       if (rect) {
         const menuWidth = 160
-        const left = Math.max(8, rect.right - menuWidth + window.scrollX)
-        const top = rect.bottom + window.scrollY + 6
+        const left = Math.max(8, rect.right - menuWidth)
+        const top = rect.bottom + 6
         setMenuCoords({ top, left })
       }
     }
@@ -513,13 +513,12 @@ const Projeto = () => {
                 const opening = !showProfileMenu
                 setShowProfileMenu(opening)
                 if (opening) {
-                  // calcula posição do menu ao abrir
                   const rect = userIconRef.current?.getBoundingClientRect()
                   if (rect) {
-                    // largura do menu definida no CSS (~160px)
                     const menuWidth = 160
-                    const left = Math.max(8, rect.right - menuWidth + window.scrollX)
-                    const top = rect.bottom + window.scrollY + 6
+                    // position:fixed é relativo à viewport — não somar scroll
+                    const left = Math.max(8, rect.right - menuWidth)
+                    const top = rect.bottom + 6
                     setMenuCoords({ top, left })
                   }
                 }
@@ -535,7 +534,7 @@ const Projeto = () => {
               <div
                 className="idx-profile-menu"
                 style={{
-                  position: 'absolute',
+                  position: 'fixed',
                   top: `${menuCoords.top}px`,
                   left: `${menuCoords.left}px`,
                   zIndex: 200000,
@@ -558,6 +557,7 @@ const Projeto = () => {
               </div>,
               document.body,
             )}
+
         </div>
         <div className="prj-toolbar">
           <div className="prj-toolbar__tabs">

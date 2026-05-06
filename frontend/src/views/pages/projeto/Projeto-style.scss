@@ -14,7 +14,6 @@ html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  overflow: hidden;
 }
 
 html *, html *::before, html *::after {
@@ -437,7 +436,8 @@ summary::marker {
 .prj-page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;        // altura fixa para ativar o scroll interno
+  overflow: hidden;     // impede que o page inteiro cresça e perca o scroll do prj-content
   background-color: #f4f6f9;
 }
 
@@ -449,6 +449,7 @@ summary::marker {
   display: flex;
   flex-direction: column;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  overflow: visible;    // garante que o dropdown de perfil não seja cortado pelo header
 }
 
 .prj-toolbar {
@@ -476,8 +477,33 @@ summary::marker {
   display: flex;
   justify-content: center;
   padding: 2rem 1rem;
-  overflow-y: auto;
+  overflow-y: auto;    // scroll interno da área de conteúdo
   align-items: flex-start;
+}
+
+/* ── Cores de botões ── */
+// Botões danger e success: texto sempre branco
+.btn-danger,
+.btn-success {
+  color: #ffffff !important;
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: #ffffff !important;
+  }
+}
+
+// Botão ghost danger: texto vermelho por padrão, branco no hover
+.btn-ghost-danger {
+  color: #BC1F1B !important;
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: #ffffff !important;
+    background-color: #BC1F1B !important;
+  }
 }
 
 .section__section {
