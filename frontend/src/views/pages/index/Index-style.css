@@ -21,7 +21,8 @@
 .idx-page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: var(--idx-surface);
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   color: var(--idx-text-primary);
