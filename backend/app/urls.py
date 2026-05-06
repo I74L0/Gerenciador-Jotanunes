@@ -1,8 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
-from .views import atualizar_status_item, ItemUpdateStatusAPIView
-
 
 router = DefaultRouter()
 router.register(r'obras', views.ObraViewSet, basename='obra')
@@ -16,9 +14,5 @@ urlpatterns = [
     path('', include(router.urls)),
 
     path('alterar-senha/', views.alterar_senha, name='alterar_senha'),
-    path('me/', views.me, name='me'),
-    path('itens/<int:pk>/', ItemUpdateStatusAPIView.as_view()),
-    path('ambientes/privativos/', views.AmbientesPrivativosListCreateView.as_view(), name='ambientes-privativos'),
-    path("api/item-status/<int:pk>/", atualizar_status_item, name="item-status"),
-    path('ambientes/area-comum/', views.AmbientesAreaComumListCreateView.as_view(), name='ambientes-area-comum'),
+    path('me/', views.me, name='me')
 ]

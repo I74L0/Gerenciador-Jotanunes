@@ -9,8 +9,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 import re
 from rest_framework import generics
 from rest_framework.views import APIView
-import tempfile
-import os
 from django.templatetags.static import static
 
 from .serializers import MyTokenObtainPairSerializer
@@ -26,6 +24,7 @@ from .serializers import (
 
 from xhtml2pdf import pisa
 from io import BytesIO
+
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
@@ -61,7 +60,16 @@ def usuario_logout_view(request):
 
 
 class ObraViewSet(viewsets.ModelViewSet):
-    queryset = Obra.objects.all().order_by('-id')
+    queryset = (
+        Obra.objects.all()
+        .select_related('estado', 'cidade')
+        .prefetch_related(
+            'ambientes__itens__descricoes',
+            'materiais__marcas',
+            'materiais__item',
+        )
+        .order_by('-id')
+    )
     serializer_class = ObraSerializer
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
 
@@ -71,8 +79,6 @@ class ObraViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'create', 'duplicar']:
             self.permission_classes = [permissions.IsAuthenticated]
-        elif self.action == 'gerar_pdf':
-            self.permission_classes = [permissions.IsAuthenticated, IsGestor]
         else:
             self.permission_classes = [permissions.IsAuthenticated, IsGestor]
         return super().get_permissions()
@@ -85,8 +91,6 @@ class ObraViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'], url_path='gerar-pdf')
     def gerar_pdf(self, request, pk=None):
-
-
         obra = self.get_object()
 
         if not self.pode_gerar_pdf(request.user):
@@ -116,7 +120,7 @@ class ObraViewSet(viewsets.ModelViewSet):
         else:
             localizacao = "Localização não informada"
 
-        materiais = Material.objects.prefetch_related("marcas").all()
+        materiais = obra.materiais.prefetch_related("marcas").all()
 
         marcas_list = [
             {
@@ -137,9 +141,7 @@ class ObraViewSet(viewsets.ModelViewSet):
             "logo_footer_url": logo_footer_url,
         })
 
-
-
-        resultado = BytesIO() 
+        resultado = BytesIO()
         pisa_status = pisa.CreatePDF(html_string, dest=resultado)
 
         if pisa_status.err:
@@ -150,7 +152,7 @@ class ObraViewSet(viewsets.ModelViewSet):
         response = HttpResponse(pdf_data, content_type="application/pdf")
         response["Content-Disposition"] = f'attachment; filename=\"especificacao_{obra.id}.pdf\"'
         return response
-    
+
     @action(detail=True, methods=['post'], url_path='finalizar')
     def finalizar_obra(self, request, pk=None):
         try:
@@ -305,25 +307,6 @@ class PerfilView(APIView):
         return Response(serializer.errors, status=400)
 
 
-class AmbientesPrivativosListCreateView(generics.ListCreateAPIView):
-    serializer_class = AmbienteSerializer
-
-    def get_queryset(self):
-        return Ambiente.objects.filter(tipo="PRIVATIVO")
-
-    def perform_create(self, serializer):
-        serializer.save(tipo="PRIVATIVO")
-
-
-class AmbientesAreaComumListCreateView(generics.ListCreateAPIView):
-    serializer_class = AmbienteSerializer
-
-    def get_queryset(self):
-        return Ambiente.objects.filter(tipo="COMUM")
-
-    def perform_create(self, serializer):
-        serializer.save(tipo="COMUM")
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def alterar_senha(request):
@@ -351,32 +334,11 @@ def alterar_senha(request):
 @permission_classes([IsAuthenticated])
 def me(request):
     user = request.user
+    grupos = {g.name for g in user.groups.all()}
     return Response({
         "username": user.username,
         "is_superuser": user.is_superuser,
-        "is_gestor": user.groups.filter(name="Gestores").exists(),
-        "is_criador": user.groups.filter(name="Criadores").exists(),
-        "is_adm": user.groups.filter(name="Adm").exists(),
+        "is_gestor": "Gestores" in grupos,
+        "is_criador": "Criadores" in grupos,
+        "is_adm": "Adm" in grupos,
     })
-
-@api_view(["PATCH"])
-def atualizar_status_item(request, pk):
-    try:
-        item = Item.objects.get(pk=pk)
-    except Item.DoesNotExist:
-        return Response({"error": "Item não encontrado"}, status=404)
-
-    novo_status = request.data.get("status")
-
-    if novo_status is None:
-        return Response({"error": "Campo 'status' é obrigatório"}, status=400)
-
-    item.status = novo_status
-    item.save(update_fields=["status"])
-
-    return Response(ItemSerializer(item).data, status=200)
-
-class ItemUpdateStatusAPIView(generics.UpdateAPIView):
-    queryset = Item.objects.all()
-    serializer_class = ItemSerializer
-    http_method_names = ["patch", "put"]

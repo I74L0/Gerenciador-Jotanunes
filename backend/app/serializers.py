@@ -1,7 +1,8 @@
+from django.db import transaction
 from rest_framework import serializers
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import Obra, Ambiente, Material, Marca, Item, Descricao, Estado, Cidade
+from .models import Obra, Ambiente, Item, Material, Marca, Descricao, Estado, Cidade
 
 User = get_user_model()
 
@@ -59,18 +60,12 @@ class UsuarioLoginSerializer(serializers.Serializer):
 
 
 class UsuarioUpdateSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=False)
-
     class Meta:
         model = User
-        fields = ["first_name", "email", "password"]
+        fields = ["first_name", "email"]
 
     def update(self, instance, validated_data):
-        password = validated_data.pop("password", None)
         instance = super().update(instance, validated_data)
-        if password:
-            instance.set_password(password)
-            instance.save()
         return instance
 
 
@@ -107,9 +102,7 @@ class DescricaoSerializer(serializers.ModelSerializer):
 
 
 class ItemSerializer(serializers.ModelSerializer):
-    # campo usado apenas para criar/atualizar a relação (entrada do seu JSON)
     descricao = serializers.CharField(required=False, allow_blank=True, write_only=True)
-    # na saída, mostramos a lista de textos (campo 'detalhe' do model Descricao)
     descricoes = serializers.SlugRelatedField(
         many=True, slug_field="detalhe", read_only=True
     )
@@ -121,7 +114,6 @@ class ItemSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         descricao_texto = validated_data.pop("descricao", None)
         nome = validated_data.get("nome")
-        # busca item existente (como você fazia) ou cria novo
         item = Item.objects.filter(nome__iexact=nome).first()
         if not item:
             item = Item.objects.create(nome=nome)
@@ -130,6 +122,7 @@ class ItemSerializer(serializers.ModelSerializer):
             item.descricoes.clear()
             item.descricoes.add(desc_obj)
         return item
+
 
 class MaterialSerializer(serializers.ModelSerializer):
     item = serializers.CharField()
@@ -155,6 +148,7 @@ class MaterialSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return {
+            "id": instance.id,
             "item": instance.item.nome if instance.item else None,
             "marcas": [m.nome for m in instance.marcas.all()],
         }
@@ -165,7 +159,7 @@ class AmbienteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ambiente
-        fields = ["nome", "tipo", "itens"]
+        fields = ["id", "nome", "tipo", "itens"]
 
     def create(self, validated_data):
         itens_data = validated_data.pop("itens", [])
@@ -233,6 +227,45 @@ class ObraSerializer(serializers.ModelSerializer):
             )
         return cidade
 
+    def _sync_ambientes(self, instance, ambientes_data):
+        """
+        PONTO 1+2: Substitui o padrão delete-all + recreate por um upsert baseado
+        em nome+tipo. Preserva os IDs dos ambientes existentes, evita dados
+        parciais com transaction.atomic (aplicado no chamador).
+
+        Lógica:
+          - Ambientes enviados que já existem (mesmo nome+tipo) → atualiza itens.
+          - Ambientes enviados que não existiam → cria.
+          - Ambientes no banco não enviados → remove.
+        """
+        # Indexa ambientes existentes por (nome, tipo) para lookup O(1)
+        existentes = {
+            (a.nome, a.tipo): a
+            for a in instance.ambientes.all()
+        }
+        nomes_tipos_enviados = set()
+
+        for ambiente_data in ambientes_data:
+            itens_data = ambiente_data.pop("itens", [])
+            chave = (ambiente_data.get("nome"), ambiente_data.get("tipo"))
+            nomes_tipos_enviados.add(chave)
+
+            if chave in existentes:
+                ambiente = existentes[chave]
+                ambiente.itens.clear()
+            else:
+                ambiente = Ambiente.objects.create(obra=instance, **ambiente_data)
+
+            for item_data in itens_data:
+                item = ItemSerializer().create(item_data)
+                ambiente.itens.add(item)
+
+        # Remove ambientes que não foram enviados (comportamento anterior preservado)
+        for chave, ambiente in existentes.items():
+            if chave not in nomes_tipos_enviados:
+                ambiente.delete()
+
+    @transaction.atomic
     def create(self, validated_data):
         ambientes_data = validated_data.pop("ambientes", [])
         materiais_data = validated_data.pop("materiais", [])
@@ -263,6 +296,7 @@ class ObraSerializer(serializers.ModelSerializer):
 
         return obra
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         request = self.context.get("request")
         user = request.user if request else None
@@ -289,14 +323,10 @@ class ObraSerializer(serializers.ModelSerializer):
         instance.save()
 
         if ambientes_data is not None:
-            instance.ambientes.all().delete()
-            for ambiente_data in ambientes_data:
-                itens_data = ambiente_data.pop("itens", [])
-                ambiente = Ambiente.objects.create(obra=instance, **ambiente_data)
-                for item_data in itens_data:
-                    item = ItemSerializer().create(item_data)
-                    ambiente.itens.add(item)
+            self._sync_ambientes(instance, ambientes_data)
 
+        # Materiais: comportamento de replace mantido (clear + recria),
+        # pois não há ID de referência vindo do frontend ainda
         if materiais_data is not None:
             instance.materiais.clear()
             for material_data in materiais_data:
