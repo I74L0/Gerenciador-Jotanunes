@@ -3,12 +3,26 @@ let cache = null
 const fetchDados = () =>
   fetch('/template.json')
     .then((res) => {
-      if (!res.ok) throw new Error('Falha ao carregar dados.json')
+      if (!res.ok) throw new Error('Falha ao carregar template.json')
       return res.json()
     })
     .then((d) => {
       cache = d
       return JSON.parse(JSON.stringify(d))
+    })
+    .catch((err) => {
+      console.warn('Não foi possível carregar template.json, utilizando modelo padrão vazio.', err)
+      const defaultTemplate = {
+        nome: "",
+        estado: "",
+        cidade: "",
+        texto_prefacio: "",
+        observacao_final: "",
+        ambientes: [],
+        materiais: []
+      }
+      cache = defaultTemplate
+      return JSON.parse(JSON.stringify(defaultTemplate))
     })
 
 export const getTemplate = () => {
