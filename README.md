@@ -17,173 +17,102 @@
 ```
 Gerenciador-jotanunes/
 ├── backend/               # API REST (Django + DRF)
-│   ├── app/         # App principal
-│   ├── config/        # Configurações Django
-│   └── manage.py
 ├── frontend/             # Interface Web (React + Vite)
-│   ├── src/
-│   ├── public/
-│   └── vite.config.mjs
-├── nginx/                # Configuração de reverse proxy
-└── docker-compose.yml    # Orquestração de containers
+├── nginx/                # Configuração de reverse proxy e build de produção
+└── Docker-compose.yml    # Orquestração de containers
 ```
 
 ## 🛠️ Stack Tecnológico
 
 | Camada | Tecnologia |
 |--------|-----------|
-| **Frontend** | React, Vite, ESLint |
+| **Frontend** | React, Vite, CoreUI |
 | **Backend** | Django, Django REST Framework |
-| **Banco de Dados** | SQLite (desenvolvimento) |
+| **Banco de Dados** | MySQL (Docker) |
+| **Fila de Tarefas** | Celery + Redis |
 | **Containerização** | Docker, Docker Compose |
-| **Proxy** | Nginx |
+| **Proxy / Servidor** | Nginx |
 
 ---
 
 ## ⚙️ Instalação e Configuração
 
-### 1️⃣ Configuração Inicial (Ambiente Virtual)
+### 1️⃣ Pré-requisitos
+- Docker instalado
+- Docker Compose instalado
 
-Crie um ambiente virtual Python:
+### 2️⃣ Configuração do Ambiente
+Crie um arquivo `.env` na raiz do projeto com base no `.env.example`:
 
 ```bash
-python -m venv venv
+cp .env.example .env
 ```
 
-Ative o ambiente virtual de acordo com seu sistema operacional:
+*(Certifique-se de ajustar as senhas e chaves conforme necessário)*
 
-**Windows (PowerShell):**
-```powershell
-.\venv\Scripts\Activate.ps1
-```
+### 3️⃣ Iniciando o Projeto
 
-**Windows (CMD):**
+Para iniciar todo o ecossistema (Banco, Backend, Frontend Dev, Redis, Celery, Nginx):
+
 ```bash
-venv\Scripts\activate.bat
+docker-compose up --build
 ```
 
-**Linux/Mac:**
-```bash
-source venv/Scripts/activate
-```
+O comando acima irá:
+1. Construir as imagens necessárias.
+2. Iniciar o MySQL e aguardar que ele esteja saudável.
+3. Rodar as migrações do Django automaticamente.
+4. Iniciar o servidor de desenvolvimento do Vite (Frontend).
+5. Iniciar o servidor Gunicorn (Backend).
+6. Iniciar o Worker do Celery.
+7. Iniciar o Nginx como proxy reverso.
 
 ---
 
-### 2️⃣ Backend - Django
+## 🚀 Desenvolvimento
 
-#### 📍 Navegação
+### Comandos Úteis
 
-```bash
-cd backend
-```
-
-#### 🔧 Instalação e Setup
-
-```bash
-# Instalar dependências
-pip install -r requirements.txt
-
-# Executar migrações do banco de dados
-python manage.py migrate
-
-# Criar usuário administrador (superuser)
-python manage.py createsuperuser
-
-# Iniciar servidor
-python manage.py runserver
-```
-
-✅ Backend estará disponível em: **http://127.0.0.1:8000**
-
----
-
-### 3️⃣ Frontend - React + Vite
-
-#### 📍 Navegação
-
-```bash
-cd frontend
-```
-
-#### 🔧 Instalação e Setup
-
-```bash
-# Instalar dependências
-npm install
-
-# Iniciar servidor de desenvolvimento
-npm start
-```
-
-✅ Frontend estará disponível em: **http://localhost:3000**
-
----
-
-## 🚀 Quick Start
-
-### Execução Rápida do Backend
-
-```bash
-python -m venv venv
-venv\Scripts\activate.bat
-cd backend
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
-```
-
-### Execução Rápida do Frontend
-
-```bash
-python -m venv venv
-venv\Scripts\activate.bat
-cd frontend
-npm install
-npm start
-```
+| Ação | Comando |
+|------|---------|
+| Iniciar containers | `docker-compose up` |
+| Parar containers | `docker-compose down` |
+| Ver logs do backend | `docker logs -f django_backend_jotanunes` |
+| Criar Superusuário | `docker exec -it django_backend_jotanunes python manage.py createsuperuser` |
+| Shell do Django | `docker exec -it django_backend_jotanunes python manage.py shell` |
 
 ---
 
 ## 🌐 URLs e Endpoints
 
-### Admin & Aplicação
+### Acesso via Nginx (Recomendado)
 
-| URL | Descrição |
-|-----|-----------|
-| **http://127.0.0.1:8000/** | Página inicial do backend |
-| **http://127.0.0.1:8000/admin** | Painel administrativo Django |
-| **http://127.0.0.1:8000/api/** | Base de todos os endpoints |
+| Serviço | URL |
+|---------|-----|
+| **Aplicação (Frontend)** | [http://localhost](http://localhost) |
+| **Admin Django** | [http://localhost/admin](http://localhost/admin) |
+| **API Docs (Swagger)** | [http://localhost/api/schema/swagger-ui/](http://localhost/api/schema/swagger-ui/) |
 
-### Exemplos de Endpoints da API
+### Acesso Direto (Desenvolvimento)
 
-```
-http://127.0.0.1:8000/api/obras          # Listar obras
-http://127.0.0.1:8000/api/ambientes      # Listar ambientes
-http://127.0.0.1:8000/api/materiais      # Listar materiais
-```
-
-### Frontend
-
-| URL | Descrição |
-|-----|-----------|
-| **http://localhost:3000** | Aplicação React principal |
+| Serviço | URL |
+|---------|-----|
+| **Frontend (Vite HMR)** | [http://localhost:5173](http://localhost:5173) |
 
 ---
 
 ## 📝 Notas Importantes
 
-- Certifique-se de estar no diretório correto antes de executar os comandos
-- O backend deve estar rodando antes de acessar a aplicação frontend
-- Use o painel admin (http://127.0.0.1:8000/admin) para gerenciar dados
-- As migrações devem ser executadas sempre que há mudanças no banco de dados
+- **Banco de Dados**: O MySQL armazena dados no volume `mysql_data`. Eles persistem entre reinicializações dos containers.
+- **Hot Reload**: Mudanças no código do frontend (Pasta `/frontend`) e backend (Pasta `/backend`) são refletidas automaticamente nos containers.
+- **Migrações**: São executadas automaticamente ao subir o container do backend.
 
 ---
 
 ## 🔗 Referências
 
+- [Docker Documentation](https://docs.docker.com/)
 - [Django Documentation](https://docs.djangoproject.com/)
-- [Django REST Framework](https://www.django-rest-framework.org/)
-- [React Documentation](https://react.dev/)
 - [Vite Documentation](https://vitejs.dev/)
 
 ---
