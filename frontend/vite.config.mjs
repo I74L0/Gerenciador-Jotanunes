@@ -10,6 +10,11 @@ export default defineConfig(() => {
       outDir: 'build',
     },
     css: {
+      preprocessorOptions: {
+        scss: {
+          quietDeps: true,
+        },
+      },
       postcss: {
         plugins: [
           autoprefixer({}), // add options if needed

@@ -54,4 +54,6 @@ wcwidth==0.2.14
 webencodings==0.5.1
 zopfli==0.4.0
 xhtml2pdf
-mysqlclient==2.2.7
+mysqlclient==2.2.7
+redis==5.3.1
+gunicorn==23.0.0

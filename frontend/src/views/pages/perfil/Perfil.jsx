@@ -11,7 +11,7 @@ import {
   CButton,
 } from '@coreui/react'
 
-import './Perfil.css'
+import './perfil.css'
 import AlterarSenhaModal from './AlterarSenha'
 import { getUser } from '../../../api'
 
