@@ -54,18 +54,24 @@ export default function ProtectedRoute({ children }) {
     const checkAuth = async () => {
       const access = localStorage.getItem('accessToken')
 
-      // 1) Sem token: tenta refresh imediatamente
+      // 1) Sem token: tenta refresh imediatamente se houver um refresh token salvo
       if (!access) {
-        const refreshed = await attemptRefresh()
-        if (refreshed) {
-          const newAccess = localStorage.getItem('accessToken')
-          if (newAccess) {
-            applyTokenToClient(newAccess)
-            if (mounted) setAuthorized(true)
-            return
+        const refresh = localStorage.getItem('refreshToken')
+        if (refresh) {
+          const refreshed = await attemptRefresh()
+          if (refreshed) {
+            const newAccess = localStorage.getItem('accessToken')
+            if (newAccess) {
+              applyTokenToClient(newAccess)
+              if (mounted) setAuthorized(true)
+              return
+            }
           }
+          // Se tinha refresh mas falhou, a sessão realmente expirou
+          handleLogout(true)
         }
-        handleLogout()
+        
+        // Se não tinha refresh (primeiro acesso) ou se o logout já limpou, apenas desautoriza
         if (mounted) setAuthorized(false)
         return
       }
@@ -91,8 +97,8 @@ export default function ProtectedRoute({ children }) {
         }
       }
 
-      // 4) Falha geral -> logout
-      handleLogout()
+      // 4) Falha geral -> logout (sessão expirou)
+      handleLogout(true)
       if (mounted) setAuthorized(false)
     }
 

@@ -51,14 +51,15 @@ services:
       dockerfile: Dockerfile
     container_name: django_backend_jotanunes
     command: >
-      sh -c "python manage.py migrate &&
+      sh -c "python manage.py collectstatic --noinput &&
+             python manage.py migrate &&
              echo '' &&
              echo '#######################################################' &&
-             echo '#       🚀 GERENCIADOR JOTANUNES - PRONTO!          #' &&
+             echo '#       🚀 GERENCIADOR JOTANUNES - PRONTO!            #' &&
              echo '#######################################################' &&
              echo '#                                                     #' &&
-             echo '#  👉 Frontend: http://localhost:5173                 #' &&
-             echo '#  👉 Backend API: http://localhost:8000/api          #' &&
+             echo '#  👉 Frontend: http://localhost                      #' &&
+             echo '#  👉 Backend API: http://localhost/api               #' &&
              echo '#                                                     #' &&
              echo '#######################################################' &&
              echo '' &&
@@ -77,7 +78,7 @@ services:
       redis:
         condition: service_started
     healthcheck:
-      test: ["CMD-SHELL", "cat < /dev/null > /dev/tcp/127.0.0.1/8000 || exit 1"]
+      test: [ "CMD-SHELL", "cat < /dev/null > /dev/tcp/127.0.0.1/8000 || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -58,7 +58,7 @@ apiClient.interceptors.response.use(
       if (!newToken) {
         processQueue(null, null)
         isRefreshing = false
-        handleLogout()
+        handleLogout(true)
         return Promise.reject(error)
       }
 

@@ -59,12 +59,14 @@ export const attemptRefresh = async () => {
 
 /**
  * handleLogout - limpa tokens e redireciona para /login
+ * @param {boolean} expired - se true, adiciona query param sessionExpired=true
  */
-export const handleLogout = () => {
+export const handleLogout = (expired = false) => {
   localStorage.removeItem('accessToken')
   localStorage.removeItem('refreshToken')
   localStorage.removeItem('descricoesSalvas')
   if (window.location.pathname !== '/login') {
-    window.location.href = '/login?sessionExpired=true'
+    const url = expired === true ? '/login?sessionExpired=true' : '/login'
+    window.location.href = url
   }
 }
