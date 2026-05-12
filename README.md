@@ -16,7 +16,7 @@
 
 ```
 Gerenciador-jotanunes/
-├── backend/               # API REST (Django + DRF)
+├── backend/              # API REST (Django + DRF)
 ├── frontend/             # Interface Web (React + Vite)
 ├── nginx/                # Configuração de reverse proxy e build de produção
 └── Docker-compose.yml    # Orquestração de containers
@@ -48,14 +48,19 @@ Crie um arquivo `.env` na raiz do projeto com base no `.env.example`:
 cp .env.example .env
 ```
 
-*(Certifique-se de ajustar as senhas e chaves conforme necessário)*
+> [!IMPORTANT]
+> Você **deve** alterar as seguintes variáveis no arquivo `.env` para garantir a segurança:
+> - `SECRET_KEY`: Chave mestra de segurança do Django.
+> - `DB_PASSWORD`: Senha do usuário do banco de dados MySQL.
+> - `DB_ROOT_PASSWORD`: Senha do usuário root do MySQL.
+
 
 ### 3️⃣ Iniciando o Projeto
 
 Para iniciar todo o ecossistema (Banco, Backend, Frontend Dev, Redis, Celery, Nginx):
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 O comando acima irá:
@@ -75,8 +80,8 @@ O comando acima irá:
 
 | Ação | Comando |
 |------|---------|
-| Iniciar containers | `docker-compose up` |
-| Parar containers | `docker-compose down` |
+| Iniciar containers | `docker compose up` |
+| Parar containers | `docker compose down` |
 | Ver logs do backend | `docker logs -f django_backend_jotanunes` |
 | Criar Superusuário | `docker exec -it django_backend_jotanunes python manage.py createsuperuser` |
 | Shell do Django | `docker exec -it django_backend_jotanunes python manage.py shell` |
@@ -117,4 +122,4 @@ O comando acima irá:
 
 ---
 
-**Desenvolvido com ❤️**
+**Desenvolvido com ❤️ por Ítalo dos Santos Oliveira**
