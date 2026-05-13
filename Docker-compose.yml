@@ -24,7 +24,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.dev
       args:
-        VITE_API_URL: ${VITE_API_URL}
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
     container_name: frontend_jotanunes
     volumes:
       - ./frontend:/app
@@ -37,6 +37,8 @@ services:
     restart: always
     networks:
       - jotanunes-net
+    env_file:
+      - .env
 
   redis:
     image: redis:7-alpine
@@ -51,8 +53,7 @@ services:
       dockerfile: Dockerfile
     container_name: django_backend_jotanunes
     command: >
-      sh -c "python manage.py collectstatic --noinput &&
-             python manage.py migrate &&
+      sh -c "python manage.py migrate &&
              echo '' &&
              echo '#######################################################' &&
              echo '#       🚀 GERENCIADOR JOTANUNES - PRONTO!            #' &&
@@ -112,7 +113,7 @@ services:
       context: .
       dockerfile: ./nginx/Dockerfile.nginx
       args:
-        VITE_API_URL: ${VITE_API_URL}
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
     container_name: nginx_jotanunes
     ports:
       - "80:80"
