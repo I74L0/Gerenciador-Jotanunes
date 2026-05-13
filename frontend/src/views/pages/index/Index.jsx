@@ -48,7 +48,7 @@ const Index = () => {
   useEffect(() => {
     const token = localStorage.getItem('accessToken')
 
-    fetch('http://localhost:8000/api/me/', {
+    fetch('/api/me/', {
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token,
@@ -293,7 +293,7 @@ const Index = () => {
               </button>
               {podeAdministrar && (
                 <button
-                  onClick={() => (window.location.href = 'http://127.0.0.1:8000/admin/')}
+                  onClick={() => (window.location.href = '/admin/')}
                   className="idx-profile-menu__btn"
                 >
                   Administrador

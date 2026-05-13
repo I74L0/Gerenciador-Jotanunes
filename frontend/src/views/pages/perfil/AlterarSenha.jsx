@@ -30,7 +30,7 @@ const AlterarSenhaModal = ({ aberto, fecharModal }) => {
     }
 
     try {
-      const res = await fetch('http://localhost:8000/api/alterar-senha/', {
+      const res = await fetch('/api/alterar-senha/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

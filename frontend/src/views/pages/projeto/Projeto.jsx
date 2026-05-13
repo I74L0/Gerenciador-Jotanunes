@@ -151,7 +151,7 @@ const Projeto = () => {
       try {
         const token = localStorage.getItem('accessToken')
 
-        const permissaoRes = await fetch('http://localhost:8000/api/me/', {
+        const permissaoRes = await fetch('/api/me/', {
           headers: {
             Authorization: 'Bearer ' + token,
           },

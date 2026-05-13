@@ -58,7 +58,7 @@ const Perfil = () => {
       });
 
     // Buscar permissões
-    fetch('http://localhost:8000/api/me/', {
+    fetch('/api/me/', {
       headers: { Authorization: 'Bearer ' + token }
     })
       .then(res => res.json())
